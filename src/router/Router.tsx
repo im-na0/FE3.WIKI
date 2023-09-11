@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import Layout from "../layouts/Layout";
+// import Layout from "../layouts/Layout";
+import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
 import Wiki from "../pages/Wiki";
 import Project from "../pages/Project";
@@ -12,8 +13,14 @@ import AddressBook from "../pages/AddressBook";
 const Router = () => {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Main />}></Route>
+      {/* <Route element={<Layout />}>
+        <Route path="/wiki" element={<Wiki />}></Route>
+        <Route path="/project" element={<Project />}></Route>
+        <Route path="/address-book" element={<AddressBook />}></Route>
+        <Route path="/timer" element={<Timer />}></Route>
+      </Route> */}
+      <Route element={<SubLayout />}>
+        <Route path="/" index element={<Main />}></Route>
         <Route path="/wiki" element={<Wiki />}></Route>
         <Route path="/project" element={<Project />}></Route>
         <Route path="/address-book" element={<AddressBook />}></Route>
