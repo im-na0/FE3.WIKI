@@ -8,7 +8,7 @@ import Project from "../pages/Project";
 import Timer from "../pages/Timer";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
-import AddressBook from "../pages/AddressBook";
+import Employee from "../pages/Employee";
 
 const Router = () => {
   return (
@@ -23,7 +23,7 @@ const Router = () => {
         <Route path="/" index element={<Main />}></Route>
         <Route path="/wiki" element={<Wiki />}></Route>
         <Route path="/project" element={<Project />}></Route>
-        <Route path="/address-book" element={<AddressBook />}></Route>
+        <Route path="/employee" element={<Employee />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
         <Route path="/signin" element={<SignIn />}></Route>
         <Route path="/signup" element={<SignUp />}></Route>
