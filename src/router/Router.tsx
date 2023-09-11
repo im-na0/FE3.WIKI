@@ -9,6 +9,7 @@ import Timer from "../pages/Timer";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import Employee from "../pages/Employee";
+import EmailModal from "../components/signin/EmailModal";
 
 const Router = () => {
   return (
