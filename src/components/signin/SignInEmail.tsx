@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { Button, Modal, Checkbox, Form, Input } from "antd";
 import { styled } from "styled-components";
+import { auth } from "../../libs/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
+interface FieldType {
+  userEmail?: string;
+  password?: string;
+  remember?: string;
+}
 const Container = styled.div`
   margin: 0;
   padding: 0;
@@ -24,13 +33,34 @@ const onFinish = (values: any) => {
 const onFinishFailed = (errorInfo: any) => {
   console.log("Failed: ", errorInfo);
 };
-type FieldType = {
-  userEmail?: string;
-  password?: string;
-  remember?: string;
-};
+
 const EmailModal = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const handleSignIn = async () => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        /*createUserWithEmailAndPassword => signInWithEmailAndPassword*/
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
+      console.log("로그인 성공:", user);
+    } catch (error) {
+      console.error("로그인 실패:", error);
+    }
+  };
   return (
     <Container>
       <ModalContainer>
@@ -52,7 +82,7 @@ const EmailModal = () => {
               { required: true, message: "사용하실 이메일을 입력해주세요!" },
             ]}
           >
-            <Input />
+            <Input onChange={handleEmailChange} />
           </Form.Item>
 
           <Form.Item<FieldType>
@@ -60,7 +90,7 @@ const EmailModal = () => {
             name="password"
             rules={[{ required: true, message: "비밀번호를 입력해주세요!" }]}
           >
-            <Input.Password />
+            <Input.Password onChange={handlePasswordChange} />
           </Form.Item>
           <Form.Item<FieldType>
             name="remember"
@@ -71,7 +101,7 @@ const EmailModal = () => {
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" onClick={handleSignIn}>
               제출
             </Button>
           </Form.Item>

@@ -1,8 +1,10 @@
 import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { styled } from "styled-components";
-import EmailModal from "../components/signin/EmailModal";
+import EmailModal from "../components/signin/SignInEmail";
 import { Modal } from "antd";
+import signInGoogle from "../components/signin/SignInGoogle";
+import { Link } from "react-router-dom";
 const Container = styled.div`
   margin: 0;
   padding: 0;
@@ -58,11 +60,22 @@ const GoogleLogin = styled.button`
   }
 `;
 const EmailLogin = styled(GoogleLogin)`
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 `;
 
 const IconContainer = styled.div`
   margin-right: 20px;
+`;
+const MoveSingUp = styled(Link)`
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #1c49ff;
+  span {
+    color: #909090;
+    font-weight: normal;
+  }
 `;
 const SignIn = () => {
   const [isEmailModalOpen, setEmailModalOpen] = useState(false);
@@ -85,7 +98,7 @@ const SignIn = () => {
             <br />
             시작하시기 전에 로그인을 해주세요!
           </MainTitle>
-          <GoogleLogin>
+          <GoogleLogin onClick={signInGoogle}>
             <IconContainer>
               <GoogleOutlined />
             </IconContainer>
@@ -99,6 +112,9 @@ const SignIn = () => {
             <span>직접 이메일 입력</span>
           </EmailLogin>
         </LoginBtnContainer>
+        <MoveSingUp to="/signup">
+          <span>아직 계정이 없으신가요?</span> 회원가입하기
+        </MoveSingUp>
       </SignInContainer>
       <Modal open={isEmailModalOpen} onCancel={handleCancel} onOk={handleOk}>
         <EmailModal />
