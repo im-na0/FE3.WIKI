@@ -12,6 +12,7 @@ const TimerBorder = styled.div`
   white-space: pre-line;
   display: flex;
   justify-content: flex-end;
+  font-size: 1rem;
 `;
 
 const TextAlign = styled.div`
