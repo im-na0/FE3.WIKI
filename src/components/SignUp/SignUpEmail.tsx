@@ -34,7 +34,7 @@ const onFinishFailed = (errorInfo: any) => {
   console.log("Failed: ", errorInfo);
 };
 
-const SignInEmailModal = () => {
+const SignUpEmailModal = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -46,24 +46,24 @@ const SignInEmailModal = () => {
     setPassword(e.target.value);
   };
 
-  const handleSignIn = async () => {
+  const handleSignUp = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password,
       );
       const user = userCredential.user;
       console.log("로그인 성공:", user);
+      alert("회원가입 완료되었습니다!");
     } catch (error) {
-      alert("회원가입부터 진행해주세요");
       console.error("로그인 실패:", error);
     }
   };
   return (
     <Container>
       <ModalContainer>
-        <ModalTitle>Wiki에서 사용하고 있는 이메일을 적어주세요!</ModalTitle>
+        <ModalTitle>Wiki에서 사용하실 이메일을 적어주세요!</ModalTitle>
         <Form
           name="basic"
           labelCol={{ span: 8 }}
@@ -80,7 +80,7 @@ const SignInEmailModal = () => {
             rules={[
               {
                 required: true,
-                message: "사용하고 계신 이메일을 입력해주세요!",
+                message: "사용하실 이메일을 입력해주세요!",
               },
             ]}
           >
@@ -101,7 +101,7 @@ const SignInEmailModal = () => {
           ></Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit" onClick={handleSignIn}>
+            <Button type="primary" htmlType="submit" onClick={handleSignUp}>
               제출
             </Button>
           </Form.Item>
@@ -110,4 +110,4 @@ const SignInEmailModal = () => {
     </Container>
   );
 };
-export default SignInEmailModal;
+export default SignUpEmailModal;

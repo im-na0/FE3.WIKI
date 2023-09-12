@@ -1,10 +1,11 @@
 import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { styled } from "styled-components";
-import EmailModal from "../components/signin/SignInEmail";
+import SignInEmailModal from "../components/SignIn/SignInEmail";
 import { Modal } from "antd";
-import signInGoogle from "../components/signin/SignInGoogle";
+import signInGoogle from "../components/SignIn/SignInGoogle";
 import { Link } from "react-router-dom";
+import { MainTitle } from "../components/SignUp/Title";
 const Container = styled.div`
   margin: 0;
   padding: 0;
@@ -28,12 +29,6 @@ const Logo = styled.div`
   line-height: 50px;
   margin: 60px auto;
   text-align: center;
-`;
-const MainTitle = styled.p`
-  font-size: 20px;
-  font-weight: 500;
-  text-align: start;
-  margin: 0 auto;
 `;
 const LoginBtnContainer = styled.div`
   margin-top: 50px;
@@ -117,7 +112,7 @@ const SignIn = () => {
         </MoveSingUp>
       </SignInContainer>
       <Modal open={isEmailModalOpen} onCancel={handleCancel} onOk={handleOk}>
-        <EmailModal />
+        <SignInEmailModal />
       </Modal>
     </Container>
   );
