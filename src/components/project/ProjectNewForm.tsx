@@ -10,8 +10,8 @@ const ProjectNewForm = ({ isEdit }: { isEdit: boolean }) => {
 
   return (
     <div className="project-container">
-      <div className="project__new-proj-top">
-        <h2>프로젝트 {isEdit ? "수정" : "추가"}</h2>
+      <div className="project__top-title">
+        <h3>프로젝트 {isEdit ? "수정" : "추가"}</h3>
         <Button type="primary" icon={<SaveFilled />} size="large">
           저장
         </Button>

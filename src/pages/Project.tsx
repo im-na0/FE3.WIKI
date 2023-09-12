@@ -9,10 +9,12 @@ const Project = () => {
     <Layout>
       <ProjectSider />
       <div className="drag-drop-area">
-        <h2>프로젝트</h2>
-        <h3>프론트엔드 개발팀 Project</h3>
+        <div className="project__top-title">
+          <h3>프로젝트</h3>
+        </div>
+        <h2>프론트엔드 개발팀 Project</h2>
         <ProjectDragDrop />
-        <h3>백엔드 개발팀 Project</h3>
+        <h2>백엔드 개발팀 Project</h2>
         <ProjectDragDrop />
       </div>
     </Layout>

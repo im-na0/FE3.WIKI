@@ -1,7 +1,7 @@
 .drag-drop-area, .project-container {
     width:100%;
     background: #fff;
-    padding: 0 40px;
+    padding-left: 40px;
 }
 .drag-drop-wrap{
     display:flex;
@@ -18,8 +18,17 @@
     padding:5px;
 
 }
-.project__new-proj-top{
+.project__top-title{
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+.project__top-title h3{
+    padding-left: 20px;
+    border-left: 3px solid #00b96b;
+    color: #555;
+}
+.project__top-btns{
+    display: flex;
+    gap:10px;
 }
