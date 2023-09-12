@@ -6,7 +6,7 @@ import ProjectDragDrop from "../components/project/ProjectDragDrop";
 
 const Project = () => {
   return (
-    <Layout style={{ margin: "0 -24px" }}>
+    <Layout>
       <ProjectSider />
       <div className="drag-drop-area">
         <h2>프로젝트</h2>

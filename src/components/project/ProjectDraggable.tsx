@@ -1,13 +1,10 @@
 import React from "react";
-import {
-  CalendarOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Draggable } from "react-beautiful-dnd";
 import type { ProjectInfo } from "./ProjectDragDrop";
 import styled from "styled-components";
+import ProjectAssignee from "./ProjectAssignee";
+import ProjectDate from "./ProjectDate";
 
 interface ProjectDraggableProps {
   project: ProjectInfo;
@@ -17,20 +14,9 @@ const Project = styled.div`
   padding: 10px;
   background-color: #fff;
   border-radius: 5px;
-  .project__item-info {
-    margin-bottom: 6px;
-  }
-  .text-block {
-    display: inline-block;
-    font-size: 12px;
-    padding: 3px 5px;
-    margin-left: 6px;
-    &.user-block {
-      background-color: lightgrey;
-    }
-    &.date-block {
-      background-color: lightpink;
-    }
+  .project__item-title {
+    margin-bottom: 12px;
+    font-size: 16px;
   }
 `;
 
@@ -48,19 +34,9 @@ const ProjectDraggable = ({ project, index }: ProjectDraggableProps) => {
             </div>
           </div>
           <div {...provided.dragHandleProps}>
-            <div className="project__item-info">{project.title}</div>
-            <div className="project__item-info">
-              <CalendarOutlined />
-              <span className="text-block date-block">{project.duration}</span>
-            </div>
-            <div className="project__item-info">
-              <UserOutlined />
-              {project.assignees.map((assignee) => (
-                <span className="text-block user-block" key={assignee}>
-                  {assignee}
-                </span>
-              ))}
-            </div>
+            <div className="project__item-title">{project.title}</div>
+            <ProjectDate duration={project.duration} />
+            <ProjectAssignee assignees={project.assignees} />
           </div>
         </Project>
       )}

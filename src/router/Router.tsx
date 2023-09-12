@@ -6,6 +6,7 @@ import Main from "../pages/Main";
 import Wiki from "../pages/Wiki";
 import Project from "../pages/Project";
 import ProjectNew from "../pages/ProjectNew";
+import ProjectDetail from "../pages/ProjectDetail";
 import Timer from "../pages/Timer";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
@@ -28,7 +29,7 @@ const Router = () => {
           path="/project/new"
           element={<ProjectNew isEdit={false} />}
         ></Route>
-        <Route path="/project/:projectId" element={<Project />}></Route>
+        <Route path="/project/:projectId" element={<ProjectDetail />}></Route>
         <Route
           path="/project/:projectId/edit"
           element={<ProjectNew isEdit={true} />}
