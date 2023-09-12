@@ -1,0 +1,20 @@
+.drag-drop-area {
+    width:100%;
+    background: #fff;
+    padding: 0 40px;
+}
+.drag-drop-wrap{
+    display:flex;
+    flex-wrap:wrap;
+    align-items: flex-start;
+    gap:10px;
+}
+.project__item-btns{
+    display:flex;
+    justify-content: flex-end;
+
+}
+.project__item-btn{
+    padding:5px;
+
+}
