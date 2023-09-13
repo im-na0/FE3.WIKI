@@ -30,14 +30,6 @@ const ProjectStatus = styled.div<{ $status: string }>`
 const ProjectListItem = ({ project }: { project: ProjectInfo }) => {
   return (
     <ProjectItem>
-      {/* <div className="project__item-btns">
-        <div className="project__item-btn">
-          <EditOutlined />
-        </div>
-        <div className="project__item-btn">
-          <DeleteOutlined />
-        </div>
-      </div> */}
       <div>
         <ProjectStatus $status={project.status}>
           {project.status === "progress"

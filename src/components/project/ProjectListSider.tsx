@@ -1,13 +1,13 @@
 import React from "react";
 import ProjectListItem from "./ProjectListItem";
-import { projectList, projectList2, projectList3 } from "./ProjectDragDrop";
-
-const projects = [...projectList, ...projectList2, ...projectList3];
+import useQueryProjectAllList from "../../hooks/project/useQueryProjectAllList";
 
 const ProjectListSider = () => {
+  const projects = useQueryProjectAllList();
+
   return (
     <div className="project__all-list">
-      {projects.map((project) => (
+      {projects?.map((project) => (
         <ProjectListItem key={project.id} project={project} />
       ))}
     </div>

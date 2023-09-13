@@ -35,6 +35,15 @@ const ProjectNewForm = ({ isEdit }: { isEdit: boolean }) => {
             <Select.Option value="진종수">진종수</Select.Option>
           </Select>
         </Form.Item>
+        <Form.Item label="프로젝트 담당:">
+          <Select placeholder="프로젝트를 담당할 팀을 선택 해주세요.">
+            <Select.Option value="FE1팀">FE1팀</Select.Option>
+            <Select.Option value="FE2팀">FE2팀</Select.Option>
+            <Select.Option value="BE1팀">BE1팀</Select.Option>
+            <Select.Option value="BE2팀">BE2팀</Select.Option>
+            <Select.Option value="QA팀">QA팀</Select.Option>
+          </Select>
+        </Form.Item>
         <Form.Item label="프로젝트 기간:">
           <RangePicker />
         </Form.Item>

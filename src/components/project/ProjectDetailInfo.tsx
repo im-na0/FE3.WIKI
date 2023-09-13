@@ -4,8 +4,11 @@ import { DeleteFilled, EditFilled } from "@ant-design/icons";
 import ProjectMdViewer from "./ProjectMdViewer";
 import ProjectDate from "./ProjectDate";
 import ProjectAssignee from "./ProjectAssignee";
+import { useRecoilState } from "recoil";
+import { projectDetailState } from "../../store/project";
 
 const ProjectDetailInfo = () => {
+  const [projectDetail] = useRecoilState(projectDetailState);
   return (
     <div className="project-container">
       <div className="project__top-title">
@@ -19,9 +22,9 @@ const ProjectDetailInfo = () => {
           </Button>
         </div>
       </div>
-      <h2>OO전자 토이 프로젝트 생성</h2>
-      <ProjectDate duration={"2023.09.10 ~ 2023.09.20"} />
-      <ProjectAssignee assignees={["김OO", "이XX"]} />
+      <h2>{projectDetail.title}</h2>
+      <ProjectDate duration={projectDetail.duration} />
+      <ProjectAssignee assignees={projectDetail.assignees} />
       <ProjectMdViewer />
     </div>
   );
