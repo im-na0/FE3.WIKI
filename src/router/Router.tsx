@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
@@ -14,7 +14,19 @@ import Employee from "../pages/Employee";
 import StartRegister from "../components/SignUp/Register/StartRegister";
 import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
+import { setPersistence, browserSessionPersistence } from "@firebase/auth";
+import { auth } from "../libs/firebase";
 const Router = () => {
+  useEffect(() => {
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        console.log("로그인 유지 설정 완료");
+      })
+      .catch((error) => {
+        console.error("로그인 유지 설정 오류:", error);
+      });
+  }, []);
+
   return (
     <Routes>
       {/* <Route element={<Layout />}>

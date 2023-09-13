@@ -6,6 +6,7 @@ import { Modal } from "antd";
 import signInGoogle from "../components/SignIn/SignInGoogle";
 import { Link } from "react-router-dom";
 import { MainTitle } from "../components/SignUp/Title";
+import AuthStateChanged from "../components/SignIn/AuthStateChanged";
 const Container = styled.div`
   margin: 0;
   padding: 0;
@@ -111,6 +112,7 @@ const SignIn = () => {
       <Modal open={isEmailModalOpen} onCancel={handleCancel} onOk={handleOk}>
         <SignInEmailModal />
       </Modal>
+      <AuthStateChanged />
     </Container>
   );
 };

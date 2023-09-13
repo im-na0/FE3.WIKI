@@ -22,7 +22,6 @@ const TimerAlign = styled.div`
   flexDirection: "column",
   justifyContent: "right",
   alignItems: "center"}`;
-
 const GreetingText = styled.div`
   font-size: "1.5rem";
 `;
@@ -49,7 +48,7 @@ const TimerApp = () => {
   const [userName, setUserName] = useState<string | null>("");
 
   const UpdateTime = () => {
-    let nowTime = new Date().toLocaleTimeString();
+    const nowTime = new Date().toLocaleTimeString();
     setNowTime(nowTime);
   };
 
