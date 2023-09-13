@@ -14,8 +14,6 @@ const Project = () => {
         </div>
         <h2>프론트엔드 개발팀 Project</h2>
         <ProjectDragDrop />
-        <h2>백엔드 개발팀 Project</h2>
-        <ProjectDragDrop />
       </div>
     </Layout>
   );

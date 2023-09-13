@@ -5,6 +5,7 @@ import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
 import Wiki from "../pages/Wiki";
 import Project from "../pages/Project";
+import ProjectList from "../pages/ProjectList";
 import ProjectNew from "../pages/ProjectNew";
 import ProjectDetail from "../pages/ProjectDetail";
 import Timer from "../pages/Timer";
@@ -25,6 +26,7 @@ const Router = () => {
         <Route path="/" index element={<Main />}></Route>
         <Route path="/wiki" element={<Wiki />}></Route>
         <Route path="/project" element={<Project />}></Route>
+        <Route path="/project/all" element={<ProjectList />}></Route>
         <Route
           path="/project/new"
           element={<ProjectNew isEdit={false} />}
