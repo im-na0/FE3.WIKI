@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-// import Layout from "../layouts/Layout";
 import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
 import Wiki from "../pages/Wiki";
@@ -12,7 +11,9 @@ import Timer from "../pages/Timer";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import Employee from "../pages/Employee";
-
+import StartRegister from "../components/SignUp/Register/StartRegister";
+import UserRegister from "../components/SignUp/Register/UserRegister";
+import EndRegister from "../components/SignUp/Register/EndRegister";
 const Router = () => {
   return (
     <Routes>
@@ -40,6 +41,9 @@ const Router = () => {
         <Route path="/timer" element={<Timer />}></Route>
         <Route path="/signin" element={<SignIn />}></Route>
         <Route path="/signup" element={<SignUp />}></Route>
+        <Route path="/start-register" element={<StartRegister />}></Route>
+        <Route path="/user-register" element={<UserRegister />}></Route>
+        <Route path="/end-register" element={<EndRegister />}></Route>
       </Route>
     </Routes>
   );
