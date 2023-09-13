@@ -1,14 +1,16 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-
-// styles
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 import {
   FolderOutlined,
   FileOutlined,
   FolderAddOutlined,
 } from "@ant-design/icons";
-
-// firebase
 import { db } from "../../libs/firebase";
 import {
   collection,
@@ -23,16 +25,20 @@ import {
 interface NewFile {
   name: string;
   subName: string;
+  date: string;
 }
 
 const Nav = () => {
-  const [folders, setFolders] = useState<DocumentData[]>([]);
-  const [files, setFiles] = useState<DocumentData[]>([]);
+  const [items, setItems] = useState<DocumentData[]>([]);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
   const [inputState, setInputState] = useState<boolean>(false);
   const [newFolder, setNewFolder] = useState<string>("");
   const [fileState, setFileState] = useState<boolean>(false);
-  const [newFile, setNewFile] = useState<NewFile>({ name: "", subName: "" });
+  const [newFile, setNewFile] = useState<NewFile>({
+    name: "",
+    subName: "",
+    date: "",
+  });
 
   useEffect(() => {
     refreshFolders();
@@ -42,19 +48,15 @@ const Nav = () => {
     const q = query(collection(db, "WikiPage"));
     const querySnapshot = await getDocs(q);
     const folderData = querySnapshot.docs.map((doc) => doc.data());
-    setFolders(folderData);
-  };
-
-  const refreshFiles = async (folderId: string) => {
-    const q = query(collection(db, "WikiPage"), where("title", "==", folderId));
-    const querySnapshot = await getDocs(q);
-    const fileData = querySnapshot.docs.map((doc) => doc.data().items);
-    setFiles(fileData);
+    setItems(folderData);
   };
 
   const handleFolderClick = (folderId: string) => {
-    setCurrentFolder(folderId);
-    refreshFiles(folderId);
+    if (!fileState) {
+      setCurrentFolder((prevFolder) =>
+        prevFolder === folderId ? null : folderId,
+      );
+    }
   };
 
   const addFolder = async () => {
@@ -65,7 +67,7 @@ const Nav = () => {
     refreshFolders();
   };
 
-  const addFile = async (folderId: string) => {
+  const addFile = async (currentFolder: string) => {
     try {
       const q = query(
         collection(db, "WikiPage"),
@@ -75,9 +77,12 @@ const Nav = () => {
       const folderDoc = querySnapshot.docs[0];
       const exist = folderDoc.data().items;
 
+      const date = new Date();
+
       const newFileData = {
         name: newFile.name,
         subName: newFile.subName,
+        date: date,
       };
 
       exist.push(newFileData);
@@ -86,9 +91,9 @@ const Nav = () => {
         items: exist,
       });
 
-      refreshFiles(folderId);
+      refreshFolders();
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -109,7 +114,7 @@ const Nav = () => {
   };
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewFile({ name: e.target.value, subName: "" });
+    setNewFile({ ...newFile, name: e.target.value });
   };
 
   return (
@@ -134,23 +139,25 @@ const Nav = () => {
         )}
       </StyledDiv>
       <StlyedUl>
-        {folders.map((folder: any, index: number) => (
+        {items.map((item: any, index: number) => (
           <li
-            key={folder.title + index}
-            onClick={() => handleFolderClick(folder.title)}
+            key={item.title + index}
+            onClick={() => {
+              handleFolderClick(item.title);
+            }}
           >
             <StyledTitle>
               <div>
                 <FolderOutlined />
-                <StyledSpan>{folder.title}</StyledSpan>
+                <StyledSpan>{item.title}</StyledSpan>
               </div>
               <button onClick={() => setFileState(true)}>+</button>
             </StyledTitle>
-            {folder.title === currentFolder && (
+            {item.title === currentFolder && (
               <>
                 {fileState ? (
                   <FormContainer>
-                    <FileOutlined />
+                    <FileOutlined style={{ fontSize: "20px" }} />
                     <FileForm onSubmit={onSubmitFile}>
                       <input
                         placeholder="파일명을 입력하세요."
@@ -160,18 +167,15 @@ const Nav = () => {
                   </FormContainer>
                 ) : null}
                 <StyledFile>
-                  {files.map((file, index) =>
-                    file.map((v: any) => (
-                      <>
-                        <StyledItem key={v.name + index}>
-                          <div>
-                            <FileOutlined />
-                            <StyledSpan>{v.name}</StyledSpan>
-                          </div>
-                        </StyledItem>
-                      </>
-                    )),
-                  )}
+                  {item.items &&
+                    item.items.map((v: any, fileIndex: number) => (
+                      <StyledItem key={v.name + fileIndex}>
+                        <div>
+                          <FileOutlined />
+                          <StyledSpan>{v.name}</StyledSpan>
+                        </div>
+                      </StyledItem>
+                    ))}
                 </StyledFile>
               </>
             )}
@@ -190,7 +194,8 @@ const StyledContainer = styled.div`
   padding-right: 15px;
   margin-right: 30px;
   width: 280px;
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.01);
+  border-radius: 15px;
 `;
 const StyledDiv = styled.div`
   display: flex;
@@ -217,16 +222,28 @@ const StlyedUl = styled.ul`
 `;
 const StyledTitle = styled.div`
   font-size: 18px;
-  font-weight: 800;
-  padding: 5px;
-  margin-bottom: 10px;
+  font-weight: 600;
+  padding: 8px;
+  margin-bottom: 13.5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
   button {
     all: unset;
     font-size: 13px;
     color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    right: 0;
+    z-index: 3;
+    &:hover {
+      font-size: 1.25rem;
+      transition: all 0.3s;
+    }
+  }
+  &:hover {
+    transition: all 0.3s;
+    background-color: rgba(0, 0, 0, 0.03);
   }
 `;
 const StyledSpan = styled.span`
@@ -236,12 +253,13 @@ const StyledFile = styled.ul`
   list-style: none;
   margin-bottom: 10px;
   cursor: pointer;
-  font-weight: 600;
-  padding-left: 30px;
+  font-weight: 500;
+  padding-left: 33px;
+  color: rgba(0, 0, 0, 0.85);
 `;
 const StyledItem = styled.li`
   padding: 3px;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   font-size: 15px;
   &:hover {
     color: blue;
@@ -251,10 +269,10 @@ const StyledItem = styled.li`
 const FormContainer = styled.div`
   display: flex;
   margin: 10px 0;
-  margin-left: 33px;
+  margin-left: 35px;
 `;
 const FileForm = styled.form`
-  margin-left: 10px;
+  margin-left: 7px;
   input {
     all: unset;
     border: none;
