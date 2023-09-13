@@ -21,13 +21,10 @@ const SignUpContainer = styled.div`
   margin: 100px auto;
   text-align: center;
 `;
-const Logo = styled.div`
-  border: 1px solid black;
-  border-radius: 20px;
+const Logo = styled.img`
   width: 150px;
   height: 50px;
-  line-height: 50px;
-  margin: 60px auto;
+  margin: 50px auto;
   text-align: center;
 `;
 const LoginBtnContainer = styled.div`
@@ -86,7 +83,7 @@ const SignUp = () => {
   return (
     <Container>
       <SignUpContainer>
-        <Logo>LOGO</Logo>
+        <Logo src="/fe3-wiki-logo.png" alt="logo"></Logo>
         <LoginBtnContainer>
           <MainTitle>
             Wiki에 오신 것을 환영합니다!
