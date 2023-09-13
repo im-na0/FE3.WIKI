@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  FormEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import {
   FolderOutlined,
@@ -138,7 +132,7 @@ const Nav = () => {
           />
         )}
       </StyledDiv>
-      <StlyedUl>
+      <StyledUl>
         {items.map((item: any, index: number) => (
           <li
             key={item.title + index}
@@ -151,37 +145,35 @@ const Nav = () => {
                 <FolderOutlined />
                 <StyledSpan>{item.title}</StyledSpan>
               </div>
-              <button onClick={() => setFileState(true)}>+</button>
+              <button onClick={() => setFileState((prevState) => !prevState)}>
+                {fileState ? "Cancel" : "New File"}
+              </button>
             </StyledTitle>
-            {item.title === currentFolder && (
-              <>
-                {fileState ? (
-                  <FormContainer>
-                    <FileOutlined style={{ fontSize: "20px" }} />
-                    <FileForm onSubmit={onSubmitFile}>
-                      <input
-                        placeholder="파일명을 입력하세요."
-                        onChange={onChangeFile}
-                      />
-                    </FileForm>
-                  </FormContainer>
-                ) : null}
-                <StyledFile>
-                  {item.items &&
-                    item.items.map((v: any, fileIndex: number) => (
-                      <StyledItem key={v.name + fileIndex}>
-                        <div>
-                          <FileOutlined />
-                          <StyledSpan>{v.name}</StyledSpan>
-                        </div>
-                      </StyledItem>
-                    ))}
-                </StyledFile>
-              </>
-            )}
+            <StyledFile isOpen={item.title === currentFolder}>
+              {fileState ? (
+                <FormContainer>
+                  <FileOutlined style={{ fontSize: "20px" }} />
+                  <FileForm onSubmit={onSubmitFile}>
+                    <input
+                      placeholder="파일명을 입력하세요."
+                      onChange={onChangeFile}
+                    />
+                  </FileForm>
+                </FormContainer>
+              ) : null}
+              {item.items &&
+                item.items.map((v: any, fileIndex: number) => (
+                  <StyledItem key={v.name + fileIndex}>
+                    <div>
+                      <FileOutlined />
+                      <StyledSpan>{v.name}</StyledSpan>
+                    </div>
+                  </StyledItem>
+                ))}
+            </StyledFile>
           </li>
         ))}
-      </StlyedUl>
+      </StyledUl>
     </StyledContainer>
   );
 };
@@ -197,6 +189,7 @@ const StyledContainer = styled.div`
   background-color: rgba(0, 0, 0, 0.01);
   border-radius: 15px;
 `;
+
 const StyledDiv = styled.div`
   display: flex;
   justify-content: space-between;
@@ -211,7 +204,7 @@ const StyledH1 = styled.h1`
   font-size: 15px;
 `;
 
-const StlyedUl = styled.ul`
+const StyledUl = styled.ul`
   list-style: none;
   height: 80%;
   margin: 0;
@@ -220,43 +213,55 @@ const StlyedUl = styled.ul`
   padding-left: 15px;
   cursor: pointer;
 `;
+
 const StyledTitle = styled.div`
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   padding: 8px;
-  margin-bottom: 13.5px;
+  margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   button {
     all: unset;
-    font-size: 13px;
+    font-size: 11px;
     color: rgba(0, 0, 0, 0.5);
     position: absolute;
     right: 0;
     z-index: 3;
+    transition: font-size 0.3s;
     &:hover {
-      font-size: 1.25rem;
-      transition: all 0.3s;
+      font-size: 13px;
     }
   }
   &:hover {
-    transition: all 0.3s;
     background-color: rgba(0, 0, 0, 0.03);
+    transition: background-color 0.3s;
   }
 `;
+
 const StyledSpan = styled.span`
   margin-left: 10px;
 `;
-const StyledFile = styled.ul`
+
+const StyledFile = styled.ul<{ isOpen: boolean }>`
   list-style: none;
   margin-bottom: 10px;
   cursor: pointer;
   font-weight: 500;
   padding-left: 33px;
   color: rgba(0, 0, 0, 0.85);
+  max-height: ${(props) => (props.isOpen ? "200px" : "0")};
+  transition:
+    max-height 0.3s,
+    opacity 0.3s;
+  div {
+    opacity: ${(props) => (props.isOpen ? "1" : "0")};
+    transition: opacity 0.3s;
+  }
 `;
+
 const StyledItem = styled.li`
   padding: 3px;
   margin-bottom: 10px;
@@ -266,11 +271,13 @@ const StyledItem = styled.li`
     transition: all 1s;
   }
 `;
+
 const FormContainer = styled.div`
   display: flex;
   margin: 10px 0;
-  margin-left: 35px;
+  margin-left: 0px;
 `;
+
 const FileForm = styled.form`
   margin-left: 7px;
   input {
