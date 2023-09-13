@@ -23,8 +23,8 @@ const TimerAlign = styled.div`
   justifyContent: "right",
   alignItems: "center"}`;
 
-const GreetingText = styled.div<TimerProps>`
-  font-size: 1.3rem;
+const GreetingText = styled.div`
+  font-size: "1.5rem";
 `;
 
 const TimerApp = () => {
@@ -44,8 +44,9 @@ const TimerApp = () => {
     useState<boolean>(false); // 출근 버튼 클릭 가능 상태로 시작
   const [finishWorkBtnClicked, setFinishWorkBtnClicked] =
     useState<boolean>(false); // 퇴근 버튼 클릭 가능 상태로 시작
-  const [clickedStartBtnText, setClickedStartBtnText] = useState(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
-  const [clickedFinishBtnText, setClickedFinishBtnText] = useState(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
+  const [clickedStartBtnText, setClickedStartBtnText] = useState<string>(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
+  const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
+  const [userName, setUserName] = useState<string | null>("");
 
   const UpdateTime = () => {
     let nowTime = new Date().toLocaleTimeString();
@@ -115,7 +116,7 @@ const TimerApp = () => {
       <TimerAlign>
         <div>
           <div>
-            <TimerText> TODAY {nowDate}</TimerText>
+            <TimerText>TODAY {nowDate}</TimerText>
           </div>
           <div>
             <TimerText fontSize="2.3rem">
@@ -141,7 +142,7 @@ const TimerApp = () => {
           onClick={recordStartWork}
           disabled={startWorkBtnClicked}
           style={{
-            width: "120px",
+            width: "130px",
             height: "60px",
             backgroundColor: startWorkBtnClicked ? "gray" : "#3956A3",
             color: startWorkBtnClicked ? "#5F5F5F" : "white",
@@ -160,7 +161,7 @@ const TimerApp = () => {
           ) : (
             <>
               <CheckOutlined />
-              &nbsp;출근 완료!
+              &nbsp;출근!
               <br />
               {clickedStartBtnText}
             </>
@@ -174,7 +175,7 @@ const TimerApp = () => {
           onClick={recordFinishWork}
           disabled={finishWorkBtnClicked}
           style={{
-            width: "120px",
+            width: "130px",
             height: "60px",
             backgroundColor: finishWorkBtnClicked ? "gray" : "#728AC9",
             color: finishWorkBtnClicked ? "#5F5F5F" : "white",
@@ -193,7 +194,7 @@ const TimerApp = () => {
           ) : (
             <>
               <PoweroffOutlined />
-              &nbsp;퇴근 완료!
+              &nbsp;퇴근!
               <br />
               {clickedFinishBtnText}
             </>
