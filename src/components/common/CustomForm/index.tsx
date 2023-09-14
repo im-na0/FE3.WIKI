@@ -78,6 +78,8 @@ function CustomModal({
       width={width}
       style={style}
       footer={footer}
+      transitionName="none"
+      maskTransitionName="none"
     >
       {children}
     </Modal>

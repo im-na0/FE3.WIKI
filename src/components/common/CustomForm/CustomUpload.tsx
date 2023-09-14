@@ -8,18 +8,20 @@ interface Props {
 }
 
 export default function CustomUpload({ name }: Props) {
+  const [imageUrl, setImageUrl] = useState("");
   const [fileList, setFileList] = useState<any[]>([]);
 
   const handleUpload = (file: RcFile) => {
-    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-    if (!isJpgOrPng) {
-      message.error("You can only upload JPG/PNG file!");
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error("Image must be smaller than 2MB!");
-    }
-    return isJpgOrPng && isLt2M;
+    const reader = new FileReader();
+    reader.onload = (data) => {
+      if (typeof data.target?.result === "string") {
+        console.log(data.target?.result);
+        setImageUrl(data.target?.result); // 미리보기를 위한 *임시 url*
+      }
+    };
+    reader.readAsDataURL(file);
+    // prevent upload
+    return false;
   };
 
   const onPreview = async (file: any) => {
@@ -46,6 +48,18 @@ export default function CustomUpload({ name }: Props) {
     </div>
   );
 
+  const CustomItemRender = ({ file, fileList }: any) => {
+    return (
+      <div className="custom-item-renderer">
+        <img src={fileList.url} alt={file.name} />
+        <div className="buttons flex mt-1 ">
+          <button>View</button>
+          <button>Delete</button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Form.Item name={name}>
       <Upload
@@ -55,9 +69,15 @@ export default function CustomUpload({ name }: Props) {
         onPreview={onPreview}
         accept="image/png, image/jpeg"
         maxCount={1}
-        onChange={({ fileList }) => setFileList(fileList)}
+        itemRender={CustomItemRender}
       >
-        {fileList.length >= 1 ? null : customUploadButton}
+        {imageUrl ? (
+          <div className="ant-upload-list-item-container">
+            <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+          </div>
+        ) : (
+          customUploadButton
+        )}
       </Upload>
     </Form.Item>
   );
