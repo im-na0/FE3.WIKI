@@ -61,7 +61,7 @@ const items: MenuProps["items"] = [
   },
 ];
 
-export default function CardTable() {
+export default function MemberTable() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const columns: ColumnsType<DataType> = [

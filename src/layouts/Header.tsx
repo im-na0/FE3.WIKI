@@ -59,7 +59,7 @@ const MainHeader = () => {
               <button className="user-link timer-btn">출퇴근 타이머</button>
             </li>
             <li>
-              <Link to={"/signin"} className="user-link signin-link">
+              <Link to={"/Signin"} className="user-link signin-link">
                 로그인
               </Link>
             </li>

@@ -4,7 +4,7 @@ import { Input } from "antd";
 
 const { Search } = Input;
 
-export default function TableSearch() {
+export default function MemberSearch() {
   return (
     <Search
       placeholder="input search text"

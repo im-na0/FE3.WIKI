@@ -1,10 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 
-import CardTable from "../components/Employee/CardTable";
-import CardHeading from "../components/Employee/CardHeading";
+import MemberTable from "../components/Employee/MemberTable";
+import MemberHeading from "../components/Employee/MemberHeading";
 
-export const Container = styled.div`
+const Container = styled.div`
   max-width: 100%;
   margin: 0 auto;
   padding: 0 1rem;
@@ -30,11 +30,11 @@ const Header = styled.div`
   font-weight: bold;
 `;
 
-const CarContainer = styled.div`
+const CardContainer = styled.div`
   background-color: #fff;
   border-radius: 8px;
   color: #526484;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 0px 5px 0px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
   word-wrap: break-word;
 `;
 
@@ -42,17 +42,17 @@ const Employee = () => {
   return (
     <Container>
       <Header>
-        <h2>임직원</h2>
+        <h4>직원 정보</h4>
       </Header>
-      <CarContainer className="card-container">
+      <CardContainer className="card-container">
         <div className="card-heading">
-          <CardHeading />
+          <MemberHeading />
         </div>
         <div className="card-content">
-          <CardTable />
+          <MemberTable />
         </div>
         <div className="card-footer"></div>
-      </CarContainer>
+      </CardContainer>
     </Container>
   );
 };
