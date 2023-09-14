@@ -16,6 +16,7 @@ import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
 import { setPersistence, browserSessionPersistence } from "@firebase/auth";
 import { auth } from "../libs/firebase";
+import EmployeeDetail from "../pages/EmployeeDetail";
 const Router = () => {
   useEffect(() => {
     setPersistence(auth, browserSessionPersistence)
@@ -49,6 +50,7 @@ const Router = () => {
           element={<ProjectNew isEdit={true} />}
         ></Route>
         <Route path="/employee" element={<Employee />}></Route>
+        <Route path="/employee/:memberId" element={<EmployeeDetail />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
       </Route>
     </Routes>

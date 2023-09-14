@@ -14,7 +14,7 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
 
-  const handleCancel = () => {
+  const handleSubmit = () => {
     onCancel();
     form.resetFields();
   };
@@ -23,7 +23,7 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
     <Form
       onFinish={(value) => {
         console.log(value);
-        handleCancel();
+        handleSubmit();
       }}
       form={form}
     >

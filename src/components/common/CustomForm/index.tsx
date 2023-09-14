@@ -1,4 +1,12 @@
-import { Form, Input, InputProps, Modal, ModalProps, Select } from "antd";
+import {
+  Form,
+  Input,
+  InputProps,
+  Modal,
+  ModalProps,
+  Select,
+  Button,
+} from "antd";
 import { Rule } from "antd/lib/form";
 import React, { ReactNode } from "react";
 
@@ -86,6 +94,39 @@ function CustomModal({
   );
 }
 
+interface CustomButtonProps {
+  children?: string;
+  danger?: boolean;
+  icon?: ReactNode;
+  shape?: "circle" | "default" | "round" | undefined;
+  onClick?: () => void;
+  htmlType?: "button" | "submit" | "reset";
+}
+
+function CustomButton({
+  children,
+  danger,
+  icon,
+  shape,
+  onClick,
+  htmlType,
+}: CustomButtonProps) {
+  return (
+    <Form.Item>
+      <Button
+        htmlType={htmlType}
+        type="primary"
+        shape={shape}
+        danger={danger}
+        icon={icon}
+        onClick={onClick}
+      >
+        {children}
+      </Button>
+    </Form.Item>
+  );
+}
+
 export function useValidate() {
   const required = () => ({ required: true, message: "필수 항목입니다" });
 
@@ -117,6 +158,7 @@ const CustomForm = {
   Input: CustomInput,
   Select: CustomSelect,
   Modal: CustomModal,
+  Button: CustomButton,
   useValidate,
 };
 
