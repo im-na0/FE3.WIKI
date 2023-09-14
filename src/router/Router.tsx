@@ -16,6 +16,7 @@ import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
 import { setPersistence, browserSessionPersistence } from "@firebase/auth";
 import { auth } from "../libs/firebase";
+import AddInfo from "../components/SignUp/AddInfo/AddInfo";
 const Router = () => {
   useEffect(() => {
     setPersistence(auth, browserSessionPersistence)
@@ -34,6 +35,8 @@ const Router = () => {
       <Route path="/start-register" element={<StartRegister />}></Route>
       <Route path="/user-register" element={<UserRegister />}></Route>
       <Route path="/end-register" element={<EndRegister />}></Route>
+      {/*  addinfo 삭제 예정 */}
+      <Route path="/addinfo" element={<AddInfo />}></Route>
       <Route element={<SubLayout />}>
         <Route path="/" index element={<Main />}></Route>
         <Route path="/wiki" element={<Wiki />}></Route>

@@ -8,6 +8,10 @@ import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../Navigation";
 import { motion } from "framer-motion";
+import { addDoc, collection } from "firebase/firestore";
+import { doc } from "prettier";
+import { db } from "../../../libs/firebase";
+import { useNavigate } from "react-router-dom";
 
 const props: UploadProps = {
   name: "file",
@@ -52,9 +56,12 @@ const UserNameCategory = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const UserCompanyCategory = styled(UserNameCategory)``;
-const UserRankCategory = styled(UserNameCategory)``;
+const UserEmailCategory = styled(UserNameCategory)``;
+const UserPhoneCategory = styled(UserNameCategory)``;
+const UserTeamCategory = styled(UserNameCategory)``;
+const UserPositionCategory = styled(UserNameCategory)``;
 const UserImageCategory = styled(UserNameCategory)``;
+const UserDepartmentCategory = styled(UserNameCategory)``;
 const BtnContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -86,6 +93,40 @@ const SubmitBtn = styled.button`
 `;
 export default function UserRegister() {
   const { moveStartRegister, moveEndRegister } = useNavigation();
+  const [input, setInput] = useState({
+    name: "",
+    email: "",
+    phonenumber: "",
+    department: "",
+    team: "",
+    position: "",
+  });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInput((prevInput) => ({
+      ...prevInput,
+      [name]: value,
+    }));
+  };
+  const handleUpload = async () => {
+    try {
+      const userDB = collection(db, "Users");
+      const newUser = {
+        name: input.name,
+        email: input.email,
+        phonenumber: input.phonenumber,
+        department: input.department,
+        team: input.team,
+        position: input.position,
+      };
+      const docRef = await addDoc(userDB, newUser);
+      console.log("ID: ", docRef.id);
+      alert("업로드 성공");
+    } catch (error) {
+      console.error("Error: ", error);
+      alert("업로드 실패");
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -98,11 +139,62 @@ export default function UserRegister() {
           <UserNameCategory>
             <span>이름</span>
             <Input
+              name="name"
               style={{ width: "320px" }}
               placeholder="사용하실 이름을 입력해주세요"
+              onChange={handleInputChange}
             />
           </UserNameCategory>
-          <UserCompanyCategory>
+          <UserEmailCategory>
+            <span>이메일</span>
+            <Input
+              name="email"
+              style={{ width: "320px" }}
+              placeholder="이메일을 입력해주세요"
+              onChange={handleInputChange}
+            />
+          </UserEmailCategory>
+          <UserPhoneCategory>
+            <span>휴대폰 번호</span>
+            <Input
+              name="phonenumber"
+              style={{ width: "320px" }}
+              placeholder="휴대폰 번호를 입력해주세요"
+              onChange={handleInputChange}
+            />
+          </UserPhoneCategory>
+          <UserDepartmentCategory>
+            <span>소속 부서</span>
+            <Select
+              showSearch
+              style={{ width: 320 }}
+              placeholder="소속 부서를 골라주세요"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? "").includes(input)
+              }
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? "")
+                  .toLowerCase()
+                  .localeCompare((optionB?.label ?? "").toLowerCase())
+              }
+              options={[
+                {
+                  value: "1",
+                  label: "개발",
+                },
+                {
+                  value: "2",
+                  label: "기획",
+                },
+                {
+                  value: "3",
+                  label: "인사",
+                },
+              ]}
+            />
+          </UserDepartmentCategory>
+          <UserTeamCategory>
             <span>소속 팀</span>
             <Select
               showSearch
@@ -140,14 +232,16 @@ export default function UserRegister() {
                 },
               ]}
             />
-          </UserCompanyCategory>
-          <UserRankCategory>
+          </UserTeamCategory>
+          <UserPositionCategory>
             <span>직급</span>
             <Input
+              name="position"
               style={{ width: "320px" }}
               placeholder="맡으신 직급을 입력해주세요"
+              onChange={handleInputChange}
             />
-          </UserRankCategory>
+          </UserPositionCategory>
           <UserImageCategory>
             <span>프로필 사진</span>
             <Upload {...props}>
@@ -158,7 +252,7 @@ export default function UserRegister() {
             <BackBtn onClick={moveStartRegister}>
               <ArrowLeftOutlined />
             </BackBtn>
-            <SubmitBtn onClick={moveEndRegister}>완료</SubmitBtn>
+            <SubmitBtn onClick={handleUpload}>완료</SubmitBtn>
           </BtnContainer>
         </UserInfoContainer>
         <SlideCounter>

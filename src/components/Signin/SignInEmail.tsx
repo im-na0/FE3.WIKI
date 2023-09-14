@@ -53,7 +53,9 @@ const SignInEmailModal = () => {
         password,
       );
       const user = userCredential.user;
+      const uid = user.uid;
       console.log("로그인 성공:", user);
+      console.log(uid);
     } catch (error) {
       alert("회원가입부터 진행해주세요");
       console.error("로그인 실패:", error);
