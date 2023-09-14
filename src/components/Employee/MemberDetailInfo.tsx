@@ -15,19 +15,23 @@ function MemberDetailInfo() {
 
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
-
+  // 프로필 카드 상태 초기화
   const [name, setName] = useState("김땡땡");
   const [department, setDepartment] = useState("FE");
 
-  const handleSubmit = () => {
+  const handleProfileCard = () => {
     if (isEditMode) {
       const fieldsValue = form.getFieldsValue();
       setName(fieldsValue.name);
       setDepartment(fieldsValue.department);
     }
-    // form.resetFields();
-    setIsEditMode(false);
   };
+  const toggleEditMode = () => {
+    setIsEditMode((prevIsEditMode) => {
+      return !prevIsEditMode; // 업데이트된 값을 반환
+    });
+  };
+
   const imageInput = useRef<HTMLInputElement | null>(null);
   const onCickImageUpload = () => {
     console.log("실행", imageInput);
@@ -42,32 +46,28 @@ function MemberDetailInfo() {
   };
 
   return (
-    <Form
-      onFinish={(value) => {
-        console.log(value);
-        handleSubmit();
-      }}
-      form={form}
-    >
+    <Form form={form}>
       <div className="member-header">
         <div className="member-title">
           <h3>직원 정보 / {memberId}</h3>
           <span className="member-desc">{memberId} 님의 프로필</span>
         </div>
         <div className="member-btn-area">
-          {isEditMode ? (
-            <Button type="primary" icon={<EditOutlined />} htmlType="submit">
-              Save
-            </Button>
-          ) : (
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              onClick={() => setIsEditMode(true)}
-            >
-              Edit
-            </Button>
-          )}
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              toggleEditMode();
+              if (isEditMode) {
+                const formValues = form.getFieldsValue();
+                console.log(formValues);
+                handleProfileCard();
+                form.submit();
+              }
+            }}
+          >
+            {isEditMode ? "Save" : "Edit"}
+          </Button>
         </div>
       </div>
       <div className="member-container">
@@ -84,14 +84,14 @@ function MemberDetailInfo() {
                     : "https://deploy-preview-66--effulgent-axolotl-ab38e8.netlify.app/asset/member3.png"
                 }
               />
-              {imageInput.current && !imageInput.current.disabled ? (
+              {isEditMode && ( // edit 모드일 때만 버튼을 렌더링합니다.
                 <Button
                   type="primary"
                   shape="circle"
                   icon={<CameraFilled />}
                   onClick={onCickImageUpload}
                 ></Button>
-              ) : null}
+              )}
             </label>
             <input
               type="file"
