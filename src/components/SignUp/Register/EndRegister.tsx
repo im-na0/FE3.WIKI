@@ -11,6 +11,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin-top: 80px;
 `;
 const EndContainer = styled.div`
   width: 50%;
