@@ -29,12 +29,11 @@ const Router = () => {
 
   return (
     <Routes>
-      {/* <Route element={<Layout />}>
-        <Route path="/wiki" element={<Wiki />}></Route>
-        <Route path="/project" element={<Project />}></Route>
-        <Route path="/address-book" element={<AddressBook />}></Route>
-        <Route path="/timer" element={<Timer />}></Route>
-      </Route> */}
+      <Route path="/signin" element={<SignIn />}></Route>
+      <Route path="/signup" element={<SignUp />}></Route>
+      <Route path="/start-register" element={<StartRegister />}></Route>
+      <Route path="/user-register" element={<UserRegister />}></Route>
+      <Route path="/end-register" element={<EndRegister />}></Route>
       <Route element={<SubLayout />}>
         <Route path="/" index element={<Main />}></Route>
         <Route path="/wiki" element={<Wiki />}></Route>
@@ -51,11 +50,6 @@ const Router = () => {
         ></Route>
         <Route path="/employee" element={<Employee />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
-        <Route path="/signin" element={<SignIn />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/start-register" element={<StartRegister />}></Route>
-        <Route path="/user-register" element={<UserRegister />}></Route>
-        <Route path="/end-register" element={<EndRegister />}></Route>
       </Route>
     </Routes>
   );

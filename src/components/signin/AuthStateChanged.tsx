@@ -1,25 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { auth } from "../../libs/firebase";
-import { Container } from "../../pages/Employee";
 import { useNavigate } from "react-router";
-import SignInEmailModal from "./SignInEmail";
+import { useRecoilState } from "recoil";
+import { authState } from "../../store/signin";
+import StartRegister from "../SignUp/Register/StartRegister";
+import SignIn from "../../pages/SignIn";
 import Main from "../../pages/Main";
 
 const AuthStateChanged = () => {
-  const [isSignIn, setIsSignIn] = useState(false);
+  // const [isSignIn, setIsSignIn] = useState(false);
+  const [isSignIn, setIsSignIn] = useRecoilState(authState);
   const navigate = useNavigate();
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       console.log(user);
       if (user) {
         setIsSignIn(true);
-        navigate("/");
+        navigate("/start-register");
       } else {
         setIsSignIn(false);
+        console.log("Status : Logout");
       }
     });
   }, []);
-  return <div>{isSignIn ? <Main /> : <SignInEmailModal />}</div>;
+  return <div>{isSignIn ? <Main /> : null}</div>;
 };
 
 export default AuthStateChanged;
