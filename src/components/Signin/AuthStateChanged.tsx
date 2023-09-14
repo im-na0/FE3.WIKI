@@ -3,8 +3,6 @@ import { auth } from "../../libs/firebase";
 import { useNavigate } from "react-router";
 import { useRecoilState } from "recoil";
 import { authState } from "../../store/signin";
-import StartRegister from "../SignUp/Register/StartRegister";
-import SignIn from "../../pages/SignIn";
 import Main from "../../pages/Main";
 
 const AuthStateChanged = () => {

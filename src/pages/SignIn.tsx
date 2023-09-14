@@ -1,12 +1,12 @@
 import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { styled } from "styled-components";
-import SignInEmailModal from "../components/SignIn/SignInEmail";
+import SignInEmailModal from "../components/Signin/SignInEmail";
 import { Modal } from "antd";
-import signInGoogle from "../components/SignIn/SignInGoogle";
+import signInGoogle from "../components/Signin/SignInGoogle";
 import { Link } from "react-router-dom";
 import { MainTitle } from "../components/SignUp/Title";
-import AuthStateChanged from "../components/SignIn/AuthStateChanged";
+import AuthStateChanged from "../components/Signin/AuthStateChanged";
 import { motion } from "framer-motion";
 const Container = styled.div`
   margin: 0;
