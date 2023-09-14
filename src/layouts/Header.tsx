@@ -2,7 +2,9 @@ import React from "react";
 import "../styles/Header.css";
 import { Layout, theme } from "antd";
 import { Link } from "react-router-dom";
-
+import { useRecoilState } from "recoil";
+import { authState } from "../store/signin";
+import { auth } from "../libs/firebase";
 interface MenuListItem {
   key: number;
   to: string;
@@ -36,6 +38,12 @@ const MainHeader = () => {
     //   text: "위키",
     // },
   ];
+  const [isSignIn, setIsSignIn] = useRecoilState(authState);
+  const handleSignOut = () => {
+    setIsSignIn(false);
+    auth.signOut();
+    alert("로그아웃 되었습니다!");
+  };
   return (
     <Header style={{ background: colorBgContainer }}>
       <div className="header-wrap">
@@ -59,9 +67,18 @@ const MainHeader = () => {
               <button className="user-link timer-btn">출퇴근 타이머</button>
             </li>
             <li>
-              <Link to={"/Signin"} className="user-link signin-link">
-                로그인
-              </Link>
+              {isSignIn ? (
+                <button
+                  className="user-link signin-link"
+                  onClick={handleSignOut}
+                >
+                  로그아웃
+                </button>
+              ) : (
+                <Link to={"/signin"} className="user-link signin-link">
+                  로그인
+                </Link>
+              )}
             </li>
           </ul>
         </div>

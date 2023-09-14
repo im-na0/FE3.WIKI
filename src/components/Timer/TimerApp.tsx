@@ -22,7 +22,6 @@ const TimerAlign = styled.div`
   flexDirection: "column",
   justifyContent: "right",
   alignItems: "center"}`;
-
 const GreetingText = styled.div`
   font-size: "1.5rem";
 `;
