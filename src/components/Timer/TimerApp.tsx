@@ -49,7 +49,7 @@ const TimerApp = () => {
   const [userName, setUserName] = useState<string | null>("");
 
   const UpdateTime = () => {
-    let nowTime = new Date().toLocaleTimeString();
+    const nowTime = new Date().toLocaleTimeString();
     setNowTime(nowTime);
   };
 
