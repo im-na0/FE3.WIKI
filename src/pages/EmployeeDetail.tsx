@@ -41,9 +41,6 @@ function EmployeeDetail() {
   const { memberId } = useParams();
   return (
     <Container>
-      {/*<Header>*/}
-      {/*  <h4>직원 정보 / {memberId}</h4>*/}
-      {/*</Header>*/}
       <CardContainer className="card-container">
         <MemberDetailInfo />
       </CardContainer>
