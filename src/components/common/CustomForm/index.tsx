@@ -1,12 +1,4 @@
-import {
-  Form,
-  Input,
-  InputProps,
-  Modal,
-  ModalProps,
-  Select,
-  Button,
-} from "antd";
+import { Form, Input, InputProps, Modal, ModalProps, Select } from "antd";
 import { Rule } from "antd/lib/form";
 import React, { ReactNode } from "react";
 
@@ -15,6 +7,7 @@ interface FormItemProps {
   name: string;
   disabled?: boolean;
   rules?: Rule[];
+  value?: string;
 }
 
 function CustomInput({
@@ -22,11 +15,12 @@ function CustomInput({
   name,
   rules,
   disabled,
+  value,
   ...args
 }: FormItemProps & InputProps) {
   return (
     <Form.Item label={label} name={name} rules={rules}>
-      <Input disabled={disabled} {...args} />
+      <Input value={value} disabled={disabled} {...args} />
     </Form.Item>
   );
 }
@@ -38,9 +32,11 @@ function CustomSelect({
   rules,
   disabled,
   defaultValue,
+  readOnly,
 }: FormItemProps & {
   options: Record<string, string>;
   defaultValue?: string;
+  readOnly?: boolean;
 }) {
   return (
     <Form.Item
@@ -49,7 +45,7 @@ function CustomSelect({
       rules={rules}
       initialValue={defaultValue}
     >
-      <Select disabled={disabled}>
+      <Select disabled={disabled} className={readOnly ? "readOnly" : undefined}>
         {Object.entries(options).map(([key, val]) => (
           <Select.Option
             value={Number.isNaN(Number(key)) ? key : Number(key)}
@@ -103,30 +99,6 @@ interface CustomButtonProps {
   htmlType?: "button" | "submit" | "reset";
 }
 
-function CustomButton({
-  children,
-  danger,
-  icon,
-  shape,
-  onClick,
-  htmlType,
-}: CustomButtonProps) {
-  return (
-    <Form.Item>
-      <Button
-        htmlType={htmlType}
-        type="primary"
-        shape={shape}
-        danger={danger}
-        icon={icon}
-        onClick={onClick}
-      >
-        {children}
-      </Button>
-    </Form.Item>
-  );
-}
-
 export function useValidate() {
   const required = () => ({ required: true, message: "필수 항목입니다" });
 
@@ -158,7 +130,6 @@ const CustomForm = {
   Input: CustomInput,
   Select: CustomSelect,
   Modal: CustomModal,
-  Button: CustomButton,
   useValidate,
 };
 

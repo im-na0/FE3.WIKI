@@ -82,3 +82,28 @@
     border-radius: 5px;
     padding: 3rem;
 }
+
+/* custom antd style */
+.ant-input[readonly]{
+    border: 0;
+    background-color: #fff;
+    color: #000;
+}
+.ant-select-disabled.ant-select-selector {
+    border: 0;
+    background-color: #fff;
+    color: #000;
+}
+
+.ant-select.readOnly
+{
+    pointer-events: none;
+}
+.ant-select.readOnly > .ant-select-selector {
+    border: 0;
+    background-color: #fff;
+    color: #000;
+}
+.ant-select.readOnly > .ant-select-arrow {
+    display: none;
+}

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import "../styles/Employee.css";
-import MemberDetailInfo from "../components/Employee/MemberDetail/MemberDetailInfo";
+import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
 
 const Container = styled.div`
   max-width: 100%;
