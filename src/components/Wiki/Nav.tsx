@@ -252,7 +252,8 @@ const StyledFile = styled.ul<{ isOpen: boolean }>`
   font-weight: 500;
   padding-left: 33px;
   color: rgba(0, 0, 0, 0.85);
-  max-height: ${(props) => (props.isOpen ? "200px" : "0")};
+  max-height: ${(props) => (props.isOpen ? "500px" : "0")};
+  overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
