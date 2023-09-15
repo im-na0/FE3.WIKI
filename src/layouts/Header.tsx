@@ -39,10 +39,15 @@ const MainHeader = () => {
     // },
   ];
   const [isSignIn, setIsSignIn] = useRecoilState(authState);
+  const storeUid: string | null = localStorage.getItem("uid");
+  console.log(storeUid);
   const handleSignOut = () => {
-    setIsSignIn(false);
-    auth.signOut();
-    alert("로그아웃 되었습니다!");
+    if (storeUid) {
+      localStorage.removeItem(storeUid);
+      setIsSignIn(false);
+      auth.signOut();
+      alert("로그아웃 되었습니다!");
+    }
   };
   return (
     <Header style={{ background: colorBgContainer }}>

@@ -54,6 +54,7 @@ const SignInEmailModal = () => {
       );
       const user = userCredential.user;
       const uid = user.uid;
+      localStorage.setItem("uid", uid); // uid 내보내기
       console.log("로그인 성공:", user);
       console.log(uid);
     } catch (error) {

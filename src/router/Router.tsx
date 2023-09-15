@@ -19,7 +19,7 @@ import { auth } from "../libs/firebase";
 import AddInfo from "../components/SignUp/AddInfo/AddInfo";
 const Router = () => {
   useEffect(() => {
-    setPersistence(auth, browserSessionPersistence)
+    setPersistence(auth, browserSessionPersistence) // broswerSessionPersistence
       .then(() => {
         console.log("로그인 유지 설정 완료");
       })

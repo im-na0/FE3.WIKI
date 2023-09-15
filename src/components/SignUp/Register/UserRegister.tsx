@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { PlusOutlined } from "@ant-design/icons";
 import { Button, Input, Select, Upload, message } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
@@ -8,11 +7,9 @@ import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../Navigation";
 import { motion } from "framer-motion";
-import { addDoc, collection } from "firebase/firestore";
-import { doc } from "prettier";
-import { db } from "../../../libs/firebase";
+import { addDoc, collection, getDocs, setDoc, doc } from "firebase/firestore";
+import { db, auth } from "../../../libs/firebase";
 import { useNavigate } from "react-router-dom";
-
 const props: UploadProps = {
   name: "file",
   action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
@@ -30,6 +27,16 @@ const props: UploadProps = {
     }
   },
 };
+
+interface Department {
+  id: string;
+  name: string; // 부서 이름
+  teams: string[]; // 부서 안에 속해 있는 팀 이름
+}
+interface Team {
+  id: string; // Team Name
+  member: string; // Team 속해 있는 멤버
+}
 
 const Container = styled.div`
   margin: 0;
@@ -91,8 +98,63 @@ const SubmitBtn = styled.button`
     color: #fff;
   }
 `;
+// Departments Collection 진입
+async function getDepartments() {
+  const departmentRef = collection(db, "Department");
+  const querySnapshot = await getDocs(departmentRef);
+  const departments: Department[] = [];
+  querySnapshot.forEach((doc) => {
+    departments.push({ id: doc.id, ...doc.data() } as Department);
+    console.log(departments);
+  });
+  return departments;
+}
+// Departments ID => Teams Collection 진입
+async function getTeams(selectedPart: string | undefined) {
+  if (!selectedPart) {
+    return [];
+  }
+  const teamsRef = collection(db, "Department", selectedPart, "Teams"); // "개발"은 나중에 동적으로 바꿔줌
+  const querySnapshot = await getDocs(teamsRef);
+  const teams: Team[] = [];
+  querySnapshot.forEach((doc) => {
+    teams.push({ id: doc.id, ...doc.data() } as Team);
+    console.log(teams);
+  });
+  return teams;
+}
 export default function UserRegister() {
+  const storeUid = localStorage.getItem("uid"); // uid 가져오기
   const { moveStartRegister, moveEndRegister } = useNavigation();
+  const [departmentOptions, setDepartmentOptions] = useState<Department[]>([]); // firebase에 있는 부서 옵션 저장
+  // console.log(departmentOptions);
+  const [teamOptions, setTeamOptions] = useState<Team[]>([]); // firebase에 있는 team 옵션 저장
+  const [selectedPart, setSelectedPart] = useState<string | undefined>(
+    undefined,
+  );
+  const [selectedTeam, setSelectedTeam] = useState<string | undefined>(
+    undefined,
+  );
+  const handleSelectedPart = (value: string | undefined) => {
+    setSelectedPart(value);
+  };
+  const handleSelectedTeam = (value: string | undefined) => {
+    setSelectedTeam(value);
+  };
+  useEffect(() => {
+    async function fetchDepartment() {
+      const departments = await getDepartments();
+      setDepartmentOptions(departments);
+    }
+    fetchDepartment();
+  }, []);
+  useEffect(() => {
+    async function fetchTeam() {
+      const teams = await getTeams(selectedPart);
+      setTeamOptions(teams);
+    }
+    fetchTeam();
+  }, [selectedPart]);
   const [input, setInput] = useState({
     name: "",
     email: "",
@@ -103,6 +165,12 @@ export default function UserRegister() {
   });
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === "department") {
+      setSelectedPart(value);
+    }
+    if (name === "team") {
+      setSelectedTeam(value);
+    }
     setInput((prevInput) => ({
       ...prevInput,
       [name]: value,
@@ -110,18 +178,23 @@ export default function UserRegister() {
   };
   const handleUpload = async () => {
     try {
-      const userDB = collection(db, "Users");
-      const newUser = {
-        name: input.name,
-        email: input.email,
-        phonenumber: input.phonenumber,
-        department: input.department,
-        team: input.team,
-        position: input.position,
-      };
-      const docRef = await addDoc(userDB, newUser);
-      console.log("ID: ", docRef.id);
-      alert("업로드 성공");
+      if (storeUid) {
+        const userDB = doc(db, "Users", storeUid);
+        const newUser = {
+          name: input.name,
+          email: input.email,
+          phonenumber: input.phonenumber,
+          department: selectedPart,
+          team: selectedTeam,
+          position: input.position,
+        };
+        const docRef = await setDoc(userDB, newUser);
+        alert("업로드 성공");
+        moveEndRegister();
+      } else {
+        console.error("로그아웃 상태");
+        alert("로그아웃 상태입니다");
+      }
     } catch (error) {
       console.error("Error: ", error);
       alert("업로드 실패");
@@ -178,20 +251,11 @@ export default function UserRegister() {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
-              options={[
-                {
-                  value: "1",
-                  label: "개발",
-                },
-                {
-                  value: "2",
-                  label: "기획",
-                },
-                {
-                  value: "3",
-                  label: "인사",
-                },
-              ]}
+              options={departmentOptions.map((department) => ({
+                value: department.id,
+                label: department.name,
+              }))}
+              onChange={handleSelectedPart}
             />
           </UserDepartmentCategory>
           <UserTeamCategory>
@@ -209,28 +273,11 @@ export default function UserRegister() {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
-              options={[
-                {
-                  value: "1",
-                  label: "FE팀",
-                },
-                {
-                  value: "2",
-                  label: "BE팀",
-                },
-                {
-                  value: "3",
-                  label: "기획팀",
-                },
-                {
-                  value: "4",
-                  label: "디자인팀",
-                },
-                {
-                  value: "5",
-                  label: "놀고먹는팀",
-                },
-              ]}
+              options={teamOptions.map((team) => ({
+                value: team.id,
+                label: team.id,
+              }))}
+              onChange={handleSelectedTeam}
             />
           </UserTeamCategory>
           <UserPositionCategory>
