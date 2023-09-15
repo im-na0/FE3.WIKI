@@ -1,41 +1,49 @@
-import {
-  projectConverter,
-  projectDetailConverter,
-  type ProjectInfo,
-} from "../../libs/firestore";
-import { collection, query, getDocs, doc, getDoc } from "firebase/firestore";
+import { projectConverter, type ProjectInfo } from "../../libs/firestore";
+import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { firestoreDb } from "../../libs/firebase";
-import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
-import { projectDetailState } from "../../store/project";
+import { useEffect } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { isLoadingState, projectListState } from "../../store/project";
 
 const useQueryProjectAllList = () => {
-  const [projects, setProjects] = useState<ProjectInfo[]>();
-  const [, setProjectDetail] = useRecoilState(projectDetailState);
+  const setIsLoading = useSetRecoilState(isLoadingState);
+  const [projects, setProjects] = useRecoilState(projectListState);
+
   useEffect(() => {
+    setIsLoading(true);
     (async () => {
       try {
-        const projectAll: ProjectInfo[] = [];
+        const projectPlus: ProjectInfo[] = [];
+        const projectProgress: ProjectInfo[] = [];
+        const projectCompleted: ProjectInfo[] = [];
+
         const q = query(
           collection(firestoreDb, "Project").withConverter(projectConverter),
+          orderBy("order"),
         );
         const querySn = await getDocs(q);
         querySn.forEach((project) => {
           const data = project.data();
-          projectAll.push(data);
+          switch (data.status) {
+            case "plus":
+              projectPlus.push(data);
+              break;
+            case "progress":
+              projectProgress.push(data);
+              break;
+            case "completed":
+              projectCompleted.push(data);
+              break;
+          }
         });
-        setProjects(projectAll);
-
-        const firstId = projectAll[0].id;
-        const docRef = doc(firestoreDb, "Project", firstId).withConverter(
-          projectDetailConverter,
-        );
-        const docSn = await getDoc(docRef);
-        if (docSn.exists()) {
-          const data = docSn.data();
-          setProjectDetail(data);
-        }
+        setProjects({
+          plus: projectPlus,
+          progress: projectProgress,
+          completed: projectCompleted,
+        });
+        setIsLoading(false);
       } catch (error) {
+        setIsLoading(false);
         if (error instanceof Error) console.log(error.message);
       }
     })();

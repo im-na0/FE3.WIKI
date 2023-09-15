@@ -14,6 +14,8 @@ const Project = styled.div`
   padding: 10px;
   background-color: #fff;
   border-radius: 5px;
+  margin-bottom: 6px;
+  border: 1px solid #dfdfdf;
   .project__item-title {
     margin-bottom: 12px;
     font-size: 16px;
@@ -21,6 +23,7 @@ const Project = styled.div`
 `;
 
 const ProjectDraggable = ({ project, index }: ProjectDraggableProps) => {
+  // console.log(project.id, "project rendering");
   return (
     <Draggable draggableId={project.id} index={index}>
       {(provided) => (
@@ -44,4 +47,4 @@ const ProjectDraggable = ({ project, index }: ProjectDraggableProps) => {
   );
 };
 
-export default ProjectDraggable;
+export default React.memo(ProjectDraggable);

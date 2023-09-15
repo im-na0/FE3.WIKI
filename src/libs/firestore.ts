@@ -12,7 +12,7 @@ export class ProjectInfo {
     public status: "progress" | "completed" | "plus",
     public order: number,
     public assignees: string[],
-    public duration: string,
+    public duration: string[],
   ) {}
   toString() {
     return this.id + ", " + this.title + ", " + this.status + ", " + this.order;
@@ -20,13 +20,14 @@ export class ProjectInfo {
 }
 export class ProjectDetail {
   constructor(
-    public id: string,
     public title: string,
     public status: "progress" | "completed" | "plus",
     public order: number,
     public assignees: string[],
-    public duration: string,
+    public duration: string[],
+    public teams: string[],
     public data: string,
+    public id?: string,
   ) {}
   toString() {
     return this.id + ", " + this.title + ", " + this.status + ", " + this.order;
@@ -68,6 +69,7 @@ export const projectDetailConverter: FirestoreDataConverter<ProjectDetail> = {
       order: docData.order,
       assignees: docData.assignees,
       duration: docData.duration,
+      teams: docData.teams,
       data: docData.data,
     };
   },
@@ -78,13 +80,14 @@ export const projectDetailConverter: FirestoreDataConverter<ProjectDetail> = {
     const sn = snapshot;
     const data = snapshot.data(options);
     return new ProjectDetail(
-      sn.id,
       data.title,
       data.status,
       data.order,
       data.assignees,
       data.duration,
+      data.teams,
       data.data,
+      sn.id,
     );
   },
 };
