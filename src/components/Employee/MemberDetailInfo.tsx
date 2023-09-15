@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Divider } from "antd";
+import { Button } from "antd";
 import CustomForm from "../common/CustomForm";
 import { EditOutlined } from "@ant-design/icons";
-
-import MemberProfileCard from "./MemberProfileCard";
-import MemberDetailForm from "./MemberDetailForm";
+import MemberForm from "./MemberForm";
+import MemberProfile from "./MemberProfile";
 
 function MemberDetailInfo() {
   const { memberId } = useParams();
@@ -30,18 +29,6 @@ function MemberDetailInfo() {
     setIsEditMode((prevIsEditMode) => {
       return !prevIsEditMode;
     });
-  };
-
-  const imageInput = useRef<HTMLInputElement | null>(null);
-  const onCickImageUpload = () => {
-    console.log("실행", imageInput);
-    imageInput.current?.click();
-  };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target?.files?.[0];
-    if (selectedFile) {
-      setUploadedFile(selectedFile);
-    }
   };
 
   return (
@@ -71,12 +58,7 @@ function MemberDetailInfo() {
       </div>
       <div className="member-container">
         <div className="memer-profile-area">
-          <MemberProfileCard
-            uploadedFile={uploadedFile}
-            onImageUpload={onCickImageUpload}
-            isEditMode={isEditMode}
-            handleChange={handleChange}
-          />
+          <MemberProfile isEditMode={isEditMode} />
           <div className="member-profile-info">
             <div className="title-text">{name}</div>
             <div className="desc-text">{department}</div>
@@ -84,7 +66,7 @@ function MemberDetailInfo() {
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            <MemberDetailForm isEditMode={isEditMode} />
+            <MemberForm isEditMode={isEditMode} />
           </div>
         </div>
       </div>

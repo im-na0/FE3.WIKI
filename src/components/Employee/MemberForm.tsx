@@ -2,11 +2,14 @@ import React from "react";
 import { Divider } from "antd";
 import CustomForm from "../common/CustomForm";
 import { SELECT_OPTIONS } from "../../constant/member";
-const { required, max, pattern } = CustomForm.useValidate();
+import MemberProfile from "./MemberProfile";
+import styled from "styled-components";
 
-function MemberDetailForm({ isEditMode }: { isEditMode: boolean }) {
+function MemberForm({ isEditMode }: { isEditMode: boolean }) {
+  const { required, max, pattern } = CustomForm.useValidate();
   return (
     <>
+      {/*<MemberProfile isEditMode={isEditMode} />*/}
       <Divider orientation="left">기본 정보</Divider>
       <CustomForm.Input
         label="이름"
@@ -55,4 +58,4 @@ function MemberDetailForm({ isEditMode }: { isEditMode: boolean }) {
   );
 }
 
-export default MemberDetailForm;
+export default MemberForm;

@@ -1,20 +1,24 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { CameraFilled } from "@ant-design/icons";
 import { Button } from "antd";
 
-interface MemberProfileCardProps {
-  uploadedFile: File | null;
-  onImageUpload: () => void;
-  isEditMode: boolean;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
+  const imageInput = useRef<HTMLInputElement | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-function MemberProfileCard({
-  uploadedFile,
-  onImageUpload,
-  isEditMode,
-  handleChange,
-}: MemberProfileCardProps) {
+  const onImageUpload = () => {
+    console.log("실행", imageInput);
+    imageInput.current?.click();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target?.files?.[0];
+    if (!selectedFile) {
+      return;
+    }
+    setUploadedFile(selectedFile);
+  };
+
   return (
     <div className="member-pofile-wrap">
       <label htmlFor="image" className="member-form-profile">
@@ -43,6 +47,7 @@ function MemberProfileCard({
         id="image"
         accept="image/*"
         style={{ display: "none" }}
+        ref={imageInput}
         onChange={handleChange}
         disabled={!isEditMode}
       />
@@ -50,4 +55,4 @@ function MemberProfileCard({
   );
 }
 
-export default MemberProfileCard;
+export default MemberProfile;
