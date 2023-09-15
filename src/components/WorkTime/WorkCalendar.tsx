@@ -5,31 +5,42 @@ import type { Dayjs } from "dayjs";
 import type { BadgeProps, CalendarProps } from "antd";
 import { Badge, Calendar } from "antd";
 
+// firebase
+import { db } from "../../libs/firebase";
+import { collection, getDocs, Timestamp } from "firebase/firestore";
+
+const DataCellCustom = styled.div`
+  overflow-y: hidden;
+  margin: 0;
+  padding: 0;
+
+  ul {
+    text-align: left;
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    text-align: left;
+    margin: 0;
+    padding: 0;
+    font-size: 8px;
+  }
+`;
+
 const getListData = (value: Dayjs) => {
   let listData;
   switch (value.date()) {
     case 8:
-      listData = [
-        { type: "warning", content: "This is warning event." },
-        { type: "success", content: "This is usual event." },
-      ];
+      listData = [{ type: "error", content: "휴가-이땡땡이" }];
       break;
     case 10:
-      listData = [
-        { type: "warning", content: "This is warning event." },
-        { type: "success", content: "This is usual event." },
-        { type: "error", content: "This is error event." },
-      ];
+      listData = [{ type: "error", content: "휴가-홍길동" }];
       break;
     case 15:
-      listData = [
-        { type: "warning", content: "This is warning event" },
-        { type: "success", content: "This is very long usual event......" },
-        { type: "error", content: "This is error event 1." },
-        { type: "error", content: "This is error event 2." },
-        { type: "error", content: "This is error event 3." },
-        { type: "error", content: "This is error event 4." },
-      ];
+      listData = [{ type: "error", content: "휴가-이땡땡이" }];
+      break;
+    case 20:
+      listData = [{ type: "warning", content: "조퇴-이땡땡이" }];
       break;
     default:
   }
@@ -56,16 +67,20 @@ const WorkCalendar: React.FC = () => {
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value);
     return (
-      <ul className="events">
-        {listData.map((item) => (
-          <li key={item.content}>
-            <Badge
-              status={item.type as BadgeProps["status"]}
-              text={item.content}
-            />
-          </li>
-        ))}
-      </ul>
+      <DataCellCustom>
+        <ul className="events">
+          {listData.map((item) => (
+            <li key={item.content}>
+              <Badge
+                status={item.type as BadgeProps["status"]}
+                text={
+                  <span style={{ fontSize: "0.8rem" }}>{item.content}</span>
+                }
+              />
+            </li>
+          ))}
+        </ul>
+      </DataCellCustom>
     );
   };
 

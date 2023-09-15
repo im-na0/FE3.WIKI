@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Segmented, Table } from "antd";
+import { Pagination, Segmented, Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import WorkCalendar from "./WorkCalendar";
 
@@ -22,20 +22,34 @@ interface DataType {
   leave: string;
 }
 
-const ContainerAlign = styled.div`
+const Container = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: top;
-  margin-top: 0;
+  justify-content: space-between;
+  align-items: flex-start;
 `;
 
-const TableWrapper = styled.div`
-  width: 60%;
+const LeftContainer = styled.div`
+  flex: 6;
 `;
 
 const WorkTimeText = styled.span<WorkTimeProps>`
   font-size: ${(props) => props.fontSize || "1.7rem"};
   color: ${(props) => props.color || "#3A56A3"};
+`;
+const TableWrapper = styled.div`
+  width: 100%;
+  padding: 1rem;
+`;
+
+const PaginationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+`;
+
+const RightContainer = styled.div`
+  flex: 4;
+  margin-left: 10px;
 `;
 
 const WorkTimeList = () => {
@@ -65,8 +79,8 @@ const WorkTimeList = () => {
         multiple: 1,
       },
       render: (starttime) =>
-        `${starttime.toDate().toLocaleDateString()}
-         ${starttime.toDate().toLocaleTimeString()}`,
+        `${starttime && starttime.toDate().toLocaleDateString()}
+         ${starttime && starttime.toDate().toLocaleTimeString()}`,
     },
     {
       title: "퇴근 시간",
@@ -77,11 +91,11 @@ const WorkTimeList = () => {
         multiple: 2,
       },
       render: (finishtime) =>
-        `${finishtime.toDate().toLocaleDateString()} 
-         ${finishtime.toDate().toLocaleTimeString()}`,
+        `${finishtime && finishtime.toDate().toLocaleDateString()} 
+         ${finishtime && finishtime.toDate().toLocaleTimeString()}`,
     },
     {
-      title: "비고 (조퇴, 휴가 등)",
+      title: "비고 (휴가 등)",
       dataIndex: "leave",
     },
   ];
@@ -95,22 +109,28 @@ const WorkTimeList = () => {
 
       workTimeSnap.forEach((doc) => {
         const workTimeData = doc.data();
-        fetchedWorkTime.push({
-          key: doc.id,
-          name: workTimeData.name,
-          department: workTimeData.department,
-          team: workTimeData.team,
-          starttime: workTimeData.starttime,
-          finishtime: workTimeData.finishtime,
-          leave: workTimeData.leave,
-        });
+        if (
+          (workTimeFilter === "나의 출퇴근 현황" &&
+            workTimeData.name === "홍길동") ||
+          workTimeFilter === "우리팀 출퇴근 현황"
+        ) {
+          fetchedWorkTime.push({
+            key: doc.id,
+            name: workTimeData.name,
+            department: workTimeData.department,
+            team: workTimeData.team,
+            starttime: workTimeData.starttime,
+            finishtime: workTimeData.finishtime,
+            leave: workTimeData.leave,
+          });
+        }
       });
       setworkTimeData(fetchedWorkTime);
       console.log(fetchedWorkTime);
     };
 
     fetchWorkTime();
-  }, []);
+  }, [workTimeFilter]);
 
   const onChange: TableProps<DataType>["onChange"] = (
     pagination,
@@ -122,46 +142,34 @@ const WorkTimeList = () => {
   };
 
   return (
-    <>
-      <WorkTimeText color="#999999" fontSize="1.2rem">
-        오늘도 열일했다!
-      </WorkTimeText>
-      <br />
-      <WorkTimeText># 나의 출퇴근 일지</WorkTimeText>
-      <br />
-      <br />
-      <Segmented
-        options={["나의 출퇴근 현황", "우리팀 출퇴근 현황"]}
-        value={workTimeFilter as string}
-        onChange={(value) => setWorkTimeFilter(value as string)}
-      />
-      <ContainerAlign>
-        {workTimeFilter === "나의 출퇴근 현황" && (
-          <>
-            <TableWrapper>
-              <Table
-                columns={columns}
-                dataSource={workTimeData}
-                onChange={onChange}
-              />
-              <WorkCalendar></WorkCalendar>
-            </TableWrapper>
-          </>
-        )}
-        {workTimeFilter === "우리팀 출퇴근 현황" && (
-          <>
-            <TableWrapper>
-              <Table
-                columns={columns}
-                dataSource={workTimeData}
-                onChange={onChange}
-              />
-              <WorkCalendar></WorkCalendar>
-            </TableWrapper>
-          </>
-        )}
-      </ContainerAlign>
-    </>
+    <Container>
+      <LeftContainer>
+        <WorkTimeText color="#999999" fontSize="1.2rem">
+          오늘도 열일했다!
+        </WorkTimeText>
+        <br />
+        <WorkTimeText># 출퇴근 일지</WorkTimeText>
+        <br />
+        <br />
+        <Segmented
+          options={["나의 출퇴근 현황", "우리팀 출퇴근 현황"]}
+          value={workTimeFilter as string}
+          onChange={(value) => setWorkTimeFilter(value as string)}
+        />
+        <TableWrapper>
+          <Table
+            columns={columns}
+            dataSource={workTimeData}
+            onChange={onChange}
+            pagination={{ position: ["bottomCenter"] }}
+          />
+          <PaginationWrapper></PaginationWrapper>
+        </TableWrapper>
+      </LeftContainer>
+      <RightContainer>
+        <WorkCalendar></WorkCalendar>
+      </RightContainer>
+    </Container>
   );
 };
 
