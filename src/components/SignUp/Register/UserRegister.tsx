@@ -114,7 +114,7 @@ async function getTeams(selectedPart: string | undefined) {
   if (!selectedPart) {
     return [];
   }
-  const teamsRef = collection(db, "Department", selectedPart, "Teams"); // "개발"은 나중에 동적으로 바꿔줌
+  const teamsRef = collection(db, "Department", selectedPart, "Teams");
   const querySnapshot = await getDocs(teamsRef);
   const teams: Team[] = [];
   querySnapshot.forEach((doc) => {
@@ -127,7 +127,6 @@ export default function UserRegister() {
   const storeUid = localStorage.getItem("uid"); // uid 가져오기
   const { moveStartRegister, moveEndRegister } = useNavigation();
   const [departmentOptions, setDepartmentOptions] = useState<Department[]>([]); // firebase에 있는 부서 옵션 저장
-  // console.log(departmentOptions);
   const [teamOptions, setTeamOptions] = useState<Team[]>([]); // firebase에 있는 team 옵션 저장
   const [selectedPart, setSelectedPart] = useState<string | undefined>(
     undefined,
