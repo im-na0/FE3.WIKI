@@ -12,18 +12,19 @@ function MemberDetailInfo() {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
 
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+
   // 프로필 카드 상태 초기화
   const [name, setName] = useState("김땡땡");
   const [department, setDepartment] = useState("FE");
 
   const handleProfileCard = () => {
-    if (isEditMode) {
-      const fieldsValue = form.getFieldsValue();
-      setName(fieldsValue.name);
-      setDepartment(fieldsValue.department);
+    if (!isEditMode) {
+      return;
     }
+    const fieldsValue = form.getFieldsValue();
+    setName(fieldsValue.name);
+    setDepartment(fieldsValue.department);
   };
   const toggleEditMode = () => {
     setIsEditMode((prevIsEditMode) => {
@@ -48,7 +49,7 @@ function MemberDetailInfo() {
                 const formValues = form.getFieldsValue();
                 console.log(formValues);
                 handleProfileCard();
-                form.submit();
+                form.submit(); // FIXME: 제출 전에 유효성 검사하기
               }
             }}
           >

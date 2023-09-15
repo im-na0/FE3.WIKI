@@ -11,6 +11,7 @@ import Timer from "../pages/Timer";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import Employee from "../pages/Employee";
+import WorkTime from "../pages/WorkTime";
 import StartRegister from "../components/SignUp/Register/StartRegister";
 import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
@@ -52,6 +53,12 @@ const Router = () => {
         <Route path="/employee" element={<Employee />}></Route>
         <Route path="/employee/:memberId" element={<EmployeeDetail />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
+        <Route path="/signin" element={<SignIn />}></Route>
+        <Route path="/signup" element={<SignUp />}></Route>
+        <Route path="/start-register" element={<StartRegister />}></Route>
+        <Route path="/user-register" element={<UserRegister />}></Route>
+        <Route path="/end-register" element={<EndRegister />}></Route>
+        <Route path="/worktime" element={<WorkTime />}></Route>
       </Route>
     </Routes>
   );

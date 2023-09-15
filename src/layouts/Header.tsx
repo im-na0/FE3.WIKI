@@ -64,7 +64,9 @@ const MainHeader = () => {
         <div className="header-user">
           <ul>
             <li>
-              <button className="user-link timer-btn">출퇴근 타이머</button>
+              <Link to={"/timer"} className="user-link timer-btn">
+                출퇴근 타이머
+              </Link>
             </li>
             <li>
               {isSignIn ? (

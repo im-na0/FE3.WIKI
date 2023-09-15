@@ -5,6 +5,11 @@ import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
+import { db } from "../../libs/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { UploadForm } from "../../type/form";
+
+const COLLECTION_NAME = "Users";
 
 const SumbitBtn = styled.div`
   display: flex;
@@ -16,16 +21,20 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(true);
 
-  const handleSubmit = () => {
-    onCancel();
+  const handleAdd = async (data: UploadForm) => {
+    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+      ...data,
+    });
+    console.log("Document written with ID: ", docRef.id);
+    onCancel(); // 모달창 닫기
     form.resetFields();
   };
 
   return (
     <Form
-      onFinish={(value) => {
-        console.log(value);
-        handleSubmit();
+      onFinish={(data) => {
+        console.log(data);
+        handleAdd(data);
       }}
       form={form}
     >

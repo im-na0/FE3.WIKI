@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-
 import MemberTable from "../components/Employee/MemberTable";
 import MemberHeading from "../components/Employee/MemberHeading";
 
