@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
@@ -15,15 +15,27 @@ import WorkTime from "../pages/WorkTime";
 import StartRegister from "../components/SignUp/Register/StartRegister";
 import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
+import { setPersistence, browserSessionPersistence } from "@firebase/auth";
+import { auth } from "../libs/firebase";
+import EmployeeDetail from "../pages/EmployeeDetail";
 const Router = () => {
+  useEffect(() => {
+    setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        console.log("로그인 유지 설정 완료");
+      })
+      .catch((error) => {
+        console.error("로그인 유지 설정 오류:", error);
+      });
+  }, []);
+
   return (
     <Routes>
-      {/* <Route element={<Layout />}>
-        <Route path="/wiki" element={<Wiki />}></Route>
-        <Route path="/project" element={<Project />}></Route>
-        <Route path="/address-book" element={<AddressBook />}></Route>
-        <Route path="/timer" element={<Timer />}></Route>
-      </Route> */}
+      <Route path="/signin" element={<SignIn />}></Route>
+      <Route path="/signup" element={<SignUp />}></Route>
+      <Route path="/start-register" element={<StartRegister />}></Route>
+      <Route path="/user-register" element={<UserRegister />}></Route>
+      <Route path="/end-register" element={<EndRegister />}></Route>
       <Route element={<SubLayout />}>
         <Route path="/" index element={<Main />}></Route>
         <Route path="/wiki" element={<Wiki />}></Route>
@@ -39,13 +51,8 @@ const Router = () => {
           element={<ProjectNew isEdit={true} />}
         ></Route>
         <Route path="/employee" element={<Employee />}></Route>
+        <Route path="/employee/:memberId" element={<EmployeeDetail />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
-        <Route path="/signin" element={<SignIn />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/start-register" element={<StartRegister />}></Route>
-        <Route path="/user-register" element={<UserRegister />}></Route>
-        <Route path="/end-register" element={<EndRegister />}></Route>
-        <Route path="/worktime" element={<WorkTime />}></Route>
       </Route>
     </Routes>
   );
