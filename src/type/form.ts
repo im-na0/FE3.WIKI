@@ -6,6 +6,7 @@ export interface UploadForm {
   position?: string;
   team?: string;
   access?: string | boolean;
+  photo?: string;
   finishtime?: Date;
   starttime?: Date;
 }

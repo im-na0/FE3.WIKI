@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
-import { db } from "../../libs/firebase";
+import { db, storage } from "../../libs/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { UploadForm } from "../../type/form";
+import { useRecoilState } from "recoil";
+import { formDataState, uploadFileState } from "../../store/member";
 
 const COLLECTION_NAME = "Users";
 
@@ -20,10 +23,24 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(true);
+  const [file, setFile] = useRecoilState(uploadFileState);
+  const [data, setData] = useRecoilState(formDataState);
+  const [perc, setPerc] = useState<number | null>(null);
+
+  const uploadFile = async () => {
+    const name = new Date().getTime() + file!.name;
+    const storageRef = ref(storage, `member/${file!.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file as File); // 스토리지 업로드 진행
+
+    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+    return downloadURL;
+  };
 
   const handleAdd = async (data: UploadForm) => {
+    const imageUrl = await uploadFile();
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       ...data,
+      photo: imageUrl,
     });
     console.log("Document written with ID: ", docRef.id);
     onCancel(); // 모달창 닫기
@@ -33,7 +50,6 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   return (
     <Form
       onFinish={(data) => {
-        console.log(data);
         handleAdd(data);
       }}
       form={form}
@@ -41,7 +57,12 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
       <MemberProfile isEditMode={isEditMode} />
       <MemberForm isEditMode={isEditMode} />
       <SumbitBtn>
-        <Button icon={<UserAddOutlined />} htmlType="submit" type="primary">
+        <Button
+          icon={<UserAddOutlined />}
+          htmlType="submit"
+          type="primary"
+          disabled={perc !== null && perc < 100}
+        >
           Add
         </Button>
       </SumbitBtn>

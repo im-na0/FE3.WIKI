@@ -1,42 +1,22 @@
-import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
-import { storage } from "../../libs/firebase";
 import React, { useRef, useState } from "react";
 import { CameraFilled } from "@ant-design/icons";
 import { Button } from "antd";
+import { useRecoilState } from "recoil";
+import { uploadFileState } from "../../store/member";
 
 function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
-  const imageInput = useRef<HTMLInputElement | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [file, setFile] = useRecoilState(uploadFileState);
 
+  const imageInput = useRef<HTMLInputElement | null>(null);
   const onImageUpload = () => {
-    console.log("실행", imageInput);
     imageInput.current?.click();
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target?.files?.[0];
     if (!selectedFile) {
       return;
     }
-    uploadStorage(selectedFile);
-    setUploadedFile(selectedFile);
-  };
-
-  const uploadStorage = async (file: File | undefined) => {
-    const fileName = file!.name;
-    try {
-      const storageRef = ref(storage, `images/${fileName}`);
-      const uploadImg = uploadBytesResumable(storageRef, file!);
-
-      const snapshot = await uploadImg;
-      const url = await getDownloadURL(snapshot.ref);
-
-      console.log(`Uploading ${url}`);
-      return url;
-    } catch (error) {
-      console.error("Error uploading file: ", error);
-      throw error;
-    }
+    setFile(selectedFile);
   };
 
   return (
@@ -47,8 +27,8 @@ function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
           className="profile-img hidden"
           alt="preview"
           src={
-            uploadedFile
-              ? URL.createObjectURL(uploadedFile)
+            file
+              ? URL.createObjectURL(file)
               : "https://deploy-preview-66--effulgent-axolotl-ab38e8.netlify.app/asset/member3.png"
           } // FIXME: default 이미지 변경, revoke url
         />
