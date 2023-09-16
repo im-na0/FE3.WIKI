@@ -1,15 +1,24 @@
 import React, { useEffect, useRef } from "react";
-import { Editor as ToastUIEditor } from "@toast-ui/react-editor";
 
+// Toast UI Editor
+import { Editor as ToastUIEditor } from "@toast-ui/react-editor";
 import "@toast-ui/editor/dist/toastui-editor.css";
 
+// Style
+import styled from "styled-components";
+import { Button, Space } from "antd";
+
+// Recoil
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentFolderTitle,
   currentFileTitle,
   currentItem,
+  editFileState,
+  editFileSubName,
 } from "../../store/wiki";
 
+// Firebase
 import { db } from "../../libs/firebase";
 import {
   collection,
@@ -19,6 +28,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+// Interface
 import { IItems } from "../../store/wiki";
 
 const WikiEditor = () => {
@@ -26,8 +36,10 @@ const WikiEditor = () => {
   const currentFolder = useRecoilValue(currentFolderTitle);
   const currentFile = useRecoilValue(currentFileTitle);
   const [item, setItem] = useRecoilState(currentItem);
+  const [editFile, setEditFile] = useRecoilState(editFileState);
+  const [existSub, setExistSub] = useRecoilState(editFileSubName);
 
-  const INIT = "마크다운 문법을 입력해보세요.";
+  const INIT = "마크다운 문법을 입력해보세요...";
 
   const postText = async (newData: string) => {
     const q = query(
@@ -36,7 +48,6 @@ const WikiEditor = () => {
     );
     const querySnapshot = await getDocs(q);
     const FolderDoc = querySnapshot.docs[0];
-
     const items = FolderDoc.data().items;
     const itemIndex = items.findIndex(
       (item: IItems) => item.name === currentFile,
@@ -44,40 +55,68 @@ const WikiEditor = () => {
 
     if (itemIndex !== -1) {
       items[itemIndex].subName = newData;
-
       const data = {
         items: items,
       };
-
       await updateDoc(FolderDoc.ref, data);
       setItem(items[itemIndex]);
     }
   };
 
-  useEffect(() => {
-    console.log("Post 완료");
-  }, [item]);
-
   const handleClickReg = () => {
-    const newData = editorRef.current?.getInstance().getHTML();
-    if (newData !== undefined) {
-      postText(newData);
+    if (existSub) {
+      const changeData = editorRef.current?.getInstance().getMarkdown();
+      if (changeData !== undefined) {
+        postText(changeData);
+        setEditFile(false);
+      }
+      setExistSub("");
+    } else {
+      const newData = editorRef.current?.getInstance().getMarkdown();
+      if (newData !== undefined) {
+        console.log(3.1);
+        postText(newData);
+        setEditFile(false);
+      }
     }
   };
 
+  useEffect(() => {
+    console.log("Wiki Editor 등록 완료");
+  }, [item]);
+
+  useEffect(() => {
+    console.log(1);
+  }, []);
+
   return (
-    <>
+    <Container>
+      <StyledTop>
+        <h1>{currentFile}</h1>
+        <Space wrap>
+          <Button onClick={handleClickReg}>등록</Button>
+        </Space>
+      </StyledTop>
       <ToastUIEditor
         ref={editorRef}
-        initialValue={INIT}
+        initialValue={existSub ? existSub : INIT}
         previewStyle="vertical"
         height="600px"
         initialEditType="markdown"
         useCommandShortcut={false}
       />
-      <button onClick={handleClickReg}>등록</button>
-    </>
+    </Container>
   );
 };
 
 export default WikiEditor;
+
+const Container = styled.div`
+  width: 95%;
+`;
+
+const StyledTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;

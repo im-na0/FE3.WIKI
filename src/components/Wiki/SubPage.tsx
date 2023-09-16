@@ -1,9 +1,13 @@
 import React, { useEffect } from "react";
-import { IWiki } from "../../store/wiki";
 
-// styles
+// Components
+import WikiEditor from "./WikiEditor";
+import WikiViewer from "./WikiViewer";
+
+// Style
 import styled from "styled-components";
 
+// Recoil
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   currentFolderTitle,
@@ -11,9 +15,10 @@ import {
   currentItem,
 } from "../../store/wiki";
 
-import WikiEditor from "./WikiEditor";
-import WikiViewer from "./WikiViewer";
+// Interface
+import { IWiki } from "../../store/wiki";
 
+// Firebase
 import { db } from "../../libs/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
@@ -24,7 +29,7 @@ export interface IItem {
 
 const SubPage = () => {
   const currentFolder = useRecoilValue(currentFolderTitle);
-  const currentFile = useRecoilValue(currentFileTitle);
+  const [currentFile, setCurrentFile] = useRecoilState(currentFileTitle);
   const [item, setItem] = useRecoilState(currentItem);
 
   const refreshFile = async () => {
@@ -57,12 +62,17 @@ const SubPage = () => {
         {currentFolder} / {currentFile}
       </span>
       <br />
-      <h1>{currentFile}</h1>
-      {item && (
-        <>
-          {item.subName === "" ? <WikiEditor /> : <WikiViewer content={item} />}
-        </>
-      )}
+      <div>
+        {item && (
+          <>
+            {item.subName === "" ? (
+              <WikiEditor />
+            ) : (
+              <WikiViewer content={item} />
+            )}
+          </>
+        )}
+      </div>
     </Container>
   );
 };

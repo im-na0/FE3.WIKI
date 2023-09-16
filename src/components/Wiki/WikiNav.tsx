@@ -1,13 +1,23 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { IWiki } from "../../store/wiki";
-import { useSetRecoilState } from "recoil";
-import { currentFolderTitle, currentFileTitle } from "../../store/wiki";
+
+// Style
 import styled from "styled-components";
 import {
   FolderOutlined,
   FileOutlined,
   FolderAddOutlined,
 } from "@ant-design/icons";
+import { Input } from "antd";
+
+// Recoil
+import { useRecoilState, useSetRecoilState } from "recoil";
+import {
+  currentFolderTitle,
+  currentFileTitle,
+  totalItems,
+} from "../../store/wiki";
+
+// Firebase
 import { db } from "../../libs/firebase";
 import {
   collection,
@@ -18,19 +28,26 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+// Interface
+import { IWiki } from "../../store/wiki";
+
 interface NewFile {
   name: string;
   subName: string;
 }
 
 const WikiNav = () => {
-  const [items, setItems] = useState<IWiki[]>([]);
+  const [items, setItems] = useRecoilState(totalItems);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+
   const setCurrentTarget = useSetRecoilState(currentFolderTitle);
-  const setCurrentTargetFile = useSetRecoilState(currentFileTitle);
+  const [currentTargetFile, setCurrentTargetFile] =
+    useRecoilState(currentFileTitle);
+
   const [inputState, setInputState] = useState<boolean>(false);
   const [newFolder, setNewFolder] = useState<string>("");
   const [fileState, setFileState] = useState<boolean>(false);
+
   const [newFile, setNewFile] = useState<NewFile>({
     name: "",
     subName: "",
@@ -39,6 +56,10 @@ const WikiNav = () => {
   useEffect(() => {
     refreshFolders();
   }, []);
+
+  useEffect(() => {
+    refreshFolders();
+  }, [currentTargetFile]);
 
   const refreshFolders = async () => {
     const q = query(collection(db, "WikiPage"));
@@ -122,8 +143,8 @@ const WikiNav = () => {
         <StyledH1>Wiki</StyledH1>
         {inputState ? (
           <form onSubmit={onSubmitFolder}>
-            <input
-              placeholder="폴더명을 입력하세요."
+            <Input
+              placeholder="새로운 폴더를 만들어보세요."
               value={newFolder}
               onChange={onChangeFolder}
             />
@@ -157,8 +178,8 @@ const WikiNav = () => {
                 <FormContainer>
                   <FileOutlined style={{ fontSize: "20px" }} />
                   <FileForm onSubmit={onSubmitFile}>
-                    <input
-                      placeholder="파일명을 입력하세요."
+                    <Input
+                      placeholder="새로운 파일을 만들어보세요."
                       onChange={onChangeFile}
                     />
                   </FileForm>
