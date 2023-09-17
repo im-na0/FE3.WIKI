@@ -6,6 +6,7 @@ import {
   doc,
   getCountFromServer,
   query,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where,
@@ -21,7 +22,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 
 type formValues = Pick<
   ProjectDetail,
-  "title" | "assignees" | "teams" | "duration"
+  "title" | "status" | "assignees" | "teams" | "duration"
 >;
 
 export const useMutationNewProject = ({
@@ -34,8 +35,6 @@ export const useMutationNewProject = ({
   onFinish: (values: formValues) => Promise<void>;
 } => {
   const location = useLocation();
-  // const [, setIsModifying] = useRecoilState(isModifingState);
-  // const [markdown, setMarkdown] = useState<string>();
   dayjs.extend(customParseFormat);
   const dateFormat = "YYYY/MM/DD";
   const navigate = useNavigate();
@@ -50,18 +49,20 @@ export const useMutationNewProject = ({
     const day1 = dayjs(values.duration[0]).format(dateFormat);
     const day2 = dayjs(values.duration[1]).format(dateFormat);
 
-    const q = query(collection(db, "Project"), where("status", "==", "plus"));
+    const q = query(
+      collection(db, "Project"),
+      where("status", "==", values.status),
+    );
     const snapshot = await getCountFromServer(q);
     const count = snapshot.data().count;
-    console.log(markdown);
     await setDoc(
       doc(collection(db, "Project")).withConverter(projectDetailConverter),
       {
         ...values,
         duration: [day1, day2],
-        order: count + 1,
-        status: "plus",
+        order: count,
         data: markdown!,
+        createdAt: serverTimestamp(),
       },
     );
     navigate("/project/all");

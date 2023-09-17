@@ -5,6 +5,9 @@ import type { ProjectInfo } from "./ProjectDragDrop";
 import styled from "styled-components";
 import ProjectAssignee from "./ProjectAssignee";
 import ProjectDate from "./ProjectDate";
+import { useNavigate } from "react-router-dom";
+import useMutationDelProject from "../../hooks/project/useMutationDelProject";
+import { Popconfirm } from "antd";
 
 interface ProjectDraggableProps {
   project: ProjectInfo;
@@ -23,18 +26,38 @@ const Project = styled.div`
 `;
 
 const ProjectDraggable = ({ project, index }: ProjectDraggableProps) => {
+  const navigate = useNavigate();
+  const onClickProjDelete = useMutationDelProject();
+
   // console.log(project.id, "project rendering");
   return (
     <Draggable draggableId={project.id} index={index}>
       {(provided) => (
         <Project ref={provided.innerRef} {...provided.draggableProps}>
           <div className="project__item-btns">
-            <div className="project__item-btn">
+            <h2>{project.order}</h2>
+            <div
+              className="project__item-btn"
+              onClick={() => {
+                navigate(`/project/${project.id}/edit`);
+              }}
+            >
               <EditOutlined />
             </div>
-            <div className="project__item-btn">
-              <DeleteOutlined />
-            </div>
+            <Popconfirm
+              title="프로젝트 삭제"
+              description="정말로 삭제하시겠습니까?"
+              okText="예"
+              cancelText="아니오"
+              onConfirm={() => {
+                void onClickProjDelete(project.id, project.status);
+                navigate(`/project`);
+              }}
+            >
+              <div className="project__item-btn">
+                <DeleteOutlined />
+              </div>
+            </Popconfirm>
           </div>
           <div {...provided.dragHandleProps}>
             <div className="project__item-title">{project.title}</div>

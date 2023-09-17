@@ -23,13 +23,16 @@ const ProjectMdEditor = ({
       const isValid = checkImageValidation(messageApi, blob);
       if (!isValid) return;
       try {
-        const storageRef = ref(storage, `project/${blob?.name ?? "file"}`);
+        const lastIndex = blob.name.lastIndexOf(".");
+        const fileName = blob.name.substring(0, lastIndex);
+        const ext = blob.name.substring(lastIndex);
+        const fullFileName = fileName + "-" + new Date().getTime() + ext;
+
+        const storageRef = ref(storage, `project/${fullFileName}`);
         const uploadRef = await uploadBytes(storageRef, blob).then(
           (snapshot) => snapshot.ref,
         );
-        const url = await getDownloadURL(uploadRef).then(
-          (downloadUrl) => downloadUrl,
-        );
+        const url = await getDownloadURL(uploadRef);
         callback(url, blob?.name);
       } catch (error) {
         if (error instanceof Error)

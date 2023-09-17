@@ -3,6 +3,7 @@ import {
   FirestoreDataConverter,
   QueryDocumentSnapshot,
   SnapshotOptions,
+  Timestamp,
 } from "firebase/firestore";
 
 export class ProjectInfo {
@@ -13,6 +14,7 @@ export class ProjectInfo {
     public order: number,
     public assignees: string[],
     public duration: string[],
+    public createdAt: Timestamp,
   ) {}
   toString() {
     return this.id + ", " + this.title + ", " + this.status + ", " + this.order;
@@ -27,6 +29,7 @@ export class ProjectDetail {
     public duration: string[],
     public teams: string[],
     public data: string,
+    public createdAt: Timestamp,
     public id?: string,
   ) {}
   toString() {
@@ -42,6 +45,7 @@ export const projectConverter: FirestoreDataConverter<ProjectInfo> = {
       order: docData.order,
       assignees: docData.assignees,
       duration: docData.duration,
+      createdAt: docData.createdAt,
     };
   },
   fromFirestore: (
@@ -57,6 +61,7 @@ export const projectConverter: FirestoreDataConverter<ProjectInfo> = {
       data.order,
       data.assignees,
       data.duration,
+      data.createdAt,
     );
   },
 };
@@ -71,6 +76,7 @@ export const projectDetailConverter: FirestoreDataConverter<ProjectDetail> = {
       duration: docData.duration,
       teams: docData.teams,
       data: docData.data,
+      createdAt: docData.createdAt,
     };
   },
   fromFirestore: (
@@ -87,6 +93,7 @@ export const projectDetailConverter: FirestoreDataConverter<ProjectDetail> = {
       data.duration,
       data.teams,
       data.data,
+      data.createdAt,
       sn.id,
     );
   },

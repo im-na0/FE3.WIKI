@@ -1,7 +1,7 @@
 import { atom } from "recoil";
 import { ProjectDetail, ProjectInfo } from "../libs/firestore";
 
-export const projectDetailState = atom<ProjectDetail>({
+export const projectDetailState = atom<ProjectDetail | undefined>({
   key: `projectDetailState`,
   default: undefined,
 });
@@ -13,7 +13,7 @@ export const isLoadingState = atom({
   key: "isLoadingState",
   default: false,
 });
-interface projectListType {
+export interface projectListType {
   [key: string]: ProjectInfo[];
 }
 export const projectListState = atom<projectListType>({

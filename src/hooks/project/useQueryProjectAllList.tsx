@@ -16,10 +16,9 @@ const useQueryProjectAllList = () => {
         const projectPlus: ProjectInfo[] = [];
         const projectProgress: ProjectInfo[] = [];
         const projectCompleted: ProjectInfo[] = [];
-
         const q = query(
           collection(firestoreDb, "Project").withConverter(projectConverter),
-          orderBy("order"),
+          orderBy("createdAt", "desc"),
         );
         const querySn = await getDocs(q);
         querySn.forEach((project) => {

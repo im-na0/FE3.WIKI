@@ -19,13 +19,6 @@ const ProjectDragDrop = () => {
   const setProjects = useSetRecoilState(projectListState);
   const isLoading = useRecoilValue(isLoadingState);
 
-  useEffect(() => {
-    return () => {
-      // 드래그 드롭이 되면 할 작업
-      console.log("unmount");
-    };
-  }, []);
-
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
     if (destination?.droppableId === source.droppableId) {

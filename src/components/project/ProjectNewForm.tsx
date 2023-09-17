@@ -80,6 +80,18 @@ const ProjectNewForm = ({
           <Input placeholder="프로젝트명을 입력 해주세요." />
         </Form.Item>
         <Form.Item
+          name="status"
+          label="진행상황:"
+          validateTrigger="onBlur"
+          rules={[{ required: true, message: "담당자를 선택 해주세요." }]}
+        >
+          <Select placeholder="진행상황을 선택 해주세요.">
+            <Select.Option value="plus">예정됨</Select.Option>
+            <Select.Option value="progress">진행중</Select.Option>
+            <Select.Option value="completed">완료됨</Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
           name="assignees"
           label="담당자:"
           validateTrigger="onBlur"

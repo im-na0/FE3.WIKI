@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProjectListItem from "./ProjectListItem";
 import useQueryProjectAllList from "../../hooks/project/useQueryProjectAllList";
 
@@ -9,6 +9,12 @@ const ProjectListSider = () => {
     ...projects["progress"],
     ...projects["completed"],
   ];
+  projectArr.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+
+  useEffect(() => {
+    console.log("list is rendering");
+    console.log(projectArr);
+  });
 
   return (
     <div className="project__all-list">
