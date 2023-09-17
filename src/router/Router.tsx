@@ -11,6 +11,7 @@ import Timer from "../pages/Timer";
 import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import Employee from "../pages/Employee";
+import WorkTime from "../pages/WorkTime";
 import StartRegister from "../components/SignUp/Register/StartRegister";
 import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
