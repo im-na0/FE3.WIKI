@@ -14,7 +14,10 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
+  getDocs,
   serverTimestamp,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 
@@ -32,10 +35,6 @@ const TimerAlign = styled.div`
   flexDirection: "column",
   justifyContent: "right",
   alignItems: "center"}`;
-
-const GreetingText = styled.div`
-  font-size: "1.5rem";
-`;
 
 const TimerApp = () => {
   const nowDate = new Date().toLocaleDateString("ko-KR", {
@@ -56,9 +55,11 @@ const TimerApp = () => {
     useState<boolean>(false); // 퇴근 버튼 클릭 가능 상태로 시작
   const [clickedStartBtnText, setClickedStartBtnText] = useState<string>(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
   const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
+  const [workTimeDocId, setWorkTimeDocId] = useState<string | null>(""); // starttime 기록시 자동으로 생성된 문서 ID 저장
+  const [totalWorkTime, setTotalWorkTime] = useState<number>(0); // 출근 시간과 퇴근 시간을 대조하여 총 근무 시간을 계산
   const [userName, setUserName] = useState<string | null>("");
-  const [workTimeDocId, setWorkTimeDocId] = useState<string | null>("");
 
+  // 현재 시간을 출력해주는 일반 타이머
   const UpdateTime = () => {
     const nowTime = new Date().toLocaleTimeString();
     setNowTime(nowTime);
@@ -72,9 +73,32 @@ const TimerApp = () => {
     };
   }, []);
 
+  // 출근 시간을 기준으로 총 근무 시간을 출력해주는 타이머
+  const updateTotalWorkTime = () => {
+    if (startWorkBtnClicked && !finishWorkBtnClicked) {
+      setTotalWorkTime((prevTotalWorkTime) => prevTotalWorkTime + 1);
+    }
+  };
+
+  useEffect(() => {
+    const totalWorkTimeInterval = setInterval(updateTotalWorkTime, 1000);
+
+    return () => {
+      clearInterval(totalWorkTimeInterval);
+    };
+  }, [startWorkBtnClicked, finishWorkBtnClicked]);
+
+  const formatTotalWorkTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${hours}시간 ${minutes}분 ${remainingSeconds}초`;
+  };
+
   const recordStartWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const startWorkTime = serverTimestamp();
+    const startWorkTime = serverTimestamp() as Timestamp; // 현재 시간을 출근 시간으로 기록
     const docRef = await addDoc(
       collection(db, "Users/5zrVWF5YpYr86O28D84M/worktime"),
       {
@@ -83,12 +107,6 @@ const TimerApp = () => {
     );
     console.log(docRef.id);
     setWorkTimeDocId(docRef.id); // 자동으로 생성된 문서 ID 저장
-
-    // // 현재 시간을 출근 시간으로 기록
-    // const hours = startWorkTime.getHours().toString().padStart(2, "0");
-    // const minutes = startWorkTime.getMinutes().toString().padStart(2, "0");
-    // // const seconds = startWorkTime.getSeconds().toString().padStart(2, "0");
-    // setStartWorkTime(`${hours}:${minutes}:${seconds}`);
     setStartWorkBtnClicked(true); // 출근 시간 기록 후 버튼 비활성화
     setClickedStartBtnText(nowTime);
   };
@@ -102,11 +120,7 @@ const TimerApp = () => {
     }
 
     if (workTimeDocId) {
-      const finishWorkTime = serverTimestamp();
-      // const hours = finishWorkTime.getHours().toString().padStart(2, "0");
-      // const minutes = finishWorkTime.getMinutes().toString().padStart(2, "0");
-      // const seconds = finishWorkTime.getSeconds().toString().padStart(2, "0");
-      // setFinishWorkTime(`${hours}:${minutes}:${seconds}`);
+      const finishWorkTime = serverTimestamp() as Timestamp;
       setFinishWorkBtnClicked(true); // 퇴근 시간 기록 후 버튼 비활성화
       setClickedFinishBtnText(nowTime);
 
@@ -115,7 +129,7 @@ const TimerApp = () => {
         db,
         `Users/5zrVWF5YpYr86O28D84M/worktime/${workTimeDocId}`,
       );
-      console.log(workTimeDocId);
+
       try {
         // 퇴근 시간을 해당 문서 ID에 업데이트
         await updateDoc(workTimeDocRef, {
@@ -130,29 +144,9 @@ const TimerApp = () => {
     }
   };
 
-  const calcWorkTime = () => {
-    if (startWorkTime && finishWorkTime) {
-      const startTime = startWorkTime.split(":");
-      const finishTime = finishWorkTime.split(":");
-      const startHours = parseInt(startTime[0], 10);
-      const startMinutes = parseInt(startTime[1], 10);
-      const finishHours = parseInt(finishTime[0], 10);
-      const finishMinutes = parseInt(finishTime[1], 10);
-
-      let hours = finishHours - startHours;
-      let minutes = finishMinutes - startMinutes;
-
-      if (minutes < 0) {
-        hours -= 1;
-        minutes += 60;
-      }
-
-      return `오늘 총 근무 시간은 ${hours}시간 ${minutes}분 입니다.`;
-    }
-  };
-
   return (
     <form>
+      환영합니다. OOO 님!
       <TimerAlign>
         <div>
           <div>
@@ -242,16 +236,16 @@ const TimerApp = () => {
         </Button>
       </div>
       {startWorkBtnClicked && !finishWorkBtnClicked && (
-        <GreetingText>
-          <div>좋은 하루 보내세요😊</div>
-        </GreetingText>
+        <TimerText fontSize="1.2rem" style={{ lineHeight: 2, fontWeight: 400 }}>
+          좋은 하루 보내세요😊
+        </TimerText>
       )}
       {startWorkBtnClicked && finishWorkBtnClicked && (
-        <GreetingText>
-          <div>오늘도 수고하셨습니다!👍</div>
-        </GreetingText>
+        <TimerText fontSize="1.2rem" style={{ lineHeight: 2, fontWeight: 400 }}>
+          오늘도 수고하셨습니다!👍
+        </TimerText>
       )}
-      {startWorkTime && finishWorkTime && <div>{calcWorkTime()}</div>}
+      <div>오늘 총 근무시간은 {formatTotalWorkTime(totalWorkTime)}입니다.</div>
     </form>
   );
 };
