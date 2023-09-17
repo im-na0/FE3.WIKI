@@ -20,6 +20,8 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
+import { Link } from "react-router-dom";
+import WorkTime from "../../pages/WorkTime";
 
 // 타이머 스타일링
 interface TimerProps {
@@ -245,7 +247,12 @@ const TimerApp = () => {
           오늘도 수고하셨습니다!👍
         </TimerText>
       )}
-      <div>오늘 총 근무시간은 {formatTotalWorkTime(totalWorkTime)}입니다.</div>
+      {(startWorkBtnClicked || finishWorkBtnClicked) && (
+        <div>
+          오늘 총 근무시간은 {formatTotalWorkTime(totalWorkTime)}입니다.
+          <br />
+        </div>
+      )}
     </form>
   );
 };
