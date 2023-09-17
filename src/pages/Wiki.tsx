@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
-
-// components
-import Nav from "../components/Wiki/Nav";
-import Page from "../components/Wiki/Page";
+import React from "react";
 
 // styles
 import styled from "styled-components";
 
+// components
+import WikiNav from "../components/Wiki/WikiNav";
+import Page from "../components/Wiki/Page";
+
 const Wiki = () => {
   return (
     <StyledContainer>
-      <Nav />
+      <WikiNav />
       <Page />
     </StyledContainer>
   );
@@ -21,7 +21,6 @@ export default Wiki;
 const StyledContainer = styled.div`
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100vh;
+  width: 100vw;
   display: flex;
 `;

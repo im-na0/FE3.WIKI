@@ -1,56 +1,82 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+
+// Style
 import styled from "styled-components";
 import {
   FolderOutlined,
   FileOutlined,
   FolderAddOutlined,
 } from "@ant-design/icons";
+import { Input } from "antd";
+
+// Recoil
+import { useRecoilState, useSetRecoilState } from "recoil";
+import {
+  currentFolderTitle,
+  currentFileTitle,
+  totalItems,
+} from "../../store/wiki";
+
+// Firebase
 import { db } from "../../libs/firebase";
 import {
   collection,
   query,
   where,
   getDocs,
-  DocumentData,
   addDoc,
   updateDoc,
 } from "firebase/firestore";
 
+// Interface
+import { IWiki } from "../../store/wiki";
+
 interface NewFile {
   name: string;
   subName: string;
-  date: string;
 }
 
-const Nav = () => {
-  const [items, setItems] = useState<DocumentData[]>([]);
+const WikiNav = () => {
+  const [items, setItems] = useRecoilState(totalItems);
   const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+
+  const setCurrentTarget = useSetRecoilState(currentFolderTitle);
+  const [currentTargetFile, setCurrentTargetFile] =
+    useRecoilState(currentFileTitle);
+
   const [inputState, setInputState] = useState<boolean>(false);
   const [newFolder, setNewFolder] = useState<string>("");
   const [fileState, setFileState] = useState<boolean>(false);
+
   const [newFile, setNewFile] = useState<NewFile>({
     name: "",
     subName: "",
-    date: "",
   });
 
   useEffect(() => {
     refreshFolders();
   }, []);
 
+  useEffect(() => {
+    refreshFolders();
+  }, [currentTargetFile]);
+
   const refreshFolders = async () => {
     const q = query(collection(db, "WikiPage"));
     const querySnapshot = await getDocs(q);
-    const folderData = querySnapshot.docs.map((doc) => doc.data());
+    const folderData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
     setItems(folderData);
   };
 
-  const handleFolderClick = (folderId: string) => {
+  const handleFolderClick = (current: string) => {
     if (!fileState) {
-      setCurrentFolder((prevFolder) =>
-        prevFolder === folderId ? null : folderId,
-      );
+      setCurrentFolder((prev) => (prev === current ? null : current));
+      if (currentFolder) setCurrentTarget(currentFolder);
     }
+  };
+
+  const handleFileClick = (current: string) => {
+    setCurrentTargetFile(current);
   };
 
   const addFolder = async () => {
@@ -61,11 +87,11 @@ const Nav = () => {
     refreshFolders();
   };
 
-  const addFile = async (currentFolder: string) => {
+  const addFile = async (current: string) => {
     try {
       const q = query(
         collection(db, "WikiPage"),
-        where("title", "==", currentFolder),
+        where("title", "==", current),
       );
       const querySnapshot = await getDocs(q);
       const folderDoc = querySnapshot.docs[0];
@@ -117,8 +143,8 @@ const Nav = () => {
         <StyledH1>Wiki</StyledH1>
         {inputState ? (
           <form onSubmit={onSubmitFolder}>
-            <input
-              placeholder="폴더명을 입력하세요."
+            <Input
+              placeholder="새로운 폴더를 만들어보세요."
               value={newFolder}
               onChange={onChangeFolder}
             />
@@ -133,12 +159,10 @@ const Nav = () => {
         )}
       </StyledDiv>
       <StyledUl>
-        {items.map((item: any, index: number) => (
+        {items.map((item, index: number) => (
           <li
             key={item.title + index}
-            onClick={() => {
-              handleFolderClick(item.title);
-            }}
+            onClick={() => handleFolderClick(item.title)}
           >
             <StyledTitle>
               <div>
@@ -149,21 +173,24 @@ const Nav = () => {
                 {fileState ? "Cancel" : "New File"}
               </button>
             </StyledTitle>
-            <StyledFile isOpen={item.title === currentFolder}>
+            <StyledFile isopen={item.title === currentFolder}>
               {fileState ? (
                 <FormContainer>
                   <FileOutlined style={{ fontSize: "20px" }} />
                   <FileForm onSubmit={onSubmitFile}>
-                    <input
-                      placeholder="파일명을 입력하세요."
+                    <Input
+                      placeholder="새로운 파일을 만들어보세요."
                       onChange={onChangeFile}
                     />
                   </FileForm>
                 </FormContainer>
               ) : null}
               {item.items &&
-                item.items.map((v: any, fileIndex: number) => (
-                  <StyledItem key={v.name + fileIndex}>
+                item.items.map((v, fileIndex: number) => (
+                  <StyledItem
+                    key={v.name + fileIndex}
+                    onClick={() => handleFileClick(v.name)}
+                  >
                     <div>
                       <FileOutlined />
                       <StyledSpan>{v.name}</StyledSpan>
@@ -178,14 +205,14 @@ const Nav = () => {
   );
 };
 
-export default Nav;
+export default WikiNav;
 
 const StyledContainer = styled.div`
   margin: 0;
   padding: 0;
   padding-right: 15px;
   margin-right: 30px;
-  width: 280px;
+  width: 400px;
   background-color: rgba(0, 0, 0, 0.01);
   border-radius: 15px;
 `;
@@ -245,20 +272,20 @@ const StyledSpan = styled.span`
   margin-left: 10px;
 `;
 
-const StyledFile = styled.ul<{ isOpen: boolean }>`
+const StyledFile = styled.ul<{ isopen: boolean }>`
   list-style: none;
   margin-bottom: 10px;
   cursor: pointer;
   font-weight: 500;
   padding-left: 33px;
   color: rgba(0, 0, 0, 0.85);
-  max-height: ${(props) => (props.isOpen ? "500px" : "0")};
+  max-height: ${(props) => (props.isopen ? "500px" : "0")};
   overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
   div {
-    opacity: ${(props) => (props.isOpen ? "1" : "0")};
+    opacity: ${(props) => (props.isopen ? "1" : "0")};
     transition: opacity 0.3s;
   }
 `;
