@@ -15,3 +15,14 @@ export const SELECT_OPTIONS = {
     member: "Member",
   },
 };
+
+export const TABLE_TITLE: Record<string, string> = {
+  photo: "사진",
+  name: "이름",
+  email: "이메일",
+  department: "부서",
+  position: "포지션",
+  phone: "번호",
+  team: "팀",
+  access: "권한",
+};

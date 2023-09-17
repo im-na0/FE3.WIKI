@@ -1,4 +1,6 @@
-export interface UploadForm {
+export interface FormDataType {
+  [key: string]: any;
+  id?: string;
   name?: string;
   email?: string;
   phone?: string;
