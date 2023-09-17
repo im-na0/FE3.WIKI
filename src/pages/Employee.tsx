@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import MemberTable from "../components/Employee/MemberTable";
-import MemberHeading from "../components/Employee/MemberHeading";
+import MemberList from "../components/Employee/MemberList";
 
 const Container = styled.div`
   max-width: 100%;
@@ -43,14 +42,8 @@ const Employee = () => {
       <Header>
         <h4>직원 정보</h4>
       </Header>
-      <CardContainer className="card-container">
-        <div className="card-heading">
-          <MemberHeading />
-        </div>
-        <div className="card-content">
-          <MemberTable />
-        </div>
-        <div className="card-footer"></div>
+      <CardContainer>
+        <MemberList />
       </CardContainer>
     </Container>
   );
