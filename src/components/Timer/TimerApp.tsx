@@ -1,12 +1,22 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { styled } from "styled-components";
-import { Button, Alert } from "antd";
+import { Button } from "antd";
 import {
   ClockCircleOutlined,
   CheckOutlined,
   PoweroffOutlined,
 } from "@ant-design/icons";
+
+// firebase
+import { db } from "../../libs/firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 
 // 타이머 스타일링
 interface TimerProps {
@@ -22,6 +32,7 @@ const TimerAlign = styled.div`
   flexDirection: "column",
   justifyContent: "right",
   alignItems: "center"}`;
+
 const GreetingText = styled.div`
   font-size: "1.5rem";
 `;
@@ -46,6 +57,7 @@ const TimerApp = () => {
   const [clickedStartBtnText, setClickedStartBtnText] = useState<string>(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
   const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
   const [userName, setUserName] = useState<string | null>("");
+  const [workTimeDocId, setWorkTimeDocId] = useState<string | null>("");
 
   const UpdateTime = () => {
     const nowTime = new Date().toLocaleTimeString();
@@ -60,19 +72,28 @@ const TimerApp = () => {
     };
   }, []);
 
-  const recordStartWork = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const recordStartWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // 현재 시간을 출근 시간으로 기록
-    const startWorkTime = new Date();
-    const hours = startWorkTime.getHours().toString().padStart(2, "0");
-    const minutes = startWorkTime.getMinutes().toString().padStart(2, "0");
-    const seconds = startWorkTime.getSeconds().toString().padStart(2, "0");
-    setStartWorkTime(`${hours}:${minutes}:${seconds}`);
+    const startWorkTime = serverTimestamp();
+    const docRef = await addDoc(
+      collection(db, "Users/5zrVWF5YpYr86O28D84M/worktime"),
+      {
+        starttime: startWorkTime,
+      },
+    );
+    console.log(docRef.id);
+    setWorkTimeDocId(docRef.id); // 자동으로 생성된 문서 ID 저장
+
+    // // 현재 시간을 출근 시간으로 기록
+    // const hours = startWorkTime.getHours().toString().padStart(2, "0");
+    // const minutes = startWorkTime.getMinutes().toString().padStart(2, "0");
+    // // const seconds = startWorkTime.getSeconds().toString().padStart(2, "0");
+    // setStartWorkTime(`${hours}:${minutes}:${seconds}`);
     setStartWorkBtnClicked(true); // 출근 시간 기록 후 버튼 비활성화
     setClickedStartBtnText(nowTime);
   };
 
-  const recordFinishWork = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const recordFinishWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     // 현재 시간을 퇴근 시간으로 기록
 
@@ -80,13 +101,33 @@ const TimerApp = () => {
       return alert("출근한 상태일 때만 퇴근 기록이 가능합니다!");
     }
 
-    const finishWorkTime = new Date();
-    const hours = finishWorkTime.getHours().toString().padStart(2, "0");
-    const minutes = finishWorkTime.getMinutes().toString().padStart(2, "0");
-    const seconds = finishWorkTime.getSeconds().toString().padStart(2, "0");
-    setFinishWorkTime(`${hours}:${minutes}:${seconds}`);
-    setFinishWorkBtnClicked(true); // 퇴근 시간 기록 후 버튼 비활성화
-    setClickedFinishBtnText(nowTime);
+    if (workTimeDocId) {
+      const finishWorkTime = serverTimestamp();
+      // const hours = finishWorkTime.getHours().toString().padStart(2, "0");
+      // const minutes = finishWorkTime.getMinutes().toString().padStart(2, "0");
+      // const seconds = finishWorkTime.getSeconds().toString().padStart(2, "0");
+      // setFinishWorkTime(`${hours}:${minutes}:${seconds}`);
+      setFinishWorkBtnClicked(true); // 퇴근 시간 기록 후 버튼 비활성화
+      setClickedFinishBtnText(nowTime);
+
+      // 출근 시간이 저장된 동일 문서 ID를 참조
+      const workTimeDocRef = doc(
+        db,
+        `Users/5zrVWF5YpYr86O28D84M/worktime/${workTimeDocId}`,
+      );
+      console.log(workTimeDocId);
+      try {
+        // 퇴근 시간을 해당 문서 ID에 업데이트
+        await updateDoc(workTimeDocRef, {
+          finishtime: finishWorkTime,
+        });
+        console.log("퇴근 처리가 정상적으로 완료되었습니다!");
+      } catch (error) {
+        console.error("퇴근 처리에 실패했습니다", error);
+      }
+    } else {
+      console.error("worktimeDocId is null");
+    }
   };
 
   const calcWorkTime = () => {
