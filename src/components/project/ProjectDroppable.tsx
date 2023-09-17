@@ -52,6 +52,8 @@ interface ProjectDroppableProps {
 }
 
 const ProjectDroppable = ({ id, projectList }: ProjectDroppableProps) => {
+  // const projects = projectList?.sort((a, b) => a.order - b.order);
+
   return (
     <Projects>
       <div className="project__board-top">

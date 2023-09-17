@@ -1,5 +1,5 @@
 import { projectConverter, type ProjectInfo } from "../../libs/firestore";
-import { collection, query, getDocs, orderBy } from "firebase/firestore";
+import { collection, query, getDocs, orderBy, limit } from "firebase/firestore";
 import { firestoreDb } from "../../libs/firebase";
 import { useEffect } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -18,20 +18,20 @@ const useQueryProjectAllList = () => {
         const projectCompleted: ProjectInfo[] = [];
         const q = query(
           collection(firestoreDb, "Project").withConverter(projectConverter),
-          orderBy("createdAt", "desc"),
+          orderBy("order", "desc"),
         );
         const querySn = await getDocs(q);
         querySn.forEach((project) => {
           const data = project.data();
           switch (data.status) {
             case "plus":
-              projectPlus.push(data);
+              projectPlus.unshift(data);
               break;
             case "progress":
-              projectProgress.push(data);
+              projectProgress.unshift(data);
               break;
             case "completed":
-              projectCompleted.push(data);
+              projectCompleted.unshift(data);
               break;
           }
         });

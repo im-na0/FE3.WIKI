@@ -5,6 +5,9 @@ import {
   collection,
   doc,
   getCountFromServer,
+  getDocs,
+  limit,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -48,19 +51,27 @@ export const useMutationNewProject = ({
     const markdown = editorRef.current?.getInstance().getMarkdown();
     const day1 = dayjs(values.duration[0]).format(dateFormat);
     const day2 = dayjs(values.duration[1]).format(dateFormat);
+    let count: number;
 
     const q = query(
       collection(db, "Project"),
       where("status", "==", values.status),
+      orderBy("order", "desc"),
+      limit(1),
     );
-    const snapshot = await getCountFromServer(q);
-    const count = snapshot.data().count;
+    const snapshot = await getDocs(q);
+    const snData = snapshot.docs;
+    snData.forEach((result) => {
+      const data = result.data();
+      count = data.order + 1;
+    });
+
     await setDoc(
       doc(collection(db, "Project")).withConverter(projectDetailConverter),
       {
         ...values,
         duration: [day1, day2],
-        order: count,
+        order: count!,
         data: markdown!,
         createdAt: serverTimestamp(),
       },
