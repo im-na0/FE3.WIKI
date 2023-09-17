@@ -53,12 +53,6 @@ const Router = () => {
         <Route path="/employee" element={<Employee />}></Route>
         <Route path="/employee/:memberId" element={<EmployeeDetail />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
-        <Route path="/signin" element={<SignIn />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/start-register" element={<StartRegister />}></Route>
-        <Route path="/user-register" element={<UserRegister />}></Route>
-        <Route path="/end-register" element={<EndRegister />}></Route>
-        <Route path="/worktime" element={<WorkTime />}></Route>
       </Route>
     </Routes>
   );
