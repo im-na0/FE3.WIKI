@@ -3,7 +3,6 @@ import { Button, Modal, Checkbox, Form, Input } from "antd";
 import { styled } from "styled-components";
 import { auth } from "../../libs/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 
 interface FieldType {
   userEmail?: string;

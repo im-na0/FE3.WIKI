@@ -1,13 +1,14 @@
+import { useParams } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
-
-import MemberTable from "../components/Employee/MemberTable";
-import MemberHeading from "../components/Employee/MemberHeading";
+import "../styles/Employee.css";
+import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
 
 const Container = styled.div`
   max-width: 100%;
   margin: 0 auto;
   padding: 0 1rem;
+  color: #191d25;
 
   @media (min-width: 576px) {
     max-width: 576px;
@@ -34,27 +35,17 @@ const CardContainer = styled.div`
   background-color: #fff;
   border-radius: 8px;
   color: #526484;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
   word-wrap: break-word;
 `;
-
-const Employee = () => {
+function EmployeeDetail() {
+  const { memberId } = useParams();
   return (
     <Container>
-      <Header>
-        <h4>직원 정보</h4>
-      </Header>
       <CardContainer className="card-container">
-        <div className="card-heading">
-          <MemberHeading />
-        </div>
-        <div className="card-content">
-          <MemberTable />
-        </div>
-        <div className="card-footer"></div>
+        <MemberDetailInfo />
       </CardContainer>
     </Container>
   );
-};
+}
 
-export default Employee;
+export default EmployeeDetail;
