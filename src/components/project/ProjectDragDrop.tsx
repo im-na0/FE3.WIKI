@@ -55,8 +55,6 @@ const ProjectDragDrop = () => {
           [source.droppableId]: newProjArr,
         };
       });
-
-      console.log(diff);
       // 실제 firebase에 적용하기
       const deletePromise = diff.map((item) =>
         updateOrder(item.id, item.order),
@@ -64,23 +62,50 @@ const ProjectDragDrop = () => {
       Promise.all(deletePromise);
     } else {
       // 다른 보드로 이동
+      const sourceDiff: ProjectInfo[] = [];
+      // 드래그한 요소가 원래 속해있던 배열
+      const sourceBoard = [...projects[source.droppableId]];
+      // 드래그한 요소가 놓인 배열
+      const targetBoard = [...projects[destination.droppableId]];
+      // 이동한 아이템을 잘라냅니다.
+      const movedItem = sourceBoard.splice(source.index, 1);
+      targetBoard.splice(destination.index, 0, movedItem[0]);
+
+      // order 변경하기
+      const min = targetBoard.reduce(
+        (acc, item) => Math.min(acc, item.order),
+        1000000000,
+      );
+      // state를 변경합니다.
+      const newProjArr = targetBoard.map((item, index) => {
+        const newItem = { ...item, order: min + index };
+        return newItem;
+      });
+
+      newProjArr.forEach((item, index) => {
+        if (item.order !== targetBoard[index].order) {
+          // 다르다면 변경
+          const proj = { ...item, order: min + index };
+          sourceDiff.push(proj);
+        }
+      });
+
+      console.log(sourceDiff);
+
       setProjects((allProjects) => {
-        // 이동해야할 원본배열, 대상배열을 복사합니다.
-        const sourceBoard = [...allProjects[source.droppableId]];
-        const targetBoard = [...allProjects[destination.droppableId]];
-        // 이동한 아이템을 잘라냅니다.
-        const movedItem = sourceBoard.splice(source.index, 1);
-        targetBoard.splice(destination.index, 0, movedItem[0]);
         return {
           ...allProjects,
           [source.droppableId]: sourceBoard,
-          [destination.droppableId]: targetBoard,
+          [destination.droppableId]: newProjArr,
         };
       });
+
+      // 실제 firebase에 적용하기
+      const deletePromise = sourceDiff.map((item) =>
+        updateOrder(item.id, item.order, true, destination.droppableId),
+      );
+      Promise.all(deletePromise);
     }
-    // console.log("draggableId: ", draggableId);
-    // console.log("destination: ", destination);
-    // console.log("source: ", source);
   };
   return (
     <>

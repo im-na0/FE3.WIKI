@@ -35,7 +35,7 @@ const ProjectDraggable = ({ project, index }: ProjectDraggableProps) => {
       {(provided) => (
         <Project ref={provided.innerRef} {...provided.draggableProps}>
           <div className="project__item-btns">
-            <h2>{project.order}</h2>
+            {/* <h2>{project.order}</h2> */}
             <div
               className="project__item-btn"
               onClick={() => {

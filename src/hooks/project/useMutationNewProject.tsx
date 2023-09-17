@@ -4,7 +4,6 @@ import type { Editor } from "@toast-ui/react-editor";
 import {
   collection,
   doc,
-  getCountFromServer,
   getDocs,
   limit,
   orderBy,

@@ -1,5 +1,5 @@
 import { projectConverter, type ProjectInfo } from "../../libs/firestore";
-import { collection, query, getDocs, orderBy, limit } from "firebase/firestore";
+import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { firestoreDb } from "../../libs/firebase";
 import { useEffect } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
