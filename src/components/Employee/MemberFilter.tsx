@@ -42,7 +42,20 @@ const items: MenuProps["items"] = [
   },
 ];
 
-export default function MemberFilter() {
+interface MemberFilterProps {
+  filterValue: string;
+  setFilterValue: (value: string) => void;
+}
+
+export default function MemberFilter({
+  filterValue,
+  setFilterValue,
+}: MemberFilterProps) {
+  const handleFilterClick = (key: string) => {
+    console.log("Filter clicked:", key);
+    setFilterValue(key);
+  };
+
   return (
     <Dropdown
       menu={{ items }}

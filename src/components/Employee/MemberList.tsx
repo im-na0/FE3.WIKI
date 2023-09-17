@@ -30,6 +30,9 @@ const ListTable = styled.div`
 
 export default function MemberList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [filterValue, setFilterValue] = useState("");
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -56,8 +59,11 @@ export default function MemberList() {
     <>
       <CardHeader className="card-header">
         <ToggleWrap>
-          <MemberFilter />
-          <MemberSearch />
+          <MemberFilter
+            filterValue={filterValue}
+            setFilterValue={setFilterValue}
+          />
+          <MemberSearch onSearch={setSearchText} />
         </ToggleWrap>
         <ToggleWrap>
           <Button
@@ -84,7 +90,11 @@ export default function MemberList() {
         </ToggleWrap>
       </CardHeader>
       <ListTable>
-        <MemberTable setSelectedRowKeys={setSelectedRowKeys} />
+        <MemberTable
+          setSelectedRowKeys={setSelectedRowKeys}
+          searchText={searchText}
+          filterValue={filterValue}
+        />
       </ListTable>
     </>
   );
