@@ -25,6 +25,7 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const [isEditMode, setIsEditMode] = useState(true);
   const [file, setFile] = useRecoilState(uploadFileState);
   const [data, setData] = useRecoilState(formDataState);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const uploadFile = async () => {
     const name = new Date().getTime() + file!.name;
@@ -43,6 +44,10 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
     });
     console.log("Document written with ID: ", docRef.id);
     onCancel(); // 모달창 닫기
+    console.log(previewUrl);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl); // FIXME: 리렌더 안돼서 미리보기가 남아있음
+    }
     form.resetFields();
   };
 
@@ -53,7 +58,11 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
       }}
       form={form}
     >
-      <MemberProfile isEditMode={isEditMode} />
+      <MemberProfile
+        isEditMode={isEditMode}
+        previewUrl={previewUrl}
+        setPreviewUrl={setPreviewUrl}
+      />
       <MemberForm isEditMode={isEditMode} />
       <SumbitBtn>
         <Button icon={<UserAddOutlined />} htmlType="submit" type="primary">

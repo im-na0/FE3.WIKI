@@ -17,6 +17,7 @@ function MemberDetailInfo() {
   // 프로필 카드 상태 초기화
   const [name, setName] = useState("김땡땡");
   const [department, setDepartment] = useState("FE");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleProfileCard = () => {
     if (!isEditMode) {
@@ -59,7 +60,11 @@ function MemberDetailInfo() {
       </div>
       <div className="member-container">
         <div className="memer-profile-area">
-          <MemberProfile isEditMode={isEditMode} />
+          <MemberProfile
+            isEditMode={isEditMode}
+            previewUrl={previewUrl}
+            setPreviewUrl={setPreviewUrl}
+          />
           <div className="member-profile-info">
             <div className="title-text">{name}</div>
             <div className="desc-text">{department}</div>
