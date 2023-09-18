@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../type/form";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import CustomForm from "../common/CustomForm";
 import { EditOutlined } from "@ant-design/icons";
 import MemberForm from "./MemberForm";
@@ -12,19 +12,27 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { db, storage } from "../../libs/firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 function MemberDetailInfo() {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [file, setFile] = useState<File | null>(null); // file 관리
   const { memberId } = useParams<{ memberId: string }>();
   const fetchDataParams = {
     COLLECTION_NAME: "Users",
     DOCUMENT_ID: memberId,
   };
-  const [file, setFile] = useState<File | null>(null);
+  const userData: FormDataType | null = useFetchData(fetchDataParams);
 
-  const userData: FormDataType = useFetchData(fetchDataParams);
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
@@ -36,22 +44,56 @@ function MemberDetailInfo() {
     }
   }, [userData]);
 
-  const { updateData } = useUpdateData(fetchDataParams);
-  const { uploadStorage } = useUploadStorage();
-  const { deleteStorage } = useDeleteStorage();
+  const uploadStorage = async (file: File) => {
+    const fileName = new Date().getTime() + file!.name;
+    try {
+      const storageRef = ref(storage, `member/${fileName}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      const snapshot = await uploadTask;
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      console.log("스토리지 업로드 성공!");
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading file: ", error);
+      message.error("파일 업로드 중 오류가 발생했습니다 ");
+    }
+  };
+
+  const deleteStorage = async (src: string) => {
+    try {
+      await deleteObject(ref(storage, src));
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      message.error("파일 삭제 중 오류가 발생했습니다 ");
+    }
+  };
+
+  const updateData = async (id: string, data: FormDataType) => {
+    try {
+      console.log(data);
+      await setDoc(doc(db, "User", id), {
+        ...data,
+        updatedAt: serverTimestamp(),
+      });
+      console.log("스토어 업로드 성공!");
+    } catch (error) {
+      console.error("Error updating member: ", error);
+      message.error("데이터 업데이트 중 오류가 발생했습니다 ");
+    }
+  };
 
   const handleUpdate = async () => {
     const fieldsValue = form.getFieldsValue();
     if (file != null) {
-      const uploadedPhotoUrl = await uploadStorage(file);
-      fieldsValue.photo = uploadedPhotoUrl;
-      console.log(fieldsValue);
+      const downloadURL = await uploadStorage(file);
+      fieldsValue.photo = downloadURL ? downloadURL : fieldsValue.photo;
+      console.log(downloadURL);
     }
-    if (memberId != null) {
-      if (userData.photo) {
-        deleteStorage(userData.photo);
-      }
-      updateData(memberId, fieldsValue);
+    if (userData && userData.photo) {
+      await deleteStorage(userData.photo);
+    }
+    if (memberId) {
+      await updateData(memberId, fieldsValue);
     }
     handleProfileCard();
   };
@@ -78,8 +120,8 @@ function MemberDetailInfo() {
     <Form form={form}>
       <div className="member-header">
         <div className="member-title">
-          <h3>직원 정보 / {userData.name}</h3>
-          <span className="member-desc">{userData.name} 님의 프로필</span>
+          <h3>직원 정보</h3>
+          <span className="member-desc">{userData?.name} 님의 프로필</span>
         </div>
         <div className="member-btn-area">
           <Button
@@ -88,10 +130,7 @@ function MemberDetailInfo() {
             onClick={() => {
               toggleEditMode();
               if (isEditMode) {
-                const formValues = form.getFieldsValue();
-                console.log(formValues);
                 handleUpdate();
-                form.submit();
               }
             }}
           >

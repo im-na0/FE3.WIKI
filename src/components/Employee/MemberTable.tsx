@@ -28,7 +28,6 @@ export default function MemberTable({
     useState<FormDataType[]>(initialUserData);
 
   useEffect(() => {
-    console.log(filterValue);
     const filteredByAccess = filterValue
       ? initialUserData.filter(
           (item: FormDataType) => item.access === filterValue,
@@ -77,6 +76,7 @@ export default function MemberTable({
         <Table
           dataSource={filteredData}
           columns={columns(handleDelete)}
+          scroll={{ x: "max-content" }}
           rowSelection={{
             onChange: (
               selectedKeys: React.Key[],
