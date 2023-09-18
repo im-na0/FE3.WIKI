@@ -50,7 +50,7 @@ export const useMutationNewProject = ({
     const markdown = editorRef.current?.getInstance().getMarkdown();
     const day1 = dayjs(values.duration[0]).format(dateFormat);
     const day2 = dayjs(values.duration[1]).format(dateFormat);
-    let count: number;
+    let count = 0;
 
     const q = query(
       collection(db, "Project"),
