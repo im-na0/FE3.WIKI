@@ -98,3 +98,34 @@ export const projectDetailConverter: FirestoreDataConverter<ProjectDetail> = {
     );
   },
 };
+
+// 위키 페이지 컨버터를 위한 타입 정의
+export class WikiItem {
+  constructor(
+    public date: Timestamp,
+    public name: string,
+    public subName: string,
+  ) {}
+}
+export class WikiList {
+  constructor(
+    public items: WikiItem[],
+    public title: string,
+  ) {}
+}
+
+export const wikiListConverter: FirestoreDataConverter<WikiList> = {
+  toFirestore: (docData: WikiList): DocumentData => {
+    return {
+      items: docData.items,
+      title: docData.title,
+    };
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions,
+  ) => {
+    const data = snapshot.data(options);
+    return new WikiList(data.items, data.title);
+  },
+};
