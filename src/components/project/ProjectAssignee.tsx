@@ -15,11 +15,11 @@ const ProjectAssigneeInfo = styled.div`
   }
 `;
 
-const ProjectAssignee = ({ assignees }: { assignees: string[] }) => {
+const ProjectAssignee = ({ assignees }: { assignees?: string[] }) => {
   return (
     <ProjectAssigneeInfo>
       <UserOutlined />
-      {assignees.map((assignee) => (
+      {assignees?.map((assignee) => (
         <span className="text-block user-block" key={assignee}>
           {assignee}
         </span>

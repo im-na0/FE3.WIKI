@@ -15,11 +15,11 @@ const ProjectDateInfo = styled.div`
   }
 `;
 
-const ProjectDate = ({ duration }: { duration: string }) => {
+const ProjectDate = ({ duration }: { duration?: string[] }) => {
   return (
     <ProjectDateInfo>
       <CalendarOutlined />
-      <span className="text-block date-block">{duration}</span>
+      <span className="text-block date-block">{duration?.join(" ~ ")}</span>
     </ProjectDateInfo>
   );
 };

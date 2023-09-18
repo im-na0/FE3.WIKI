@@ -6,7 +6,7 @@ import {
   ProjectOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -49,13 +49,15 @@ const NewProjectBtn = styled.div<{ $primary: string }>`
 `;
 
 const ProjectSider = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const currentPath = location.pathname.split("/")[2];
   const {
     token: { colorBgContainer, colorPrimary },
   } = theme.useToken();
 
   const onClick: MenuProps["onClick"] = (e) => {
-    console.log("click ", e);
+    // console.log("click ", e);
     switch (e.key) {
       case "all":
         navigate("/project/all");
@@ -76,7 +78,7 @@ const ProjectSider = () => {
       <Menu
         onClick={onClick}
         style={{ width: 200 }}
-        defaultSelectedKeys={["fe"]}
+        defaultSelectedKeys={[currentPath ?? "fe"]}
         defaultOpenKeys={["myteam"]}
         mode="inline"
         items={items}
