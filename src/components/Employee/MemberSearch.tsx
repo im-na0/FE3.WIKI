@@ -2,12 +2,12 @@ import React from "react";
 import { Input } from "antd";
 
 interface MemberSearchProps {
-  onSearch: (searchText: string) => void; // 검색어 전달 함수 추가
+  onSearch: (searchText: string) => void;
 }
 
 export default function MemberSearch({ onSearch }: MemberSearchProps) {
   const handleSearch = (value: string) => {
-    onSearch(value); // 검색어를 상위 컴포넌트로 전달
+    onSearch(value);
   };
 
   const { Search } = Input;
