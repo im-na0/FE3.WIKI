@@ -67,36 +67,25 @@ interface CustomModalProps {
 function CustomModal({
   title,
   width,
-  style,
   footer,
   children,
   open,
   onCancel,
 }: CustomModalProps & ModalProps) {
   return (
-    <Modal
-      title={title}
-      open={open}
-      onCancel={onCancel}
-      centered
-      width={width}
-      style={style}
-      footer={footer}
-      transitionName="none"
-      maskTransitionName="none"
-    >
-      {children}
-    </Modal>
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onCancel={onCancel}
+        centered
+        width={width}
+        footer={footer}
+      >
+        {children}
+      </Modal>
+    </>
   );
-}
-
-interface CustomButtonProps {
-  children?: string;
-  danger?: boolean;
-  icon?: ReactNode;
-  shape?: "circle" | "default" | "round" | undefined;
-  onClick?: () => void;
-  htmlType?: "button" | "submit" | "reset";
 }
 
 export function useValidate() {

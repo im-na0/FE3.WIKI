@@ -1,13 +1,35 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { CameraFilled } from "@ant-design/icons";
 import { Button } from "antd";
+import { useRecoilState } from "recoil";
+import { uploadFileState } from "../../store/member";
+interface MemberProfileProps {
+  isEditMode: boolean;
+  previewUrl: string | null;
+  setPreviewUrl: (value: string | null) => void;
+}
 
-function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
+function MemberProfile({
+  isEditMode,
+  previewUrl,
+  setPreviewUrl,
+}: MemberProfileProps) {
+  const [file, setFile] = useRecoilState(uploadFileState);
   const imageInput = useRef<HTMLInputElement | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewUrl(imageUrl);
+      return () => {
+        URL.revokeObjectURL(imageUrl);
+      };
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [file, setPreviewUrl]);
 
   const onImageUpload = () => {
-    console.log("실행", imageInput);
     imageInput.current?.click();
   };
 
@@ -16,7 +38,7 @@ function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
     if (!selectedFile) {
       return;
     }
-    setUploadedFile(selectedFile);
+    setFile(selectedFile);
   };
 
   return (
@@ -27,10 +49,9 @@ function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
           className="profile-img hidden"
           alt="preview"
           src={
-            uploadedFile
-              ? URL.createObjectURL(uploadedFile)
-              : "https://deploy-preview-66--effulgent-axolotl-ab38e8.netlify.app/asset/member3.png"
-          }
+            previewUrl ||
+            "https://deploy-preview-66--effulgent-axolotl-ab38e8.netlify.app/asset/member3.png"
+          } // FIXME: 기본 이미지 변경
         />
         {isEditMode && (
           <Button
@@ -43,7 +64,6 @@ function MemberProfile({ isEditMode }: { isEditMode: boolean }) {
       </label>
       <input
         type="file"
-        className="input-file edit"
         id="image"
         accept="image/*"
         style={{ display: "none" }}
