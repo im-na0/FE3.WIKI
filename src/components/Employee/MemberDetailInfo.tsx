@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
+import { useFetchData } from "../../hooks/Employee/useFetchData";
+import { FormDataType } from "../../type/form";
 import { Button } from "antd";
 import CustomForm from "../common/CustomForm";
 import { EditOutlined } from "@ant-design/icons";
@@ -7,14 +9,23 @@ import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
 
 function MemberDetailInfo() {
-  const { memberId } = useParams();
-
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
-
   const [isEditMode, setIsEditMode] = useState(false);
+  const { memberId } = useParams<{ memberId: string }>();
+  const fetchDataParams = {
+    COLLECTION_NAME: "Users",
+    DOCUMENT_ID: memberId,
+  };
+  const userData: FormDataType = useFetchData(fetchDataParams);
+  useEffect(() => {
+    if (userData) {
+      Object.keys(userData).forEach((fieldName) => {
+        form.setFieldsValue({ [fieldName]: userData[fieldName] });
+      });
+    }
+  }, [userData]);
 
-  // 프로필 카드 상태 초기화
   const [name, setName] = useState("김땡땡");
   const [department, setDepartment] = useState("FE");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
