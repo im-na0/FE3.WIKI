@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
-import { PlusOutlined } from "@ant-design/icons";
 import { Button, Input, Select, Upload, message } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
@@ -8,24 +7,19 @@ import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../Navigation";
 import { motion } from "framer-motion";
-
-const props: UploadProps = {
-  name: "file",
-  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
+import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import { db, auth, storage } from "../../../libs/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useRecoilState } from "recoil";
+import {
+  Department,
+  Team,
+  departmentState,
+  selectedPartState,
+  selectedTeamState,
+  teamState,
+  userInfo,
+} from "../../../store/signup";
 
 const Container = styled.div`
   margin: 0;
@@ -52,9 +46,12 @@ const UserNameCategory = styled.div`
   display: flex;
   flex-direction: column;
 `;
-const UserCompanyCategory = styled(UserNameCategory)``;
-const UserRankCategory = styled(UserNameCategory)``;
+const UserEmailCategory = styled(UserNameCategory)``;
+const UserPhoneCategory = styled(UserNameCategory)``;
+const UserTeamCategory = styled(UserNameCategory)``;
+const UserPositionCategory = styled(UserNameCategory)``;
 const UserImageCategory = styled(UserNameCategory)``;
+const UserDepartmentCategory = styled(UserNameCategory)``;
 const BtnContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -84,8 +81,152 @@ const SubmitBtn = styled.button`
     color: #fff;
   }
 `;
+
+// Departments Collection 진입
+async function getDepartments() {
+  const departmentRef = collection(db, "Department");
+  const querySnapshot = await getDocs(departmentRef);
+  const departments: Department[] = [];
+  querySnapshot.forEach((doc) => {
+    departments.push({ id: doc.id, ...doc.data() } as Department);
+    console.log(departments);
+  });
+  return departments;
+}
+// Departments ID => Teams Collection 진입
+async function getTeams(selectedPart: string | undefined) {
+  if (!selectedPart) {
+    return [];
+  }
+  const teamsRef = collection(db, "Department", selectedPart, "Teams");
+  const querySnapshot = await getDocs(teamsRef);
+  const teams: Team[] = [];
+  querySnapshot.forEach((doc) => {
+    teams.push({ id: doc.id, ...doc.data() } as Team);
+    console.log(teams);
+  });
+  return teams;
+}
 export default function UserRegister() {
+  // 로그인 유저 정보 가져오기
+  const user = auth.currentUser;
   const { moveStartRegister, moveEndRegister } = useNavigation();
+  const [departmentOptions, setDepartmentOptions] =
+    useRecoilState(departmentState);
+  const [teamOptions, setTeamOptions] = useRecoilState(teamState);
+  const [selectedPart, setSelectedPart] = useRecoilState(selectedPartState);
+  const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
+  // 부서 선택하면 선택 부서 저장
+  const handleSelectedPart = (value: string | undefined) => {
+    setSelectedPart(value);
+  };
+  // 팀 선택하면 선택 팀 저장
+  const handleSelectedTeam = (value: string | undefined) => {
+    setSelectedTeam(value);
+  };
+  useEffect(() => {
+    async function fetchDepartment() {
+      const departments = await getDepartments();
+      setDepartmentOptions(departments);
+    }
+    fetchDepartment();
+  }, []);
+  useEffect(() => {
+    async function fetchTeam() {
+      const teams = await getTeams(selectedPart);
+      setTeamOptions(teams);
+    }
+    fetchTeam();
+  }, [selectedPart]);
+  const [input, setInput] = useRecoilState(userInfo);
+  // 유저 정보 input 값 저장
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "department") {
+      setSelectedPart(value);
+    }
+    if (name === "team") {
+      setSelectedTeam(value);
+    }
+    setInput((prevInput) => ({
+      ...prevInput,
+      [name]: value,
+    }));
+  };
+  // upload 컴포넌트 props 값 => 이미지 업로드
+  const props: UploadProps = {
+    name: "file",
+    customRequest: async ({ file }) => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userUid = user.uid;
+          const uploadFile = file as File;
+          const storageRef = ref(
+            storage,
+            `images/${userUid}/${uploadFile.name}`,
+          );
+          const snapshot = await uploadBytes(storageRef, uploadFile);
+          console.log("업로드 완료", snapshot);
+          const downloadURL: string | undefined =
+            await getDownloadURL(storageRef);
+          console.log("URL : ", downloadURL);
+          setInput((prevInput) => ({
+            ...prevInput,
+            photoUrl: downloadURL,
+          }));
+        } else {
+          console.error("로그아웃 상태");
+          alert("로그인 부터 해주세요");
+        }
+      } catch (error) {
+        console.error("업로드 오류: ", error);
+      }
+    },
+    showUploadList: false,
+  };
+  // firebase에 로그인 uid 이름으로 업로드
+  const handleUpload = async () => {
+    try {
+      if (user) {
+        const userUid = user.uid; // uid 가져오기
+        const departmentPath = selectedPart ? `Department/${selectedPart}` : "";
+        const teamPath = selectedPart ? `Teams/${selectedTeam}/member` : "";
+        const path = `${departmentPath}/${teamPath}`;
+        const userDB = doc(db, "Users", userUid);
+        const newUser = {
+          name: input.name,
+          email: input.email,
+          phonenumber: input.phonenumber,
+          department: selectedPart,
+          team: selectedTeam,
+          position: input.position,
+          photoUrl: input.photoUrl,
+        };
+        await setDoc(userDB, newUser);
+        // 유저 Department/Teams 컬렉션에 member로 넣기
+        const teamDB = doc(db, path, userUid);
+        const teamData = {
+          name: input.name,
+          email: input.email,
+          phonenumber: input.phonenumber,
+          department: selectedPart,
+          team: selectedTeam,
+          position: input.position,
+          photoUrl: input.photoUrl,
+        };
+        await setDoc(teamDB, teamData);
+        alert("업로드 성공");
+        moveEndRegister();
+      } else {
+        console.error("로그아웃 상태");
+        alert("로그아웃 상태입니다");
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      alert("업로드 실패");
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -98,11 +239,53 @@ export default function UserRegister() {
           <UserNameCategory>
             <span>이름</span>
             <Input
+              name="name"
               style={{ width: "320px" }}
               placeholder="사용하실 이름을 입력해주세요"
+              onChange={handleInputChange}
             />
           </UserNameCategory>
-          <UserCompanyCategory>
+          <UserEmailCategory>
+            <span>이메일</span>
+            <Input
+              name="email"
+              style={{ width: "320px" }}
+              placeholder="이메일을 입력해주세요"
+              onChange={handleInputChange}
+            />
+          </UserEmailCategory>
+          <UserPhoneCategory>
+            <span>휴대폰 번호</span>
+            <Input
+              name="phonenumber"
+              style={{ width: "320px" }}
+              placeholder="휴대폰 번호를 입력해주세요"
+              onChange={handleInputChange}
+            />
+          </UserPhoneCategory>
+          <UserDepartmentCategory>
+            <span>소속 부서</span>
+            <Select
+              showSearch
+              style={{ width: 320 }}
+              placeholder="소속 부서를 골라주세요"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? "").includes(input)
+              }
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? "")
+                  .toLowerCase()
+                  .localeCompare((optionB?.label ?? "").toLowerCase())
+              }
+              options={departmentOptions.map((department) => ({
+                value: department.id,
+                label: department.name,
+              }))}
+              onChange={handleSelectedPart}
+            />
+          </UserDepartmentCategory>
+          <UserTeamCategory>
             <span>소속 팀</span>
             <Select
               showSearch
@@ -117,37 +300,22 @@ export default function UserRegister() {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
-              options={[
-                {
-                  value: "1",
-                  label: "FE팀",
-                },
-                {
-                  value: "2",
-                  label: "BE팀",
-                },
-                {
-                  value: "3",
-                  label: "기획팀",
-                },
-                {
-                  value: "4",
-                  label: "디자인팀",
-                },
-                {
-                  value: "5",
-                  label: "놀고먹는팀",
-                },
-              ]}
+              options={teamOptions.map((team) => ({
+                value: team.id,
+                label: team.id,
+              }))}
+              onChange={handleSelectedTeam}
             />
-          </UserCompanyCategory>
-          <UserRankCategory>
+          </UserTeamCategory>
+          <UserPositionCategory>
             <span>직급</span>
             <Input
+              name="position"
               style={{ width: "320px" }}
               placeholder="맡으신 직급을 입력해주세요"
+              onChange={handleInputChange}
             />
-          </UserRankCategory>
+          </UserPositionCategory>
           <UserImageCategory>
             <span>프로필 사진</span>
             <Upload {...props}>
@@ -158,7 +326,7 @@ export default function UserRegister() {
             <BackBtn onClick={moveStartRegister}>
               <ArrowLeftOutlined />
             </BackBtn>
-            <SubmitBtn onClick={moveEndRegister}>완료</SubmitBtn>
+            <SubmitBtn onClick={handleUpload}>완료</SubmitBtn>
           </BtnContainer>
         </UserInfoContainer>
         <SlideCounter>

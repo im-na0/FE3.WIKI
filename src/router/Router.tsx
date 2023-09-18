@@ -22,7 +22,7 @@ import EmployeeDetail from "../pages/EmployeeDetail";
 
 const Router = () => {
   useEffect(() => {
-    setPersistence(auth, browserSessionPersistence)
+    setPersistence(auth, browserSessionPersistence) // broswerSessionPersistence
       .then(() => {
         console.log("로그인 유지 설정 완료");
       })

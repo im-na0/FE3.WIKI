@@ -65,6 +65,7 @@ const MoveSingUp = styled(Link)`
   margin-bottom: 20px;
   font-size: 12px;
   font-weight: bold;
+  text-decoration: none;
   color: #1c49ff;
   span {
     color: #909090;
