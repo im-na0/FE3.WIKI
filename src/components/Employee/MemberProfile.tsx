@@ -1,20 +1,21 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { CameraFilled } from "@ant-design/icons";
 import { Button } from "antd";
-import { useRecoilState } from "recoil";
-import { uploadFileState } from "../../store/member";
 interface MemberProfileProps {
   isEditMode: boolean;
   previewUrl: string | null;
   setPreviewUrl: (value: string | null) => void;
+  file: File | null;
+  setFile: (value: File | null) => void;
 }
 
 function MemberProfile({
   isEditMode,
   previewUrl,
   setPreviewUrl,
+  file,
+  setFile,
 }: MemberProfileProps) {
-  const [file, setFile] = useRecoilState(uploadFileState);
   const imageInput = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {

@@ -10,7 +10,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { FormDataType } from "../../type/form";
 import { useRecoilState } from "recoil";
-import { formDataState, uploadFileState } from "../../store/member";
+import { uploadFileState } from "../../store/member";
 
 const COLLECTION_NAME = "Users";
 
@@ -23,8 +23,7 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(true);
-  const [file, setFile] = useRecoilState(uploadFileState);
-  const [data, setData] = useRecoilState(formDataState);
+  const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const uploadFile = async () => {
@@ -42,7 +41,6 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
       ...data,
       photo: imageUrl,
     });
-    console.log("Document written with ID: ", docRef.id);
     onCancel(); // 모달창 닫기
     console.log(previewUrl);
     if (previewUrl) {
@@ -62,6 +60,8 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
         isEditMode={isEditMode}
         previewUrl={previewUrl}
         setPreviewUrl={setPreviewUrl}
+        file={file}
+        setFile={setFile}
       />
       <MemberForm isEditMode={isEditMode} />
       <SumbitBtn>

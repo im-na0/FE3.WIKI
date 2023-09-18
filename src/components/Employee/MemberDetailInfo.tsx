@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../type/form";
 import { Button } from "antd";
@@ -7,6 +7,11 @@ import CustomForm from "../common/CustomForm";
 import { EditOutlined } from "@ant-design/icons";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
+import {
+  useUpdateData,
+  useUploadStorage,
+  useDeleteStorage,
+} from "../../hooks/Employee/useMemberMutaion";
 
 function MemberDetailInfo() {
   const Form = CustomForm.Form;
@@ -17,14 +22,39 @@ function MemberDetailInfo() {
     COLLECTION_NAME: "Users",
     DOCUMENT_ID: memberId,
   };
+  const [file, setFile] = useState<File | null>(null);
+
   const userData: FormDataType = useFetchData(fetchDataParams);
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
         form.setFieldsValue({ [fieldName]: userData[fieldName] });
+        if (fieldName === "photo") {
+          setPreviewUrl(userData[fieldName as string]);
+        }
       });
     }
   }, [userData]);
+
+  const { updateData } = useUpdateData(fetchDataParams);
+  const { uploadStorage } = useUploadStorage();
+  const { deleteStorage } = useDeleteStorage();
+
+  const handleUpdate = async () => {
+    const fieldsValue = form.getFieldsValue();
+    if (file != null) {
+      const uploadedPhotoUrl = await uploadStorage(file);
+      fieldsValue.photo = uploadedPhotoUrl;
+      console.log(fieldsValue);
+    }
+    if (memberId != null) {
+      if (userData.photo) {
+        deleteStorage(userData.photo);
+      }
+      updateData(memberId, fieldsValue);
+    }
+    handleProfileCard();
+  };
 
   const [name, setName] = useState("김땡땡");
   const [department, setDepartment] = useState("FE");
@@ -48,8 +78,8 @@ function MemberDetailInfo() {
     <Form form={form}>
       <div className="member-header">
         <div className="member-title">
-          <h3>직원 정보 / {memberId}</h3>
-          <span className="member-desc">{memberId} 님의 프로필</span>
+          <h3>직원 정보 / {userData.name}</h3>
+          <span className="member-desc">{userData.name} 님의 프로필</span>
         </div>
         <div className="member-btn-area">
           <Button
@@ -60,8 +90,8 @@ function MemberDetailInfo() {
               if (isEditMode) {
                 const formValues = form.getFieldsValue();
                 console.log(formValues);
-                handleProfileCard();
-                form.submit(); // FIXME: 제출 전에 유효성 검사하기
+                handleUpdate();
+                form.submit();
               }
             }}
           >
@@ -75,6 +105,8 @@ function MemberDetailInfo() {
             isEditMode={isEditMode}
             previewUrl={previewUrl}
             setPreviewUrl={setPreviewUrl}
+            file={file}
+            setFile={setFile}
           />
           <div className="member-profile-info">
             <div className="title-text">{name}</div>
