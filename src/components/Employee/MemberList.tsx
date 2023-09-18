@@ -72,7 +72,9 @@ export default function MemberList() {
             icon={<PlusOutlined />}
             onClick={openModal}
             size="large"
-          ></Button>
+          >
+            Add
+          </Button>
           <CustomForm.Modal
             title="멤버 등록"
             width={700}

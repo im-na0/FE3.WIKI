@@ -77,6 +77,11 @@ export default function MemberTable({
           dataSource={filteredData}
           columns={columns(handleDelete)}
           scroll={{ x: "max-content" }}
+          pagination={{
+            defaultPageSize: 8,
+            showSizeChanger: true,
+            pageSizeOptions: ["10", "15", "20"],
+          }}
           rowSelection={{
             onChange: (
               selectedKeys: React.Key[],

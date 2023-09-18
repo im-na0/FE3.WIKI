@@ -6,7 +6,7 @@ import { FormDataType } from "../../../type/form";
 interface Props<TableData> {
   data: TableData[];
   columns: ColumnsType<TableData>;
-  rowSelection: any; // FIXME: 적절한 타입 찾기
+  rowSelection: object;
 }
 
 function CustomTable<TableData extends FormDataType>({
@@ -15,12 +15,15 @@ function CustomTable<TableData extends FormDataType>({
   rowSelection,
 }: Props<TableData>) {
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      rowKey={(record) => record.id || ""}
-      rowSelection={rowSelection}
-    />
+    <>
+      {" "}
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey={(record) => record.id || ""}
+        rowSelection={rowSelection}
+      />
+    </>
   );
 }
 
