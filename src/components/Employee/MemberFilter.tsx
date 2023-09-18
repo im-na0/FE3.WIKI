@@ -3,23 +3,16 @@ import React from "react";
 import { Button, Dropdown, MenuProps } from "antd";
 
 interface MemberFilterProps {
-  filterValue: string;
   setFilterValue: (value: string) => void;
-  sortValue: string;
   setSortValue: (value: string) => void;
 }
 
 export default function MemberFilter({
-  filterValue,
   setFilterValue,
-  sortValue,
   setSortValue,
 }: MemberFilterProps) {
   const handleMenuClick: MenuProps["onClick"] = (e) => {
     switch (e.key) {
-      case "sortDefault":
-        setSortValue("");
-        break;
       case "sortName":
         setSortValue(e.key);
         break;
@@ -29,10 +22,10 @@ export default function MemberFilter({
       case "membersAll":
         setFilterValue("");
         break;
-      case "membersManager":
+      case "admin":
         setFilterValue(e.key);
         break;
-      case "membersMember":
+      case "member":
         setFilterValue(e.key);
         break;
       default:
@@ -46,11 +39,7 @@ export default function MemberFilter({
       label: "SORT BY:",
       children: [
         {
-          label: <span>default</span>,
-          key: "sortDefault",
-        },
-        {
-          label: <span>Name</span>,
+          label: <span>Name(default)</span>,
           key: "sortName",
         },
         {
@@ -68,12 +57,12 @@ export default function MemberFilter({
           key: "membersAll",
         },
         {
-          label: <span>Manager</span>,
-          key: "membersManager",
+          label: <span>admin</span>,
+          key: "admin",
         },
         {
           label: <span>Member</span>,
-          key: "membersMember",
+          key: "member",
         },
       ],
     },

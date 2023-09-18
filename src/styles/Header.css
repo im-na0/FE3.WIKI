@@ -24,7 +24,7 @@
     background-color: #f5f5f5;
 }
 .header-nav ul li:hover a{
-    color: #00b96b;
+    color: #6C63FF;
 }
 .header-nav ul li a{
     color: inherit;
@@ -51,7 +51,7 @@
     cursor:pointer;
 }
 .header-user .signin-link{
-    background-color: #00b96b;
+    background-color: #6C63FF;
     color: #fff;
     border: none;
 }

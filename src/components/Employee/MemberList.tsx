@@ -7,7 +7,7 @@ import MemberTable from "./MemberTable";
 import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useDeleteData } from "../../hook/Employee/useDeleteData";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 
 const CardHeader = styled.div`
   display: flex;
@@ -61,9 +61,7 @@ export default function MemberList() {
       <CardHeader className="card-header">
         <ToggleWrap>
           <MemberFilter
-            filterValue={filterValue}
             setFilterValue={setFilterValue}
-            sortValue={sortValue}
             setSortValue={setSortValue}
           />
           <MemberSearch onSearch={setSearchText} />
