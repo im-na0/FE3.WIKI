@@ -37,7 +37,7 @@ const Container = styled.div`
 `;
 
 const LeftContainer = styled.div`
-  flex: 6.5;
+  flex: 5;
 `;
 
 const WorkTimeText = styled.span<WorkTimeProps>`
@@ -56,8 +56,8 @@ const PaginationWrapper = styled.div`
 `;
 
 const RightContainer = styled.div`
-  flex: 3.5;
-  margin-left: 10px;
+  flex: 5;
+  margin-left: 5px;
 `;
 
 const WorkTimeList: React.FC = () => {
