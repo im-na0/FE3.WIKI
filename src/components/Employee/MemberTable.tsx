@@ -1,29 +1,79 @@
-import CustomTable from "../common/CustomTable";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Table } from "antd";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import { FormDataType } from "../../type/form";
 import { columns } from "../../data/tableColumns";
-import { useFetchData } from "../../hook/Employee/useFetchData";
-import { useDeleteData } from "../../hook/Employee/useDeleteData";
+import { useFetchData } from "../../hooks/Employee/useFetchData";
 
 interface MemberTableProps {
   setSelectedRowKeys: (keys: string[]) => void;
+  searchText: string;
+  filterValue: string;
+  sortValue: string;
 }
 
-export default function MemberTable({ setSelectedRowKeys }: MemberTableProps) {
+export default function MemberTable({
+  setSelectedRowKeys,
+  searchText,
+  filterValue,
+  sortValue,
+}: MemberTableProps) {
   const fetchDataParams = {
     COLLECTION_NAME: "Users",
     ORDER: "name",
   };
-  const data = useFetchData(fetchDataParams);
   const { deleteData } = useDeleteData();
+  const initialUserData = useFetchData(fetchDataParams);
+  const [filteredData, setFilteredData] =
+    useState<FormDataType[]>(initialUserData);
+
+  useEffect(() => {
+    console.log(filterValue);
+    const filteredByAccess = filterValue
+      ? initialUserData.filter((item) => item.access === filterValue)
+      : initialUserData;
+
+    const searchedData = filteredByAccess.filter((item) => {
+      if (!searchText) return true;
+      const nameIncludes = item.name ? item.name.includes(searchText) : false;
+      const departmentIncludes = item.department
+        ? item.department.includes(searchText)
+        : false;
+      return nameIncludes || departmentIncludes;
+    });
+
+    const sortedDataSource = [...searchedData];
+    switch (sortValue) {
+      case "sortName":
+        sortedDataSource.sort((a, b) =>
+          (a.name ?? "").localeCompare(b.name ?? ""),
+        );
+        break;
+      case "sortTeam":
+        sortedDataSource.sort((a, b) =>
+          (a.team ?? "").localeCompare(b.team ?? ""),
+        );
+        break;
+      default:
+        break;
+    }
+
+    const dataWithKeys = sortedDataSource.map((item) => ({
+      ...item,
+      key: item.id,
+    }));
+    setFilteredData(dataWithKeys);
+  }, [initialUserData, filterValue, sortValue, searchText]);
+
   const handleDelete = async (id: string) => {
     deleteData(id);
   };
+
   return (
     <>
-      {data && (
-        <CustomTable
-          data={data}
+      {filteredData && (
+        <Table
+          dataSource={filteredData}
           columns={columns(handleDelete)}
           rowSelection={{
             onChange: (

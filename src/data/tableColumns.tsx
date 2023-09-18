@@ -15,6 +15,7 @@ const Image = styled.span`
     width: 100%;
   }
 `;
+
 const Btn = styled.a`
   display: block;
   padding: 0.3rem;

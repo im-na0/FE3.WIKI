@@ -7,7 +7,7 @@ import MemberTable from "./MemberTable";
 import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useDeleteData } from "../../hook/Employee/useDeleteData";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 
 const CardHeader = styled.div`
   display: flex;
@@ -30,6 +30,10 @@ const ListTable = styled.div`
 
 export default function MemberList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [filterValue, setFilterValue] = useState(""); // 필터 상태 추가
+  const [sortValue, setSortValue] = useState(""); // 정렬 상태 추가
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -56,8 +60,11 @@ export default function MemberList() {
     <>
       <CardHeader className="card-header">
         <ToggleWrap>
-          <MemberFilter />
-          <MemberSearch />
+          <MemberFilter
+            setFilterValue={setFilterValue}
+            setSortValue={setSortValue}
+          />
+          <MemberSearch onSearch={setSearchText} />
         </ToggleWrap>
         <ToggleWrap>
           <Button
@@ -84,7 +91,12 @@ export default function MemberList() {
         </ToggleWrap>
       </CardHeader>
       <ListTable>
-        <MemberTable setSelectedRowKeys={setSelectedRowKeys} />
+        <MemberTable
+          setSelectedRowKeys={setSelectedRowKeys}
+          searchText={searchText}
+          filterValue={filterValue}
+          sortValue={sortValue}
+        />
       </ListTable>
     </>
   );
