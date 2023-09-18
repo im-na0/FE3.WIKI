@@ -14,7 +14,10 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
+  getDocs,
   serverTimestamp,
+  setDoc,
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -44,9 +47,15 @@ const TimerApp = () => {
     weekday: "narrow",
   });
 
+  const user = auth.currentUser;
+  const userUid = user ? user.uid : "ax2Eyczauq0NbDTfrB2i"; // 유저 Uid 샘플 테스트용
+  const userNameRef = collection(db, "Users");
+  const userDoc = doc(userNameRef, userUid);
+
   const [nowTime, setNowTime] = useState<string>(
     new Date().toLocaleTimeString(),
   ); // 현재 시간 표시
+  const [userName, setUserName] = useState<string | null>(""); // 현재 로그인한 유저의 이름을 관리
   const [startWorkTime, setStartWorkTime] = useState<string | null>(null); // 출근 시간 기록
   const [finishWorkTime, setFinishWorkTime] = useState<string | null>(null); // 퇴근 시간 기록
   const [startWorkBtnClicked, setStartWorkBtnClicked] =
@@ -57,7 +66,20 @@ const TimerApp = () => {
   const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
   const [workTimeDocId, setWorkTimeDocId] = useState<string | null>(""); // starttime 기록시 자동으로 생성된 문서 ID 저장
   const [totalWorkTime, setTotalWorkTime] = useState<number>(0); // 출근 시간과 퇴근 시간을 대조하여 총 근무 시간을 계산
-  const [userName, setUserName] = useState<string | null>("");
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const userDocSnap = await getDoc(userDoc);
+        const userName = userDocSnap.data()?.name || "";
+        setUserName(userName);
+        console.log("Fetched userName:", userName);
+      } catch (error) {
+        console.error("Error fetching userName:", error);
+      }
+    };
+    fetchUserName();
+  }, [userDoc]);
 
   // 현재 시간을 출력해주는 일반 타이머
   const UpdateTime = () => {
@@ -99,12 +121,23 @@ const TimerApp = () => {
   const recordStartWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const startWorkTime = serverTimestamp() as Timestamp; // 현재 시간을 출근 시간으로 기록
-    const docRef = await addDoc(
-      collection(db, "Users/5zrVWF5YpYr86O28D84M/worktime"),
-      {
-        starttime: startWorkTime,
-      },
+    const workTimeSubCollectionRef = collection(
+      db,
+      `Users/${userUid}/worktime`,
     );
+
+    // worktime이라는 하위 컬렉션이 존재하는지 확인
+    const subCollectionSnapShot = await getDocs(workTimeSubCollectionRef);
+    if (subCollectionSnapShot.empty) {
+      await setDoc(
+        doc(db, `Users/${userUid}`),
+        { worktime: [] },
+        { merge: true },
+      );
+    }
+    const docRef = await addDoc(workTimeSubCollectionRef, {
+      starttime: startWorkTime,
+    });
     console.log(docRef.id);
     setWorkTimeDocId(docRef.id); // 자동으로 생성된 문서 ID 저장
     setStartWorkBtnClicked(true); // 출근 시간 기록 후 버튼 비활성화
@@ -127,7 +160,7 @@ const TimerApp = () => {
       // 출근 시간이 저장된 동일 문서 ID를 참조
       const workTimeDocRef = doc(
         db,
-        `Users/5zrVWF5YpYr86O28D84M/worktime/${workTimeDocId}`,
+        `Users/${userUid}/worktime/${workTimeDocId}`,
       );
 
       try {
@@ -146,7 +179,7 @@ const TimerApp = () => {
 
   return (
     <form>
-      환영합니다. OOO 님!
+      환영합니다. {userName} 님!
       <TimerAlign>
         <div>
           <div>

@@ -14,6 +14,7 @@ import {
   DocumentData,
   QueryDocumentSnapshot,
   getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 
 interface WorkTimeProps {
@@ -60,7 +61,7 @@ const RightContainer = styled.div`
 `;
 
 const WorkTimeList: React.FC = () => {
-  const [workTimeData, setworkTimeData] = useState<DataType[]>([]);
+  const [workTimeData, setWorkTimeData] = useState<DataType[]>([]);
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
 
@@ -121,34 +122,60 @@ const WorkTimeList: React.FC = () => {
   useEffect(() => {
     const fetchWorkTime = async () => {
       try {
-        const workTimeRef = collection(db, "Users");
-        const userDocRef = doc(workTimeRef, userUid);
-        const userDocSnap = await getDoc(userDocRef);
-        const userName = userDocSnap.data()?.name || "";
-
-        const workTimeSnap = await getDocs(workTimeRef);
-
         const fetchedWorkTime: DataType[] = [];
 
-        workTimeSnap.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-          const workTimeData = doc.data();
-          if (
-            (workTimeFilter === "나의 출퇴근 현황" &&
-              workTimeData.name === userName) ||
-            workTimeFilter === "우리팀 출퇴근 현황"
-          ) {
-            fetchedWorkTime.push({
-              key: doc.id,
-              name: workTimeData.name,
-              department: workTimeData.department,
-              team: workTimeData.team,
-              starttime: workTimeData.starttime,
-              finishtime: workTimeData.finishtime,
+        if (workTimeFilter === "나의 출퇴근 현황") {
+          const userDocRef = doc(db, `Users/${userUid}`);
+          const userDocSnap = await getDoc(userDocRef);
+          const userData = userDocSnap.data() || {};
+
+          const userWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
+          const userWorkTimeSnap = await getDocs(userWorkTimeRef);
+
+          const unsubscribe = onSnapshot(userWorkTimeRef, (snapshot) => {
+            const updatedUserWorkTime: DataType[] = [];
+            snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+              const userWorkTimeData = doc.data();
+              updatedUserWorkTime.push({
+                key: doc.id,
+                name: userData.name || "",
+                department: userData.department || "",
+                team: userData.team || "",
+                starttime: userWorkTimeData.starttime,
+                finishtime: userWorkTimeData.finishtime,
+              });
             });
-          }
-        });
-        setworkTimeData(fetchedWorkTime);
-        console.log(fetchedWorkTime);
+            setWorkTimeData(updatedUserWorkTime);
+          });
+
+          return () => {
+            unsubscribe();
+          };
+        } else if (workTimeFilter === "우리팀 출퇴근 현황") {
+          const teamWorkTimeRef = collection(db, "Users");
+          const teamWorkTimeSnap = await getDocs(teamWorkTimeRef);
+
+          const unsubscribe = onSnapshot(teamWorkTimeRef, (snapshot) => {
+            const updatedTeamWorkTime: DataType[] = [];
+            snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+              const teamWorkTimeData = doc.data();
+              updatedTeamWorkTime.push({
+                key: doc.id,
+                name: teamWorkTimeData.name || "",
+                department: teamWorkTimeData.department || "",
+                team: teamWorkTimeData.team || "",
+                starttime: teamWorkTimeData.starttime,
+                finishtime: teamWorkTimeData.finishtime,
+              });
+            });
+            setWorkTimeData(updatedTeamWorkTime);
+          });
+
+          return () => {
+            // Unsubscribe the listener when the component unmounts
+            unsubscribe();
+          };
+        }
       } catch (error) {
         console.error("Error fetching worktime data", error);
       }
