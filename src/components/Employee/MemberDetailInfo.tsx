@@ -12,14 +12,6 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import { db, storage } from "../../libs/firebase";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 function MemberDetailInfo() {
   const Form = CustomForm.Form;
@@ -32,7 +24,9 @@ function MemberDetailInfo() {
     DOCUMENT_ID: memberId,
   };
   const userData: FormDataType | null = useFetchData(fetchDataParams);
-
+  const [cardName, setCardName] = useState(userData.name);
+  const [cardDepartment, setCardDepartment] = useState(userData.photo);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
@@ -40,54 +34,20 @@ function MemberDetailInfo() {
         if (fieldName === "photo") {
           setPreviewUrl(userData[fieldName as string]);
         }
+        setCardDepartment(userData.department);
+        setCardName(userData.name);
       });
     }
   }, [userData]);
 
-  const uploadStorage = async (file: File) => {
-    const fileName = new Date().getTime() + file!.name;
-    try {
-      const storageRef = ref(storage, `member/${fileName}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      const snapshot = await uploadTask;
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log("스토리지 업로드 성공!");
-      return downloadURL;
-    } catch (error) {
-      console.error("Error uploading file: ", error);
-      message.error("파일 업로드 중 오류가 발생했습니다 ");
-    }
-  };
-
-  const deleteStorage = async (src: string) => {
-    try {
-      await deleteObject(ref(storage, src));
-    } catch (error) {
-      console.error("Error deleting file:", error);
-      message.error("파일 삭제 중 오류가 발생했습니다 ");
-    }
-  };
-
-  const updateData = async (id: string, data: FormDataType) => {
-    try {
-      console.log(data);
-      await setDoc(doc(db, "User", id), {
-        ...data,
-        updatedAt: serverTimestamp(),
-      });
-      console.log("스토어 업로드 성공!");
-    } catch (error) {
-      console.error("Error updating member: ", error);
-      message.error("데이터 업데이트 중 오류가 발생했습니다 ");
-    }
-  };
-
   const handleUpdate = async () => {
+    const { uploadStorage } = useUploadStorage();
+    const { deleteStorage } = useDeleteStorage();
+    const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
     const fieldsValue = form.getFieldsValue();
     if (file != null) {
       const downloadURL = await uploadStorage(file);
       fieldsValue.photo = downloadURL ? downloadURL : fieldsValue.photo;
-      console.log(downloadURL);
     }
     if (userData && userData.photo) {
       await deleteStorage(userData.photo);
@@ -98,17 +58,13 @@ function MemberDetailInfo() {
     handleProfileCard();
   };
 
-  const [name, setName] = useState("김땡땡");
-  const [department, setDepartment] = useState("FE");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   const handleProfileCard = () => {
     if (!isEditMode) {
       return;
     }
     const fieldsValue = form.getFieldsValue();
-    setName(fieldsValue.name);
-    setDepartment(fieldsValue.department);
+    setCardName(fieldsValue.name);
+    setCardDepartment(fieldsValue.department);
   };
   const toggleEditMode = () => {
     setIsEditMode((prevIsEditMode) => {
@@ -148,8 +104,8 @@ function MemberDetailInfo() {
             setFile={setFile}
           />
           <div className="member-profile-info">
-            <div className="title-text">{name}</div>
-            <div className="desc-text">{department}</div>
+            <div className="title-text">{cardName}</div>
+            <div className="desc-text">{cardDepartment}</div>
           </div>
         </div>
         <div className="member-info-area">

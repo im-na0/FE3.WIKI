@@ -49,10 +49,7 @@ function MemberProfile({
           id="preview"
           className="profile-img hidden"
           alt="preview"
-          src={
-            previewUrl ||
-            "https://deploy-preview-66--effulgent-axolotl-ab38e8.netlify.app/asset/member3.png"
-          } // FIXME: 기본 이미지 변경
+          src={previewUrl || ""} // FIXME: 기본 이미지 변경
         />
         {isEditMode && (
           <Button
