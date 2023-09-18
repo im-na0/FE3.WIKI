@@ -1,24 +1,26 @@
-import React from "react";
-import { FormDataType } from "../../type/form";
-import { columns } from "../../data/tableColumns";
+import React, { useEffect, useState } from "react";
+import { Table } from "antd";
 import { useFetchData } from "../../hook/Employee/useFetchData";
 import { useDeleteData } from "../../hook/Employee/useDeleteData";
-import { Table } from "antd";
+import { FormDataType } from "../../type/form";
+import { columns } from "../../data/tableColumns";
 
 interface MemberTableProps {
   setSelectedRowKeys: (keys: string[]) => void;
   searchText: string;
   filterValue: string;
+  sortValue: string;
 }
 
 export default function MemberTable({
   setSelectedRowKeys,
   searchText,
   filterValue,
+  sortValue,
 }: MemberTableProps) {
   const fetchDataParams = {
     COLLECTION_NAME: "Users",
-    ORDER: "name",
+    ORDER: "",
   };
   const data = useFetchData(fetchDataParams);
   const { deleteData } = useDeleteData();
@@ -27,24 +29,36 @@ export default function MemberTable({
     deleteData(id);
   };
 
-  const filteredData = data?.filter((item: FormDataType) => {
-    if (!searchText) return true;
-    const nameIncludes = item.name ? item.name.includes(searchText) : false;
-    const departmentIncludes = item.department
-      ? item.department.includes(searchText)
-      : false;
+  const [filteredData, setFilteredData] = useState<FormDataType[] | null>(null);
 
-    const filterMatch = !filterValue || item.department === filterValue;
+  useEffect(() => {
+    // 필터링 로직을 구현
+    const filteredData = data
+      ?.filter((item: FormDataType) => {
+        if (!searchText) return true;
+        const nameIncludes = item.name ? item.name.includes(searchText) : false;
+        const departmentIncludes = item.department
+          ? item.department.includes(searchText)
+          : false;
 
-    return (nameIncludes || departmentIncludes) && filterMatch;
-  });
+        const filterMatch = !filterValue || item.department === filterValue;
+
+        return (nameIncludes || departmentIncludes) && filterMatch;
+      })
+      .map((item) => ({
+        ...item,
+        key: item.id,
+      }));
+    // 필터된 데이터를 setState
+    setFilteredData(filteredData);
+  }, [data, searchText, sortValue, filterValue]);
 
   return (
     <>
       {filteredData && (
         <Table
           dataSource={filteredData}
-          columns={columns(handleDelete)}
+          columns={columns(handleDelete, filterValue, sortValue)}
           rowSelection={{
             onChange: (
               selectedKeys: React.Key[],

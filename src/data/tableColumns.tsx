@@ -15,12 +15,17 @@ const Image = styled.span`
     width: 100%;
   }
 `;
+
 const Btn = styled.a`
   display: block;
   padding: 0.3rem;
 `;
 
-export const columns = (handleDelete: (id: string) => void) => {
+export const columns = (
+  handleDelete: (id: string) => void,
+  sortValue: string,
+  filterValue: string,
+) => {
   const navigate = useNavigate();
 
   return [
@@ -35,6 +40,12 @@ export const columns = (handleDelete: (id: string) => void) => {
           <div className="email">{record.email}</div>
         </div>
       ),
+      sorter: (a: FormDataType, b: FormDataType) => {
+        if (sortValue === "sortName") {
+          return (a.name || "").localeCompare(b.name || "");
+        }
+        return 0;
+      },
     },
     {
       title: "Department",
@@ -44,10 +55,23 @@ export const columns = (handleDelete: (id: string) => void) => {
           <div className="address">{record.position}</div>
         </div>
       ),
+      filters: [
+        { text: "All", value: "" },
+        { text: "Manager", value: "Manager" },
+        { text: "Member", value: "Member" },
+      ],
+     
+      },
     },
     {
       title: "Team",
       dataIndex: "team",
+      sorter: (a: FormDataType, b: FormDataType) => {
+        if (sortValue === "sortTeam") {
+          return (a.team || "").localeCompare(b.team || "");
+        }
+        return 0;
+      },
     },
     {
       title: "Phone",
