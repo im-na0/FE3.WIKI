@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ProjectListItem from "./ProjectListItem";
-import { projectList, projectList2, projectList3 } from "./ProjectDragDrop";
-
-const projects = [...projectList, ...projectList2, ...projectList3];
+import useQueryProjectAllList from "../../hooks/project/useQueryProjectAllList";
 
 const ProjectListSider = () => {
+  const projects = useQueryProjectAllList();
+  const projectArr = [
+    ...projects["plus"],
+    ...projects["progress"],
+    ...projects["completed"],
+  ];
+  projectArr.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+
+  useEffect(() => {
+    console.log("list is rendering");
+    console.log(projectArr);
+  });
+
   return (
     <div className="project__all-list">
-      {projects.map((project) => (
+      {projectArr?.map((project) => (
         <ProjectListItem key={project.id} project={project} />
       ))}
     </div>

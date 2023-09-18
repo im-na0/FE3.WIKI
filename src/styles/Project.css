@@ -16,7 +16,7 @@
 }
 .project__item-btn{
     padding:5px;
-
+    cursor: pointer;
 }
 .project__top-title{
     display: flex;
