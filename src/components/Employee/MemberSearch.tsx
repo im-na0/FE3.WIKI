@@ -10,8 +10,10 @@ export default function MemberSearch({ onSearch }: MemberSearchProps) {
     onSearch(value); // 검색어를 상위 컴포넌트로 전달
   };
 
+  const { Search } = Input;
+
   return (
-    <Input
+    <Search
       placeholder="이름 또는 부서 검색"
       allowClear
       size="large"
