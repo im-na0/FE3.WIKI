@@ -9,13 +9,11 @@ import {
 } from "@ant-design/icons";
 
 // firebase
-import { db } from "../../libs/firebase";
+import { db, auth } from "../../libs/firebase";
 import {
   addDoc,
   collection,
   doc,
-  getDoc,
-  getDocs,
   serverTimestamp,
   Timestamp,
   updateDoc,

@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Pagination, Segmented, Table } from "antd";
+import { Segmented, Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import WorkCalendar from "./WorkCalendar";
 
 // firebase
-import { db } from "../../libs/firebase";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import { db, auth } from "../../libs/firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  Timestamp,
+  DocumentData,
+  QueryDocumentSnapshot,
+  getDoc,
+} from "firebase/firestore";
 
 interface WorkTimeProps {
   fontSize?: string;
@@ -19,7 +27,6 @@ interface DataType {
   team: string;
   starttime: Timestamp;
   finishtime: Timestamp;
-  leave: string;
 }
 
 const Container = styled.div`
@@ -29,7 +36,7 @@ const Container = styled.div`
 `;
 
 const LeftContainer = styled.div`
-  flex: 6;
+  flex: 6.5;
 `;
 
 const WorkTimeText = styled.span<WorkTimeProps>`
@@ -48,14 +55,17 @@ const PaginationWrapper = styled.div`
 `;
 
 const RightContainer = styled.div`
-  flex: 4;
+  flex: 3.5;
   margin-left: 10px;
 `;
 
-const WorkTimeList = () => {
+const WorkTimeList: React.FC = () => {
   const [workTimeData, setworkTimeData] = useState<DataType[]>([]);
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
+
+  const user = auth.currentUser;
+  const userUid = user ? user.uid : "ax2Eyczauq0NbDTfrB2i"; // 유저 Uid 샘플 테스트용
 
   const columns: ColumnsType<DataType> = [
     {
@@ -74,63 +84,78 @@ const WorkTimeList = () => {
       title: "출근 시간",
       dataIndex: "starttime",
       sorter: {
-        compare: (a, b) =>
-          a.starttime.toDate().getTime() - b.starttime.toDate().getTime(),
+        compare: (a, b) => {
+          const aTime = a.starttime ? a.starttime.toDate().getTime() : 0;
+          const bTime = b.starttime ? b.starttime.toDate().getTime() : 0;
+          return aTime - bTime;
+        },
         multiple: 1,
       },
       render: (starttime) =>
-        `${starttime && starttime.toDate().toLocaleDateString()}
-         ${starttime && starttime.toDate().toLocaleTimeString()}`,
+        starttime
+          ? `${starttime.toDate().toLocaleDateString()} ${
+              starttime && starttime.toDate().toLocaleTimeString()
+            }`
+          : "",
     },
     {
       title: "퇴근 시간",
       dataIndex: "finishtime",
       sorter: {
-        compare: (a, b) =>
-          a.finishtime.toDate().getTime() - b.finishtime.toDate().getTime(),
+        compare: (a, b) => {
+          const aTime = a.finishtime ? a.finishtime.toDate().getTime() : 0;
+          const bTime = b.finishtime ? b.finishtime.toDate().getTime() : 0;
+          return aTime - bTime;
+        },
         multiple: 2,
       },
       render: (finishtime) =>
-        `${finishtime && finishtime.toDate().toLocaleDateString()} 
-         ${finishtime && finishtime.toDate().toLocaleTimeString()}`,
-    },
-    {
-      title: "비고 (휴가 등)",
-      dataIndex: "leave",
+        finishtime
+          ? `${finishtime.toDate().toLocaleDateString()} ${
+              finishtime && finishtime.toDate().toLocaleTimeString()
+            }`
+          : "",
     },
   ];
 
   useEffect(() => {
     const fetchWorkTime = async () => {
-      const workTimeRef = collection(db, "Users");
-      const workTimeSnap = await getDocs(workTimeRef);
+      try {
+        const workTimeRef = collection(db, "Users");
+        const userDocRef = doc(workTimeRef, userUid);
+        const userDocSnap = await getDoc(userDocRef);
+        const userName = userDocSnap.data()?.name || "";
 
-      const fetchedWorkTime: DataType[] = [];
+        const workTimeSnap = await getDocs(workTimeRef);
 
-      workTimeSnap.forEach((doc) => {
-        const workTimeData = doc.data();
-        if (
-          (workTimeFilter === "나의 출퇴근 현황" &&
-            workTimeData.name === "홍길동") ||
-          workTimeFilter === "우리팀 출퇴근 현황"
-        ) {
-          fetchedWorkTime.push({
-            key: doc.id,
-            name: workTimeData.name,
-            department: workTimeData.department,
-            team: workTimeData.team,
-            starttime: workTimeData.starttime,
-            finishtime: workTimeData.finishtime,
-            leave: workTimeData.leave,
-          });
-        }
-      });
-      setworkTimeData(fetchedWorkTime);
-      console.log(fetchedWorkTime);
+        const fetchedWorkTime: DataType[] = [];
+
+        workTimeSnap.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+          const workTimeData = doc.data();
+          if (
+            (workTimeFilter === "나의 출퇴근 현황" &&
+              workTimeData.name === userName) ||
+            workTimeFilter === "우리팀 출퇴근 현황"
+          ) {
+            fetchedWorkTime.push({
+              key: doc.id,
+              name: workTimeData.name,
+              department: workTimeData.department,
+              team: workTimeData.team,
+              starttime: workTimeData.starttime,
+              finishtime: workTimeData.finishtime,
+            });
+          }
+        });
+        setworkTimeData(fetchedWorkTime);
+        console.log(fetchedWorkTime);
+      } catch (error) {
+        console.error("Error fetching worktime data", error);
+      }
     };
 
     fetchWorkTime();
-  }, [workTimeFilter]);
+  }, [workTimeFilter, userUid]);
 
   const onChange: TableProps<DataType>["onChange"] = (
     pagination,
