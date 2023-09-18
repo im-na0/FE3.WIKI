@@ -42,7 +42,7 @@ const items: MenuProps["items"] = [
   },
 ];
 
-export default function TableFilter() {
+export default function MemberFilter() {
   return (
     <Dropdown
       menu={{ items }}

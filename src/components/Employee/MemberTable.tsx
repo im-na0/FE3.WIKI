@@ -36,32 +36,20 @@ const Btn = styled.a`
 const items: MenuProps["items"] = [
   {
     key: "1",
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="#">
-        Edit
-      </a>
-    ),
+    label: <span>Edit</span>,
   },
   {
     key: "2",
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="#">
-        View Profile
-      </a>
-    ),
+    label: <span>View Profile</span>,
   },
   {
     key: "3",
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="#">
-        Delete
-      </a>
-    ),
+    label: <span>Delete</span>,
     danger: true,
   },
 ];
 
-export default function CardTable() {
+export default function MemberTable() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
   const columns: ColumnsType<DataType> = [
@@ -110,18 +98,16 @@ export default function CardTable() {
       title: <EllipsisOutlined />,
       dataIndex: "",
       render: () => (
-        <a>
-          <Dropdown
-            menu={{ items }}
-            autoAdjustOverflow={true}
-            placement="bottomRight"
-            trigger={["click"]}
-          >
-            <Btn onClick={(e) => e.preventDefault()}>
-              <EllipsisOutlined />
-            </Btn>
-          </Dropdown>
-        </a>
+        <Dropdown
+          menu={{ items }}
+          autoAdjustOverflow={true}
+          placement="bottomRight"
+          trigger={["click"]}
+        >
+          <Btn onClick={(e) => e.preventDefault()}>
+            <EllipsisOutlined />
+          </Btn>
+        </Dropdown>
       ),
     },
   ];

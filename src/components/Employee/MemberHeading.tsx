@@ -1,10 +1,10 @@
 import React from "react";
-import { Button, Space } from "antd";
+import { Space } from "antd";
 import styled from "styled-components";
-import TableFilter from "./CardFilter";
-import TableSearch from "./CardSearch";
-import TableAddMember from "./CardAddMember";
-import TableExportBtn from "./CardExportBtn";
+import MemberFilter from "./MemberFilter";
+import MemberSearch from "./MemberSearch";
+import MemberControlMenu from "./MemberControlMenu";
+import MemberExportBtn from "./MemberExportBtn";
 
 const CardHeader = styled.div`
   display: flex;
@@ -26,17 +26,17 @@ export default function CardHeading() {
     <CardHeader className="card-header">
       <ToggleWrap>
         <Space direction="vertical">
-          <TableFilter />
+          <MemberFilter />
         </Space>
         <Space direction="vertical">
-          <TableSearch />
+          <MemberSearch />
         </Space>
       </ToggleWrap>
       <ToggleWrap>
-        <TableExportBtn />
+        <MemberExportBtn />
         <Space direction="vertical">
           <Space wrap>
-            <TableAddMember />
+            <MemberControlMenu />
           </Space>
         </Space>
       </ToggleWrap>
