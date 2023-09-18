@@ -1,8 +1,17 @@
 import React from "react";
-import { useRecoilState } from "recoil";
-import { auth } from "../libs/firebase";
+import MainSwiper from "../components/Main/MainSwiper";
+import "../styles/Main.css";
+import MainTeam from "../components/Main/MainTeam";
+import MainWidget from "../components/Main/MainWidget";
+
 const Main = () => {
-  return <div>Main</div>;
+  return (
+    <main>
+      <MainSwiper />
+      <MainTeam />
+      <MainWidget />
+    </main>
+  );
 };
 
 export default Main;

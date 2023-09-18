@@ -40,9 +40,12 @@ const MainHeader = () => {
   ];
   const [isSignIn, setIsSignIn] = useRecoilState(authState);
   const handleSignOut = () => {
-    setIsSignIn(false);
-    auth.signOut();
-    alert("로그아웃 되었습니다!");
+    const user = auth.currentUser;
+    if (user) {
+      setIsSignIn(false);
+      auth.signOut();
+      alert("로그아웃 되었습니다!");
+    }
   };
   return (
     <Header style={{ background: colorBgContainer }}>

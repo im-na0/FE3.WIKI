@@ -6,7 +6,6 @@ import { authState } from "../../store/signin";
 import Main from "../../pages/Main";
 
 const AuthStateChanged = () => {
-  // const [isSignIn, setIsSignIn] = useState(false);
   const [isSignIn, setIsSignIn] = useRecoilState(authState);
   const navigate = useNavigate();
   useEffect(() => {

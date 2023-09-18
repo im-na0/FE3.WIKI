@@ -5,7 +5,6 @@ import React, {
   FormEvent,
   ChangeEvent,
 } from "react";
-import { useNavigate } from "react-router-dom";
 
 // Components
 import WikiEditor from "./WikiEditor";
@@ -50,23 +49,21 @@ interface IContent {
 }
 
 const WikiViewer = ({ content }: IContent) => {
+  const { name, subName } = content;
+
   const prevSubNameRef = useRef<string | null>(null);
   const prevNameRef = useRef<string | null>(null);
-
-  const { name, subName } = content;
 
   const [renderKey, setRenderKey] = useState(0);
   const [editState, setEditState] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(name);
 
-  const currentFolder = useRecoilValue(currentFolderTitle);
   const [currentFile, setCurrentFile] = useRecoilState(currentFileTitle);
-  const [item, setItem] = useRecoilState(currentItem);
-  const setItems = useSetRecoilState(totalItems);
   const [editFile, setEditFile] = useRecoilState(editFileState);
-  const [existSub, setExistSub] = useRecoilState(editFileSubName);
-
-  const navigate = useNavigate();
+  const currentFolder = useRecoilValue(currentFolderTitle);
+  const setItem = useSetRecoilState(currentItem);
+  const setItems = useSetRecoilState(totalItems);
+  const setExistSub = useSetRecoilState(editFileSubName);
 
   const postEditTitle = async (newData: string) => {
     const q = query(
@@ -140,7 +137,6 @@ const WikiViewer = ({ content }: IContent) => {
 
   const onClickEdit = () => {
     setEditState(true);
-    console.log(editFile);
   };
 
   const onChangeEdit = (e: ChangeEvent<HTMLInputElement>) => {

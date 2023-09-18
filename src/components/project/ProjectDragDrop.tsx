@@ -101,6 +101,15 @@ const ProjectDragDrop = () => {
       });
 
       // 실제 firebase에 적용하기
+      (async () => {
+        await updateOrder(
+          movedItem[0].id,
+          movedItem[0].order,
+          true,
+          destination.droppableId,
+        );
+      })();
+      // 순서 바뀌는 요소는 모두 order값을 변경
       const deletePromise = sourceDiff.map((item) =>
         updateOrder(item.id, item.order, true, destination.droppableId),
       );
