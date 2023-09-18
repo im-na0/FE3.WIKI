@@ -39,11 +39,9 @@ const MainHeader = () => {
     // },
   ];
   const [isSignIn, setIsSignIn] = useRecoilState(authState);
-  const storeUid: string | null = localStorage.getItem("uid");
-  console.log(storeUid);
   const handleSignOut = () => {
-    if (storeUid) {
-      localStorage.removeItem(storeUid);
+    const user = auth.currentUser;
+    if (user) {
       setIsSignIn(false);
       auth.signOut();
       alert("로그아웃 되었습니다!");

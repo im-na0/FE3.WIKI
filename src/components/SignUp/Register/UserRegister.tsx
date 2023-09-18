@@ -7,36 +7,19 @@ import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../Navigation";
 import { motion } from "framer-motion";
-import { addDoc, collection, getDocs, setDoc, doc } from "firebase/firestore";
-import { db, auth } from "../../../libs/firebase";
-import { useNavigate } from "react-router-dom";
-const props: UploadProps = {
-  name: "file",
-  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
-  headers: {
-    authorization: "authorization-text",
-  },
-  onChange(info) {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-    }
-    if (info.file.status === "done") {
-      message.success(`${info.file.name} file uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-};
-
-interface Department {
-  id: string;
-  name: string; // 부서 이름
-  teams: string[]; // 부서 안에 속해 있는 팀 이름
-}
-interface Team {
-  id: string; // Team Name
-  member: string; // Team 속해 있는 멤버
-}
+import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import { db, auth, storage } from "../../../libs/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useRecoilState } from "recoil";
+import {
+  Department,
+  Team,
+  departmentState,
+  selectedPartState,
+  selectedTeamState,
+  teamState,
+  userInfo,
+} from "../../../store/signup";
 
 const Container = styled.div`
   margin: 0;
@@ -98,6 +81,7 @@ const SubmitBtn = styled.button`
     color: #fff;
   }
 `;
+
 // Departments Collection 진입
 async function getDepartments() {
   const departmentRef = collection(db, "Department");
@@ -124,19 +108,19 @@ async function getTeams(selectedPart: string | undefined) {
   return teams;
 }
 export default function UserRegister() {
-  const storeUid = localStorage.getItem("uid"); // uid 가져오기
+  // 로그인 유저 정보 가져오기
+  const user = auth.currentUser;
   const { moveStartRegister, moveEndRegister } = useNavigation();
-  const [departmentOptions, setDepartmentOptions] = useState<Department[]>([]); // firebase에 있는 부서 옵션 저장
-  const [teamOptions, setTeamOptions] = useState<Team[]>([]); // firebase에 있는 team 옵션 저장
-  const [selectedPart, setSelectedPart] = useState<string | undefined>(
-    undefined,
-  );
-  const [selectedTeam, setSelectedTeam] = useState<string | undefined>(
-    undefined,
-  );
+  const [departmentOptions, setDepartmentOptions] =
+    useRecoilState(departmentState);
+  const [teamOptions, setTeamOptions] = useRecoilState(teamState);
+  const [selectedPart, setSelectedPart] = useRecoilState(selectedPartState);
+  const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
+  // 부서 선택하면 선택 부서 저장
   const handleSelectedPart = (value: string | undefined) => {
     setSelectedPart(value);
   };
+  // 팀 선택하면 선택 팀 저장
   const handleSelectedTeam = (value: string | undefined) => {
     setSelectedTeam(value);
   };
@@ -154,14 +138,8 @@ export default function UserRegister() {
     }
     fetchTeam();
   }, [selectedPart]);
-  const [input, setInput] = useState({
-    name: "",
-    email: "",
-    phonenumber: "",
-    department: "",
-    team: "",
-    position: "",
-  });
+  const [input, setInput] = useRecoilState(userInfo);
+  // 유저 정보 input 값 저장
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "department") {
@@ -175,10 +153,47 @@ export default function UserRegister() {
       [name]: value,
     }));
   };
+  // upload 컴포넌트 props 값 => 이미지 업로드
+  const props: UploadProps = {
+    name: "file",
+    customRequest: async ({ file }) => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userUid = user.uid;
+          const uploadFile = file as File;
+          const storageRef = ref(
+            storage,
+            `images/${userUid}/${uploadFile.name}`,
+          );
+          const snapshot = await uploadBytes(storageRef, uploadFile);
+          console.log("업로드 완료", snapshot);
+          const downloadURL: string | undefined =
+            await getDownloadURL(storageRef);
+          console.log("URL : ", downloadURL);
+          setInput((prevInput) => ({
+            ...prevInput,
+            photoUrl: downloadURL,
+          }));
+        } else {
+          console.error("로그아웃 상태");
+          alert("로그인 부터 해주세요");
+        }
+      } catch (error) {
+        console.error("업로드 오류: ", error);
+      }
+    },
+    showUploadList: false,
+  };
+  // firebase에 로그인 uid 이름으로 업로드
   const handleUpload = async () => {
     try {
-      if (storeUid) {
-        const userDB = doc(db, "Users", storeUid);
+      if (user) {
+        const userUid = user.uid; // uid 가져오기
+        const departmentPath = selectedPart ? `Department/${selectedPart}` : "";
+        const teamPath = selectedPart ? `Teams/${selectedTeam}/member` : "";
+        const path = `${departmentPath}/${teamPath}`;
+        const userDB = doc(db, "Users", userUid);
         const newUser = {
           name: input.name,
           email: input.email,
@@ -186,8 +201,21 @@ export default function UserRegister() {
           department: selectedPart,
           team: selectedTeam,
           position: input.position,
+          photoUrl: input.photoUrl,
         };
-        const docRef = await setDoc(userDB, newUser);
+        await setDoc(userDB, newUser);
+        // 유저 Department/Teams 컬렉션에 member로 넣기
+        const teamDB = doc(db, path, userUid);
+        const teamData = {
+          name: input.name,
+          email: input.email,
+          phonenumber: input.phonenumber,
+          department: selectedPart,
+          team: selectedTeam,
+          position: input.position,
+          photoUrl: input.photoUrl,
+        };
+        await setDoc(teamDB, teamData);
         alert("업로드 성공");
         moveEndRegister();
       } else {
