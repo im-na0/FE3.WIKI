@@ -2,6 +2,7 @@ import React from "react";
 import { WikiList } from "../../libs/firestore";
 import styled from "styled-components";
 import { theme } from "antd";
+import { Link } from "react-router-dom";
 
 export const BorderTitle = styled.h4<{ $colorPrimary: string }>`
   border-left: 3px solid ${(props) => props.$colorPrimary};
@@ -38,7 +39,9 @@ const MainWikiWidget = ({ wikis }: { wikis?: WikiList }) => {
       <div>
         {wikis?.items.map((item) => (
           <WidgetItem key={item.date.toMillis()}>
-            <p>{item.name}</p>
+            <p>
+              <Link to={`/wiki`}>{item.name}</Link>
+            </p>
             <div className="list-date">
               <span>{item.date.toDate().getMonth() + 1}</span>.
               <span>{item.date.toDate().getUTCDate()}</span>
