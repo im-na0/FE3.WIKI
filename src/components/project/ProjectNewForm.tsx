@@ -5,15 +5,19 @@ import { SaveFilled } from "@ant-design/icons";
 import ProjectMdEditor from "./ProjectMdEditor";
 import { useMutationNewProject } from "../../hooks/project/useMutationNewProject";
 import type { Editor } from "@toast-ui/react-editor";
-import { ProjectDetail } from "../../libs/firestore";
+import { ProjectDetail, TeamList, UserList } from "../../libs/firestore";
 
 const { RangePicker } = DatePicker;
 
 const ProjectNewForm = ({
   isEdit,
+  teams,
+  users,
   projectDetail,
 }: {
   isEdit: boolean;
+  teams?: TeamList[];
+  users?: UserList[];
   projectDetail?: ProjectDetail;
 }) => {
   const [form] = Form.useForm();
@@ -98,11 +102,16 @@ const ProjectNewForm = ({
           rules={[{ required: true, message: "담당자를 선택 해주세요." }]}
         >
           <Select mode="multiple" placeholder="담당자를 선택 해주세요.">
-            <Select.Option value="김미정">김미정</Select.Option>
+            {users?.map((user) => (
+              <Select.Option key={user.name} value={user.name}>
+                {user.name}
+              </Select.Option>
+            ))}
+            {/* <Select.Option value="김미정">김미정</Select.Option>
             <Select.Option value="김성겸">김성겸</Select.Option>
             <Select.Option value="노욱진">노욱진</Select.Option>
             <Select.Option value="박나영">박나영</Select.Option>
-            <Select.Option value="진종수">진종수</Select.Option>
+            <Select.Option value="진종수">진종수</Select.Option> */}
           </Select>
         </Form.Item>
         <Form.Item
@@ -115,11 +124,16 @@ const ProjectNewForm = ({
             mode="multiple"
             placeholder="프로젝트를 담당할 팀을 선택 해주세요."
           >
-            <Select.Option value="FE1팀">FE1팀</Select.Option>
+            {teams?.map((team) => (
+              <Select.Option key={team.teamName} value={team.teamName}>
+                {team.teamName}
+              </Select.Option>
+            ))}
+            {/* <Select.Option value="FE1팀">FE1팀</Select.Option>
             <Select.Option value="FE2팀">FE2팀</Select.Option>
             <Select.Option value="BE1팀">BE1팀</Select.Option>
             <Select.Option value="BE2팀">BE2팀</Select.Option>
-            <Select.Option value="QA팀">QA팀</Select.Option>
+            <Select.Option value="QA팀">QA팀</Select.Option> */}
           </Select>
         </Form.Item>
         <Form.Item
