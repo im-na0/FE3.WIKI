@@ -23,10 +23,17 @@ export const addFolder = async (
   refreshFc: RefreshFunction,
 ): Promise<void> => {
   if (folderName.length > 0) {
+    const foldersRef = collection(db, "WikiPage");
+    const foldersQuery = query(foldersRef);
+    const foldersQuerySnapshot = await getDocs(foldersQuery);
+    const order = foldersQuerySnapshot.size;
+
     await addDoc(collection(db, "WikiPage"), {
       title: folderName,
       items: [],
+      order: order,
     });
+
     refreshFc();
   }
 };
@@ -75,7 +82,14 @@ export const addFile = async (
       subName: state.subName,
       date: date,
     };
-    exist.push(newFileData);
+
+    const order = exist.length;
+
+    exist.push({
+      ...newFileData,
+      order: order,
+    });
+
     await updateDoc(folderDoc.ref, {
       items: exist,
     });
