@@ -8,14 +8,7 @@ import {
   teamListConverter,
   userListConverter,
 } from "../../libs/firestore";
-import {
-  Timestamp,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
 import { db } from "../../libs/firebase";
 
 const useQueryProjectEdit = (): [
