@@ -52,10 +52,7 @@ function EmployeeDetail() {
       <Container>
         <Wrap>
           <Content className="card-container">
-            <MemberDetailInfo
-              collectionName={collectionName}
-              router={memberId || teamId}
-            />
+            <MemberDetailInfo collectionName={collectionName} />
           </Content>
         </Wrap>
       </Container>

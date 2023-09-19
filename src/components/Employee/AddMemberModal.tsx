@@ -28,7 +28,6 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
     const name = new Date().getTime() + file!.name;
     const storageRef = ref(storage, `member/${name}`);
     const uploadTask = uploadBytesResumable(storageRef, file as File);
-
     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
     return downloadURL;
   };

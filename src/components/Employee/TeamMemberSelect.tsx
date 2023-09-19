@@ -11,11 +11,11 @@ interface MemberSelectProps {
 }
 
 interface UserData {
-  key: string; // Transfer 컴포넌트에서 사용하기 위한 고유 키
-  title: string; // 표시될 텍스트
+  key: string;
+  title: string;
 }
 
-function MemberSelect({ onChange }: MemberSelectProps) {
+function TeamMemberSelect({ onChange }: MemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
 
@@ -44,18 +44,18 @@ function MemberSelect({ onChange }: MemberSelectProps) {
 
   return (
     <>
-      <Form.Item label="팀원" name="user" rules={[required()]}>
+      <Form.Item label="팀원" name="userId" rules={[required()]}>
         <Transfer
           dataSource={users}
           targetKeys={selectedUserKeys}
           onChange={handleUserChange}
           render={(item) => item.title}
           showSearch
-          listStyle={{ width: 500, height: 300 }}
+          listStyle={{ width: "100%" }}
         />
       </Form.Item>
     </>
   );
 }
 
-export default MemberSelect;
+export default TeamMemberSelect;

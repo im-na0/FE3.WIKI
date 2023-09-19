@@ -14,24 +14,21 @@ import {
 } from "../../hooks/Employee/useMemberMutaion";
 import TeamForm from "./TeamForm";
 
-function MemberDetailInfo({
-  collectionName,
-  router,
-}: {
-  collectionName: string;
-  router?: string;
-}) {
+function MemberDetailInfo({ collectionName }: { collectionName: string }) {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const { memberId } = useParams<{ memberId: string }>();
+  const { memberId, teamId } = useParams<{
+    memberId: string;
+    teamId: string;
+  }>();
   const fetchDataParams = {
     COLLECTION_NAME: collectionName,
-    DOCUMENT_ID: memberId,
+    DOCUMENT_ID: memberId || teamId,
   };
   const userData: FormDataType | null = useFetchData(fetchDataParams);
-  const [cardName, setCardName] = useState(userData.name);
+  const [cardName, setCardName] = useState(userData.name || userData.teamName);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   useEffect(() => {
@@ -42,16 +39,18 @@ function MemberDetailInfo({
           setPreviewUrl(userData[fieldName as string]);
         }
         setCardDepartment(userData.department);
-        setCardName(userData.name);
+        setCardName(userData.name || userData.teamName);
       });
     }
   }, [userData]);
+
+  console.log(cardName);
 
   const handleUpdate = async () => {
     try {
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
-      const { updateData } = useUpdateData({ COLLECTION_NAME: collectionName }); // 동적으로 선택한 콜렉션 이름 사용
+      const { updateData } = useUpdateData({ COLLECTION_NAME: collectionName });
       const fieldsValue = form.getFieldsValue();
 
       if (file) {
@@ -87,17 +86,16 @@ function MemberDetailInfo({
     });
   };
 
-  const { memberId: routeMemberId, teamId: routeTeamId } = useParams<{
-    memberId: string;
-    teamId: string;
-  }>();
-
   return (
     <Form form={form}>
       <div className="member-header">
         <div className="member-title">
           <h3>직원 정보</h3>
-          <span className="member-desc">{userData?.name} 님의 프로필</span>
+          <span className="member-desc">
+            {userData?.name
+              ? `${userData.name} 님의 프로필`
+              : `${userData.teamName} 팀 프로필`}
+          </span>
         </div>
         <div className="member-btn-area">
           <Button
@@ -130,9 +128,9 @@ function MemberDetailInfo({
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            {routeMemberId ? (
+            {memberId ? (
               <MemberForm isEditMode={isEditMode} />
-            ) : routeTeamId ? (
+            ) : teamId ? (
               <TeamForm isEditMode={isEditMode} />
             ) : null}
           </div>

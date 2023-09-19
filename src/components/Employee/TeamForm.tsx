@@ -4,7 +4,7 @@ import CustomForm from "../common/CustomForm";
 import { teamInputs, teamSelect } from "../../data/formSource";
 import { useRecoilState } from "recoil";
 import { formDataState, selectedUserIdsState } from "../../store/member";
-import UserSelect from "./MemberSelect";
+import TeamMemberSelect from "./TeamMemberSelect";
 
 function TeamForm({ isEditMode }: { isEditMode: boolean }) {
   const [data, setData] = useRecoilState(formDataState);
@@ -41,7 +41,7 @@ function TeamForm({ isEditMode }: { isEditMode: boolean }) {
           readOnly={!isEditMode}
         />
       ))}
-      <UserSelect
+      <TeamMemberSelect
         onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
       />
     </>
