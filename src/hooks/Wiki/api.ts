@@ -26,15 +26,25 @@ export const addFolder = async (
     const foldersRef = collection(db, "WikiPage");
     const foldersQuery = query(foldersRef);
     const foldersQuerySnapshot = await getDocs(foldersQuery);
-    const order = foldersQuerySnapshot.size;
+    const existFolderNames: string[] = [];
 
-    await addDoc(collection(db, "WikiPage"), {
-      title: folderName,
-      items: [],
-      order: order,
-    });
+    foldersQuerySnapshot.forEach((doc) =>
+      existFolderNames.push(doc.data().title),
+    );
 
-    refreshFc();
+    if (existFolderNames.includes(folderName)) {
+      alert("이미 같은 이름의 폴더가 존재합니다.");
+    } else {
+      const order = foldersQuerySnapshot.size;
+
+      await addDoc(collection(db, "WikiPage"), {
+        title: folderName,
+        items: [],
+        order: order,
+      });
+
+      refreshFc();
+    }
   }
 };
 

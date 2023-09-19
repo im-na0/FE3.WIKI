@@ -118,6 +118,7 @@ const WikiNav = () => {
     e.preventDefault();
     addFolder(newFolder, refreshFolders);
     setInputState(false);
+    setNewFolder("");
   };
 
   const onChangeFolder = (e: ChangeEvent<HTMLInputElement>) => {
