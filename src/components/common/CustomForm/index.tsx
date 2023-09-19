@@ -34,13 +34,15 @@ function CustomSelect({
   defaultValue,
   readOnly,
   value,
+  children,
 }: FormItemProps & {
   options: Record<string, string>;
   defaultValue?: string;
   readOnly?: boolean;
-  mode?: string; // mode 속성 추가
+  mode?: string;
   placeholder?: string;
   onChange?: (selectedUserIds: string[]) => void;
+  children?: ReactNode;
 }) {
   return (
     <Form.Item
@@ -54,6 +56,7 @@ function CustomSelect({
         className={readOnly ? "readOnly" : undefined}
         value={value}
       >
+        {children}
         {Object.entries(options).map(([key, val]) => (
           <Select.Option
             value={Number.isNaN(Number(key)) ? key : Number(key)}

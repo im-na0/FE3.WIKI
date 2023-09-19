@@ -22,7 +22,10 @@ export default function MemberTable({
     COLLECTION_NAME: "Users",
     ORDER: "name",
   };
-  const { deleteData } = useDeleteData();
+  const DeleteDataParams = {
+    COLLECTION_NAME: "Users",
+  };
+  const { deleteData } = useDeleteData(DeleteDataParams);
   const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
 
   const [filteredData, setFilteredData] =

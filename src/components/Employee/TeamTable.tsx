@@ -3,6 +3,7 @@ import { Table, Spin } from "antd";
 import { FormDataType } from "../../type/form";
 import { useFetchTeamData } from "../../hooks/Employee/useFetchTeamData";
 import { columns } from "../../data/teamTableColumns";
+import { useNavigate } from "react-router-dom";
 
 interface MemberTableProps {
   setSelectedRowKeys: (keys: string[]) => void;
@@ -10,7 +11,6 @@ interface MemberTableProps {
   filterValue: string;
   sortValue: string;
 }
-
 export default function TeamTable({
   setSelectedRowKeys,
   searchText,
@@ -18,8 +18,8 @@ export default function TeamTable({
   sortValue,
 }: MemberTableProps) {
   const { loading, teamData } = useFetchTeamData();
-
-  const [filteredData, setFilteredData] = useState<FormDataType[]>([]); // 초기값을 빈 배열로 설정
+  const [filteredData, setFilteredData] = useState<FormDataType[]>(teamData);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const filteredByAccess = filterValue
@@ -59,10 +59,6 @@ export default function TeamTable({
     setFilteredData(dataWithKeys);
   }, [teamData, filterValue, sortValue, searchText]);
 
-  const handleDelete = async (id: string) => {
-    // deleteData(id);
-  };
-
   console.log(filteredData);
 
   return (
@@ -72,7 +68,7 @@ export default function TeamTable({
       ) : (
         <Table
           dataSource={filteredData}
-          columns={columns}
+          columns={columns(navigate)}
           scroll={{ x: "max-content" }}
           pagination={{
             defaultPageSize: 8,

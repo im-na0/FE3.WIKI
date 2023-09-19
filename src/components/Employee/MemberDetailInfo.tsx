@@ -12,15 +12,22 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
+import TeamForm from "./TeamForm";
 
-function MemberDetailInfo() {
+function MemberDetailInfo({
+  collectionName,
+  router,
+}: {
+  collectionName: string;
+  router?: string;
+}) {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [file, setFile] = useState<File | null>(null); // file 관리
+  const [file, setFile] = useState<File | null>(null);
   const { memberId } = useParams<{ memberId: string }>();
   const fetchDataParams = {
-    COLLECTION_NAME: "Users",
+    COLLECTION_NAME: collectionName,
     DOCUMENT_ID: memberId,
   };
   const userData: FormDataType | null = useFetchData(fetchDataParams);
@@ -44,7 +51,7 @@ function MemberDetailInfo() {
     try {
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
-      const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
+      const { updateData } = useUpdateData({ COLLECTION_NAME: collectionName }); // 동적으로 선택한 콜렉션 이름 사용
       const fieldsValue = form.getFieldsValue();
 
       if (file) {
@@ -79,6 +86,11 @@ function MemberDetailInfo() {
       return !prevIsEditMode;
     });
   };
+
+  const { memberId: routeMemberId, teamId: routeTeamId } = useParams<{
+    memberId: string;
+    teamId: string;
+  }>();
 
   return (
     <Form form={form}>
@@ -118,7 +130,11 @@ function MemberDetailInfo() {
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            <MemberForm isEditMode={isEditMode} />
+            {routeMemberId ? (
+              <MemberForm isEditMode={isEditMode} />
+            ) : routeTeamId ? (
+              <TeamForm isEditMode={isEditMode} />
+            ) : null}
           </div>
         </div>
       </div>

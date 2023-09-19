@@ -25,6 +25,8 @@ export function useFetchData({
 }: FetchDataParams): FormDataType[] {
   const [data, setData] = useState<FormDataType[]>([]);
 
+  console.log(COLLECTION_NAME);
+
   useEffect(() => {
     // doc 단위
     if (DOCUMENT_ID) {
@@ -34,9 +36,9 @@ export function useFetchData({
         (snapshot) => {
           if (snapshot.exists()) {
             const docData = snapshot.data();
-            setData(docData as FormDataType[]); // FIXME: 에러나면 고치기
+            setData(docData as FormDataType[]);
           } else {
-            console.log("문서를 찾을 수 없음");
+            message.error("문서를 찾을 수 없습니다!");
           }
         },
         (error) => {

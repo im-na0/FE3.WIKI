@@ -1,9 +1,10 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import "../styles/Employee.css";
 import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
 import MemberSider from "../components/Employee/MemberSider";
 import { Layout } from "antd";
+import "../styles/Employee.css";
 
 const Container = styled.div`
   padding: 0 1rem;
@@ -41,13 +42,20 @@ const Content = styled.div`
 `;
 
 function EmployeeDetail() {
+  const { memberId, teamId } = useParams();
+
+  const collectionName = memberId ? "Users" : teamId ? "Teams" : "";
+
   return (
     <Layout>
       <MemberSider />
       <Container>
         <Wrap>
           <Content className="card-container">
-            <MemberDetailInfo />
+            <MemberDetailInfo
+              collectionName={collectionName}
+              router={memberId || teamId}
+            />
           </Content>
         </Wrap>
       </Container>

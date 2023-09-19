@@ -50,8 +50,10 @@ export default function TeamList() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
-  const { deleteData } = useDeleteData();
+  const DeleteDataParams = {
+    COLLECTION_NAME: "Teams",
+  };
+  const { deleteData } = useDeleteData(DeleteDataParams);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const handleDelete = async () => {

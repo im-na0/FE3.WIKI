@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Select } from "antd";
+import { Transfer, Form } from "antd";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../libs/firebase";
-
-const { Option } = Select;
+import { Rule } from "antd/lib/form";
+import CustomForm from "../common/CustomForm";
 
 interface MemberSelectProps {
   onChange: (selectedUserIds: string[]) => void;
+  rules?: Rule[];
 }
 
 interface UserData {
-  id?: string;
-  name?: string;
+  key: string; // Transfer 컴포넌트에서 사용하기 위한 고유 키
+  title: string; // 표시될 텍스트
 }
 
 function MemberSelect({ onChange }: MemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -25,35 +26,35 @@ function MemberSelect({ onChange }: MemberSelectProps) {
       const userArray: UserData[] = [];
 
       userSnapshot.forEach((doc) => {
-        const userData = { id: doc.id, ...doc.data() };
+        const userData = { key: doc.id, title: doc.data().name || "" };
         userArray.push(userData);
       });
-
       setUsers(userArray);
     };
 
     fetchUsers();
   }, []);
 
-  const handleUserChange = (selectedUserIds: string[]) => {
-    setSelectedUsers(selectedUserIds);
-    onChange(selectedUserIds);
+  const handleUserChange = (nextSelectedKeys: string[]) => {
+    setSelectedUserKeys(nextSelectedKeys);
+    onChange(nextSelectedKeys);
   };
 
+  const { required } = CustomForm.useValidate();
+
   return (
-    <Select
-      mode="multiple"
-      placeholder="Select users"
-      onChange={handleUserChange}
-      value={selectedUsers}
-      style={{ width: "100%" }}
-    >
-      {users.map((user) => (
-        <Option key={user.id} value={user.id}>
-          {user.name}
-        </Option>
-      ))}
-    </Select>
+    <>
+      <Form.Item label="팀원" name="user" rules={[required()]}>
+        <Transfer
+          dataSource={users}
+          targetKeys={selectedUserKeys}
+          onChange={handleUserChange}
+          render={(item) => item.title}
+          showSearch
+          listStyle={{ width: 500, height: 300 }}
+        />
+      </Form.Item>
+    </>
   );
 }
 

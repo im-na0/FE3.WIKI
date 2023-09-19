@@ -48,8 +48,10 @@ export default function MemberList() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
-  const { deleteData } = useDeleteData();
+  const DeleteDataParams = {
+    COLLECTION_NAME: "Users",
+  };
+  const { deleteData } = useDeleteData(DeleteDataParams);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const handleDelete = async () => {

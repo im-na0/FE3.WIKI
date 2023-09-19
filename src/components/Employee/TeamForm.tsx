@@ -30,10 +30,6 @@ function TeamForm({ isEditMode }: { isEditMode: boolean }) {
           onChange={handleInput}
         />
       ))}{" "}
-      <UserSelect
-        onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
-      />
-      <Divider orientation="left">회사 정보</Divider>
       {teamSelect.map((select) => (
         <CustomForm.Select
           key={select.name}
@@ -45,6 +41,9 @@ function TeamForm({ isEditMode }: { isEditMode: boolean }) {
           readOnly={!isEditMode}
         />
       ))}
+      <UserSelect
+        onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
+      />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, getDocs, getDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, getDoc, doc } from "firebase/firestore";
 import { db } from "../../libs/firebase";
 import { FormDataType } from "../../type/form";
 import { message } from "antd";
@@ -9,26 +9,23 @@ export function useFetchTeamData() {
   const [teamData, setTeamData] = useState<FormDataType[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const teamCollectionRef = collection(db, "Teams");
+    const unsubscribe = onSnapshot(teamCollectionRef, (querySnapshot) => {
+      const teamArray: any[] = [];
 
-      try {
-        const teamCollectionRef = collection(db, "Teams");
-        const teamSnapshot = await getDocs(teamCollectionRef);
+      querySnapshot.forEach((doc) => {
+        const teamData = { id: doc.id, ...doc.data() };
+        teamArray.push(teamData);
+      });
 
-        const teamArray: any[] = [];
-        teamSnapshot.forEach((doc) => {
-          const teamData = { id: doc.id, ...doc.data() };
-          teamArray.push(teamData);
-        });
-
+      const fetchTeamUsers = async () => {
         const dataWithUsers = await Promise.all(
           teamArray.map(async (team) => {
-            const userIds = Array.isArray(team.userId)
-              ? team.userId
-              : team.userId
-              ? [team.userId]
-              : []; // FIXME:
+            const userIds = team.userId
+              ? Array.isArray(team.userId)
+                ? team.userId
+                : [team.userId]
+              : [];
             const teamUserPromises = userIds.map(async (userId: string) => {
               let userData = {};
               if (userId) {
@@ -43,12 +40,12 @@ export function useFetchTeamData() {
                   }
                 } catch (error) {
                   console.error("Error fetching user data:", error);
+                  message.error("데이터를 불러올 수 없습니다!");
                 }
               }
 
               return userData;
             });
-
             const teamUsers = await Promise.all(teamUserPromises);
 
             return {
@@ -57,17 +54,15 @@ export function useFetchTeamData() {
             };
           }),
         );
-
         setTeamData(dataWithUsers);
-      } catch (error) {
-        console.error("Error fetching team data:", error);
-        message.error("데이터를 불러올 수 없습니다!");
-      } finally {
         setLoading(false);
-      }
-    };
+      };
+      fetchTeamUsers();
+    });
 
-    fetchData();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return { loading, teamData };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, message } from "antd";
-import { collection, addDoc } from "firebase/firestore";
-import { db, storage } from "../../libs/firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { db, auth } from "../../libs/firebase";
 import TeamForm from "./TeamForm";
 import { FormDataType } from "../../type/form";
 import CustomForm from "../common/CustomForm";
@@ -11,11 +11,6 @@ import { selectedUserIdsState } from "../../store/member";
 
 const COLLECTION_NAME = "Teams";
 
-const SumbitBtn = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
 export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
@@ -24,15 +19,20 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
     useRecoilState(selectedUserIdsState);
 
   const handleAdd = async (data: FormDataType) => {
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...data,
-      userId: selectedUserIds,
-    });
-    onCancel();
-    form.resetFields();
-    message.success("팀이 생성되었습니다!");
+    const user = auth.currentUser;
+    if (user) {
+      const userUid = user.uid;
+      await setDoc(doc(db, COLLECTION_NAME, userUid), {
+        ...data,
+        userId: selectedUserIds,
+        createdAt: serverTimestamp(),
+      });
+      onCancel();
+      form.resetFields();
+      message.success("팀이 생성되었습니다!");
 
-    setSelectedUserIds([]);
+      setSelectedUserIds([]);
+    }
   };
 
   return (
@@ -52,3 +52,8 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
     </Form>
   );
 }
+
+const SumbitBtn = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;

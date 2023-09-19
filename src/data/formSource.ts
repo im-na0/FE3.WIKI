@@ -52,7 +52,7 @@ export const userSelect = [
 
 export const teamInputs = [
   {
-    name: "name",
+    name: "teamName",
     label: "팀 이름",
     rules: [required(), max(20)],
   },
