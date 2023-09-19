@@ -7,14 +7,15 @@ export interface Department {
 }
 //현재 firebase에 있는 팀 타입
 export interface Team {
-  id: string; // Team Name
-  member: string; // Team 속해 있는 멤버
+  id: string;
+  teamName: string; // Team Name
+  userId: string; // Team 속해 있는 멤버
 }
 // 회원 정보 입력할 때 유저 정보 타입
 export interface User {
   name: string;
   email: string;
-  phonenumber: string;
+  phone: string;
   department: string;
   team: string;
   position: string;
@@ -44,14 +45,18 @@ export const selectedTeamState = atom<string | undefined>({
   key: "selectedTeam",
   default: undefined,
 });
-
+// 선택한 직급 상태 전역 관리
+export const selectedPoState = atom<string | undefined>({
+  key: "selectedPosition",
+  default: undefined,
+});
 // 유저 회원 정보 전역 관리
 export const userInfo = atom<User>({
   key: "userInfo",
   default: {
     name: "",
     email: "",
-    phonenumber: "",
+    phone: "",
     department: "",
     team: "",
     position: "",
