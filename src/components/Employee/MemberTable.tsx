@@ -80,7 +80,6 @@ export default function MemberTable({
           pagination={{
             defaultPageSize: 8,
             showSizeChanger: true,
-            pageSizeOptions: ["10", "15", "20"],
           }}
           rowSelection={{
             onChange: (
