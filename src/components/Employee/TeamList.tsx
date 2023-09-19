@@ -35,7 +35,7 @@ const ListTable = styled.div`
   width: 100%;
 `;
 
-export default function MemberList() {
+export default function TeamList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
@@ -65,7 +65,7 @@ export default function MemberList() {
 
   return (
     <>
-      <h2>Employee</h2>
+      <h2>Teams</h2>
       <List>
         <CardHeader className="card-header">
           <ToggleWrap>

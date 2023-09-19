@@ -2,13 +2,20 @@ import React from "react";
 import styled from "styled-components";
 import "../styles/Employee.css";
 import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
+import MemberSider from "../components/Employee/MemberSider";
+import { Layout } from "antd";
 
 const Container = styled.div`
-  max-width: 100%;
-  margin: 0 auto;
   padding: 0 1rem;
-  color: #191d25;
+  width: 100%;
+  background: #fff;
+`;
 
+const Wrap = styled.div`
+  padding: 0 1rem;
+  margin: 0 auto;
+  max-width: 100%;
+  background: #fff;
   @media (min-width: 576px) {
     max-width: 576px;
   }
@@ -26,7 +33,7 @@ const Container = styled.div`
   }
 `;
 
-const CardContainer = styled.div`
+const Content = styled.div`
   background-color: #fff;
   border-radius: 8px;
   color: #526484;
@@ -35,11 +42,16 @@ const CardContainer = styled.div`
 
 function EmployeeDetail() {
   return (
-    <Container>
-      <CardContainer className="card-container">
-        <MemberDetailInfo />
-      </CardContainer>
-    </Container>
+    <Layout>
+      <MemberSider />
+      <Container>
+        <Wrap>
+          <Content className="card-container">
+            <MemberDetailInfo />
+          </Content>
+        </Wrap>
+      </Container>
+    </Layout>
   );
 }
 

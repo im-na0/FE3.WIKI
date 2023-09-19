@@ -12,7 +12,7 @@ interface MemberTableProps {
   sortValue: string;
 }
 
-export default function MemberTable({
+export default function TeamTable({
   setSelectedRowKeys,
   searchText,
   filterValue,
@@ -25,6 +25,7 @@ export default function MemberTable({
   const { deleteData } = useDeleteData();
   const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
 
+  console.log(initialUserData);
   const [filteredData, setFilteredData] =
     useState<FormDataType[]>(initialUserData);
 

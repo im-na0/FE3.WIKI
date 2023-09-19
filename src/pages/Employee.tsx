@@ -1,12 +1,22 @@
 import React from "react";
 import styled from "styled-components";
 import MemberList from "../components/Employee/MemberList";
+import TeamList from "../components/Employee/TeamList";
+import { Layout } from "antd";
+import { useLocation } from "react-router-dom";
+import MemberSider from "../components/Employee/MemberSider";
 
 const Container = styled.div`
-  max-width: 100%;
-  margin: 0 auto;
   padding: 0 1rem;
+  width: 100%;
+  background: #fff;
+`;
 
+const Wrap = styled.div`
+  padding: 0 1rem;
+  margin: 0 auto;
+  max-width: 100%;
+  background: #fff;
   @media (min-width: 576px) {
     max-width: 576px;
   }
@@ -23,29 +33,32 @@ const Container = styled.div`
     max-width: 1200px;
   }
 `;
-const Header = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-`;
 
-const CardContainer = styled.div`
-  background-color: #fff;
-  border-radius: 8px;
-  color: #526484;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
-  word-wrap: break-word;
-`;
+const Content = styled.div``;
 
 const Employee = () => {
+  const location = useLocation();
+
+  const render = (() => {
+    switch (location.pathname) {
+      case "/employee/":
+        return <MemberList />;
+      case "/employee/team":
+        return <TeamList />;
+      default:
+        return <MemberList />;
+    }
+  })();
+
   return (
-    <Container>
-      <Header>
-        <h4>직원 정보</h4>
-      </Header>
-      <CardContainer>
-        <MemberList />
-      </CardContainer>
-    </Container>
+    <Layout>
+      <MemberSider />
+      <Container>
+        <Wrap>
+          <Content>{render}</Content>
+        </Wrap>
+      </Container>
+    </Layout>
   );
 };
 

@@ -55,10 +55,7 @@ const Router = () => {
         ></Route>
         <Route path="/employee" element={<Employee />}></Route>
         <Route path="/employee/:memberId" element={<EmployeeDetail />}></Route>
-        <Route
-          path="/employee/:memberId/edit"
-          element={<EmployeeDetail />}
-        ></Route>
+        <Route path="/employee/team" element={<Employee />}></Route>
         <Route path="/timer" element={<Timer />}></Route>
       </Route>
     </Routes>
