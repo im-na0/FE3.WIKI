@@ -26,12 +26,13 @@ import {
   where,
   getDocs,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { storage } from "../../libs/firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 // Interface
-import { IItems } from "../../store/wiki";
+import { IItem } from "../Wiki/WikiSubPage";
 
 const WikiEditor = () => {
   const editorRef = useRef<ToastUIEditor | null>(null);
@@ -52,11 +53,13 @@ const WikiEditor = () => {
     const FolderDoc = querySnapshot.docs[0];
     const items = FolderDoc.data().items;
     const itemIndex = items.findIndex(
-      (item: IItems) => item.name === currentFile,
+      (item: IItem) => item.name === currentFile,
     );
 
     if (itemIndex !== -1) {
       items[itemIndex].subName = newData;
+      const timeStamp = Timestamp.now();
+      items[itemIndex].date = timeStamp;
       const data = {
         items: items,
       };
@@ -76,7 +79,6 @@ const WikiEditor = () => {
     } else {
       const newData = editorRef.current?.getInstance().getMarkdown();
       if (newData !== undefined) {
-        console.log(3.1);
         postText(newData);
         setEditFile(false);
       }
@@ -86,10 +88,6 @@ const WikiEditor = () => {
   useEffect(() => {
     console.log("Wiki Editor 등록 완료");
   }, [item]);
-
-  useEffect(() => {
-    console.log(1);
-  }, []);
 
   const onUploadImage = async (
     blob: Blob | File,

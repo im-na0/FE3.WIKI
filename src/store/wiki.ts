@@ -1,8 +1,17 @@
 import { atom } from "recoil";
 
+import { Timestamp } from "firebase/firestore";
+
+export interface IWikiItem {
+  name: string;
+  subName: string;
+  date: Timestamp;
+}
+
 export interface IWiki {
   title: string;
-  items: Array<{ name: string; subName: string }>;
+  order: number;
+  items: IWikiItem[];
 }
 
 // 현재 선택한 폴더명
@@ -33,7 +42,8 @@ export const totalItems = atom<IWiki[]>({
   default: [
     {
       title: "",
-      items: [{ name: "", subName: "" }],
+      order: 0,
+      items: [{ name: "", subName: "", date: Timestamp.fromDate(new Date()) }],
     },
   ],
 });
@@ -78,4 +88,10 @@ export const editFileSubName = atom<string>({
 export const SelectProps = atom<string | null>({
   key: "selProps",
   default: null,
+});
+
+// Select 외부 영역 클릭 상태 관리
+export const SelectState = atom<boolean>({
+  key: "isClickOutsideState",
+  default: false,
 });

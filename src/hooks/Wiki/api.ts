@@ -23,11 +23,28 @@ export const addFolder = async (
   refreshFc: RefreshFunction,
 ): Promise<void> => {
   if (folderName.length > 0) {
-    await addDoc(collection(db, "WikiPage"), {
-      title: folderName,
-      items: [],
-    });
-    refreshFc();
+    const foldersRef = collection(db, "WikiPage");
+    const foldersQuery = query(foldersRef);
+    const foldersQuerySnapshot = await getDocs(foldersQuery);
+    const existFolderNames: string[] = [];
+
+    foldersQuerySnapshot.forEach((doc) =>
+      existFolderNames.push(doc.data().title),
+    );
+
+    if (existFolderNames.includes(folderName)) {
+      alert("이미 같은 이름의 폴더가 존재합니다.");
+    } else {
+      const order = foldersQuerySnapshot.size;
+
+      await addDoc(collection(db, "WikiPage"), {
+        title: folderName,
+        items: [],
+        order: order,
+      });
+
+      refreshFc();
+    }
   }
 };
 
@@ -75,7 +92,14 @@ export const addFile = async (
       subName: state.subName,
       date: date,
     };
-    exist.push(newFileData);
+
+    const order = exist.length;
+
+    exist.push({
+      ...newFileData,
+      order: order,
+    });
+
     await updateDoc(folderDoc.ref, {
       items: exist,
     });

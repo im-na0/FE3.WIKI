@@ -49,7 +49,7 @@ interface IContent {
 }
 
 const WikiViewer = ({ content }: IContent) => {
-  const { name, subName } = content;
+  const { name, subName, date } = content;
 
   const prevSubNameRef = useRef<string | null>(null);
   const prevNameRef = useRef<string | null>(null);
@@ -57,10 +57,12 @@ const WikiViewer = ({ content }: IContent) => {
   const [renderKey, setRenderKey] = useState(0);
   const [editState, setEditState] = useState<boolean>(false);
   const [editTitle, setEditTitle] = useState<string>(name);
+  const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   const [currentFile, setCurrentFile] = useRecoilState(currentFileTitle);
   const [editFile, setEditFile] = useRecoilState(editFileState);
   const currentFolder = useRecoilValue(currentFolderTitle);
+
   const setItem = useSetRecoilState(currentItem);
   const setItems = useSetRecoilState(totalItems);
   const setExistSub = useSetRecoilState(editFileSubName);
@@ -164,8 +166,17 @@ const WikiViewer = ({ content }: IContent) => {
   }, [editFile, editFileState]);
 
   useEffect(() => {
-    console.log("Initialize");
-  }, []);
+    if (date) {
+      const year = date.toDate().getFullYear();
+      const month = date.toDate().getMonth() + 1;
+      const day = date.toDate().getDate();
+      const hours = date.toDate().getHours();
+      const minutes = date.toDate().getMinutes();
+
+      const formatDate = `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
+      setFormattedDate(formatDate);
+    }
+  }, [date]);
 
   return (
     <Container>
@@ -195,6 +206,7 @@ const WikiViewer = ({ content }: IContent) => {
               <Button onClick={postDelete}>삭제</Button>
             </Space>
           </StyledDiv>
+          <StyledDate>최종 수정일 : {formattedDate}</StyledDate>
           <StyledViewer>
             <Viewer key={renderKey} initialValue={subName} />
           </StyledViewer>
@@ -222,9 +234,16 @@ const StyledDiv = styled.div`
     }
   }
   form {
-    margin: 5px;
+    margin-top: 10px;
+    margin-bottom: 20px;
   }
 `;
 const StyledViewer = styled.div`
   font-size: 1rem !important;
+`;
+const StyledDate = styled.div`
+  opacity: 0.5;
+  font-size: 0.75rem;
+  margin-top: -10px;
+  margin-bottom: 30px;
 `;
