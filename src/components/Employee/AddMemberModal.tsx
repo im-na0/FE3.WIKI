@@ -1,18 +1,17 @@
 import React, { useState } from "react";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
-import { db, storage } from "../../libs/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { db, storage, auth } from "../../libs/firebase";
+import { collection, setDoc, doc } from "firebase/firestore";
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { FormDataType } from "../../type/form";
-import { useRecoilState } from "recoil";
-import { uploadFileState } from "../../store/member";
 
 const COLLECTION_NAME = "Users";
+const user = auth.currentUser!;
 
 const SumbitBtn = styled.div`
   display: flex;
@@ -35,18 +34,27 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
     return downloadURL;
   };
 
+  const userUid = user.uid;
+  const userDB = doc(db, COLLECTION_NAME, userUid); // 문서 참조 생성
+
   const handleAdd = async (data: FormDataType) => {
     const imageUrl = await uploadFile();
-    const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-      ...data,
-      photo: imageUrl,
-    });
-    onCancel(); // 모달창 닫기
-    console.log(previewUrl);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl); // FIXME: 리렌더 안돼서 미리보기가 남아있음
+    console.log(imageUrl);
+    try {
+      await setDoc(userDB, {
+        ...data,
+        photo: imageUrl,
+      });
+      onCancel(); // 모달창 닫기
+      console.log(previewUrl);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl); // FIXME: 리렌더 안돼서 미리보기가 남아있음
+      }
+      form.resetFields();
+    } catch (error) {
+      console.error("Error uploading data:", error);
+      message.error("Error uploading data");
     }
-    form.resetFields();
   };
 
   return (

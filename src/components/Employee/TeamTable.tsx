@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Table } from "antd";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import React, { useEffect, useState } from "react";
+import { Table, Spin } from "antd";
 import { FormDataType } from "../../type/form";
-import { columns } from "../../data/tableColumns";
-import { useFetchData } from "../../hooks/Employee/useFetchData";
+import { useFetchTeamData } from "../../hooks/Employee/useFetchTeamData";
+import { columns } from "../../data/teamTableColumns";
 
 interface MemberTableProps {
   setSelectedRowKeys: (keys: string[]) => void;
@@ -18,23 +17,14 @@ export default function TeamTable({
   filterValue,
   sortValue,
 }: MemberTableProps) {
-  const fetchDataParams = {
-    COLLECTION_NAME: "Users",
-    ORDER: "name",
-  };
-  const { deleteData } = useDeleteData();
-  const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
+  const { loading, teamData } = useFetchTeamData();
 
-  console.log(initialUserData);
-  const [filteredData, setFilteredData] =
-    useState<FormDataType[]>(initialUserData);
+  const [filteredData, setFilteredData] = useState<FormDataType[]>([]); // 초기값을 빈 배열로 설정
 
   useEffect(() => {
     const filteredByAccess = filterValue
-      ? initialUserData.filter(
-          (item: FormDataType) => item.access === filterValue,
-        )
-      : initialUserData;
+      ? teamData.filter((item: FormDataType) => item.access === filterValue)
+      : teamData;
 
     const searchedData = filteredByAccess.filter((item: FormDataType) => {
       if (!searchText) return true;
@@ -65,19 +55,22 @@ export default function TeamTable({
       ...item,
       key: item.id,
     }));
+
     setFilteredData(dataWithKeys);
-  }, [initialUserData, filterValue, sortValue, searchText]);
+  }, [teamData, filterValue, sortValue, searchText]);
 
   const handleDelete = async (id: string) => {
-    deleteData(id);
+    // deleteData(id);
   };
 
   return (
     <>
-      {filteredData && (
+      {loading ? (
+        <Spin size="large" />
+      ) : (
         <Table
           dataSource={filteredData}
-          columns={columns(handleDelete)}
+          columns={columns}
           scroll={{ x: "max-content" }}
           pagination={{
             defaultPageSize: 8,

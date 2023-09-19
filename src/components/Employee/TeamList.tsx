@@ -8,6 +8,7 @@ import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import TeamTable from "./TeamTable";
 
 const List = styled.div`
   background-color: #fff;
@@ -102,7 +103,7 @@ export default function TeamList() {
           </ToggleWrap>
         </CardHeader>
         <ListTable>
-          <MemberTable
+          <TeamTable
             setSelectedRowKeys={setSelectedRowKeys}
             searchText={searchText}
             filterValue={filterValue}
