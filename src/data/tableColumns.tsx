@@ -3,26 +3,33 @@ import { Col, Dropdown, message, Row } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { FormDataType } from "../type/form";
-import { useNavigate } from "react-router-dom";
+import { useDeleteData } from "../hooks/Employee/useDeleteData";
 
-const Image = styled.span`
-  display: block;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
-  & > img {
-    width: 100%;
-  }
-`;
+const DeleteDataParams = {
+  COLLECTION_NAME: "Users",
+};
 
-const Btn = styled.a`
-  display: block;
-  padding: 0.3rem;
-`;
+export const columns = (navigate: any) => {
+  const { deleteData } = useDeleteData(DeleteDataParams);
 
-export const columns = (handleDelete: (id: string) => void) => {
-  const navigate = useNavigate();
+  const handleDelete = async (id: string) => {
+    console.log(id);
+    deleteData(id);
+  };
+
+  const handleMenuClick = (record: FormDataType, key: string) => {
+    if (key === "view") {
+      if (record.id) {
+        navigate(`/employee/${record.id}`);
+      }
+    }
+    if (key === "delete") {
+      message.info("삭제되었습니다");
+      if (record.id) {
+        handleDelete(record.id);
+      }
+    }
+  };
 
   return [
     {
@@ -79,19 +86,7 @@ export const columns = (handleDelete: (id: string) => void) => {
                 danger: true,
               },
             ],
-            onClick: ({ key }) => {
-              if (key === "view") {
-                if (record.id) {
-                  navigate(`/employee/${record.id}`);
-                }
-              }
-              if (key === "delete") {
-                message.info("삭제되었습니다");
-                if (record.id) {
-                  handleDelete(record.id);
-                }
-              }
-            },
+            onClick: ({ key }) => handleMenuClick(record, key),
           }}
           autoAdjustOverflow={true}
           placement="bottomRight"
@@ -105,3 +100,19 @@ export const columns = (handleDelete: (id: string) => void) => {
     },
   ];
 };
+
+const Image = styled.span`
+  display: block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  & > img {
+    width: 100%;
+  }
+`;
+
+const Btn = styled.a`
+  display: block;
+  padding: 0.3rem;
+`;

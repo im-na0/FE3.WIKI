@@ -49,3 +49,21 @@ export const userSelect = [
     rules: [required()],
   },
 ];
+
+export const teamInputs = [
+  {
+    name: "teamName",
+    label: "팀 이름",
+    rules: [required(), max(20)],
+  },
+];
+
+export const teamSelect = [
+  {
+    name: "department",
+    label: "부서",
+    options: SELECT_OPTIONS.department,
+    defaultValue: "option",
+    rules: [required()],
+  },
+];

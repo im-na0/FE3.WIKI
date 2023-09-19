@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Spin, Table } from "antd";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import React, { useEffect, useState } from "react";
+import { Table, Spin } from "antd";
 import { FormDataType } from "../../type/form";
-import { columns } from "../../data/tableColumns";
-import { useFetchData } from "../../hooks/Employee/useFetchData";
+import { useFetchTeamData } from "../../hooks/Employee/useFetchTeamData";
+import { columns } from "../../data/teamTableColumns";
 import { useNavigate } from "react-router-dom";
 
 interface MemberTableProps {
@@ -12,26 +11,20 @@ interface MemberTableProps {
   filterValue: string;
   sortValue: string;
 }
-
-export default function MemberTable({
+export default function TeamTable({
   setSelectedRowKeys,
   searchText,
   filterValue,
   sortValue,
 }: MemberTableProps) {
-  const fetchDataParams = {
-    COLLECTION_NAME: "Users",
-    ORDER: "name",
-  };
-  const data = useFetchData(fetchDataParams);
-  // const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
-  const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
+  const { loading, teamData } = useFetchTeamData();
+  const [filteredData, setFilteredData] = useState<FormDataType[]>(teamData);
   const navigate = useNavigate();
 
   useEffect(() => {
     const filteredByAccess = filterValue
-      ? data.filter((item: FormDataType) => item.access === filterValue)
-      : data;
+      ? teamData.filter((item: FormDataType) => item.access === filterValue)
+      : teamData;
 
     const searchedData = filteredByAccess.filter((item: FormDataType) => {
       if (!searchText) return true;
@@ -62,12 +55,15 @@ export default function MemberTable({
       ...item,
       key: item.id,
     }));
+
     setFilteredData(dataWithKeys);
-  }, [data, filterValue, sortValue, searchText]);
+  }, [teamData, filterValue, sortValue, searchText]);
 
   return (
     <>
-      {filteredData && (
+      {loading ? (
+        <Spin size="large" />
+      ) : (
         <Table
           dataSource={filteredData}
           columns={columns(navigate)}
@@ -75,6 +71,7 @@ export default function MemberTable({
           pagination={{
             defaultPageSize: 8,
             showSizeChanger: true,
+            pageSizeOptions: ["10", "15", "20"],
           }}
           rowSelection={{
             onChange: (

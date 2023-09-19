@@ -1,23 +1,28 @@
 import React from "react";
 import { Divider } from "antd";
 import CustomForm from "../common/CustomForm";
-import { userInputs, userSelect } from "../../data/formSource";
+import { teamInputs, teamSelect } from "../../data/formSource";
+import { useRecoilState } from "recoil";
+import { selectedUserIdsState } from "../../store/member";
+import TeamMemberSelect from "./TeamMemberSelect";
 
-function MemberForm({ isEditMode }: { isEditMode: boolean }) {
+function TeamForm({ isEditMode }: { isEditMode: boolean }) {
+  const [selectedUserIds, setSelectedUserIds] =
+    useRecoilState(selectedUserIdsState);
+
   return (
     <>
       <Divider orientation="left">기본 정보</Divider>
-      {userInputs.map((input) => (
+      {teamInputs.map((input) => (
         <CustomForm.Input
           key={input.name}
           label={input.label}
-          name={input.name}
+          name={input.name || ""}
           rules={input.rules}
           readOnly={!isEditMode}
         />
-      ))}
-      <Divider orientation="left">회사 정보</Divider>
-      {userSelect.map((select) => (
+      ))}{" "}
+      {teamSelect.map((select) => (
         <CustomForm.Select
           key={select.name}
           label={select.label}
@@ -28,8 +33,11 @@ function MemberForm({ isEditMode }: { isEditMode: boolean }) {
           readOnly={!isEditMode}
         />
       ))}
+      <TeamMemberSelect
+        onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
+      />
     </>
   );
 }
 
-export default MemberForm;
+export default TeamForm;

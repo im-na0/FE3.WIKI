@@ -1,14 +1,46 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import "../styles/Employee.css";
 import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
+import TeamDetailInfo from "../components/Employee/TeamDetailInfo"; // TeamDetailInfo 컴포넌트 추가
+import MemberSider from "../components/Employee/MemberSider";
+import { Layout } from "antd";
+import "../styles/Employee.css";
+
+function EmployeeDetail() {
+  const { memberId, teamId } = useParams();
+
+  return (
+    <Layout>
+      <MemberSider />
+      <Container>
+        <Wrap>
+          <Content className="card-container">
+            {memberId ? (
+              <MemberDetailInfo />
+            ) : teamId ? (
+              <TeamDetailInfo />
+            ) : null}
+          </Content>
+        </Wrap>
+      </Container>
+    </Layout>
+  );
+}
+
+export default EmployeeDetail;
 
 const Container = styled.div`
-  max-width: 100%;
-  margin: 0 auto;
   padding: 0 1rem;
-  color: #191d25;
+  width: 100%;
+  background: #fff;
+`;
 
+const Wrap = styled.div`
+  padding: 0 1rem;
+  margin: 0 auto;
+  max-width: 100%;
+  background: #fff;
   @media (min-width: 576px) {
     max-width: 576px;
   }
@@ -26,21 +58,9 @@ const Container = styled.div`
   }
 `;
 
-const CardContainer = styled.div`
+const Content = styled.div`
   background-color: #fff;
   border-radius: 8px;
   color: #526484;
   word-wrap: break-word;
 `;
-
-function EmployeeDetail() {
-  return (
-    <Container>
-      <CardContainer className="card-container">
-        <MemberDetailInfo />
-      </CardContainer>
-    </Container>
-  );
-}
-
-export default EmployeeDetail;
