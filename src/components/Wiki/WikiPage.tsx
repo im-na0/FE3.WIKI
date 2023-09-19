@@ -1,10 +1,11 @@
 import React from "react";
 
-// styles
+// Style
 import styled from "styled-components";
 
 // components
-import SubPage from "./SubPage";
+import WikiSubPage from "./WikiSubPage";
+import WikiDefaultPage from "./WikiDefaultPage";
 
 // Recoil
 import { useRecoilValue } from "recoil";
@@ -14,15 +15,7 @@ const Page = () => {
   const currentFile = useRecoilValue(currentFileTitle);
   return (
     <Container>
-      {currentFile !== "" ? (
-        <>
-          <SubPage />
-        </>
-      ) : (
-        <>
-          <h1>초기화면 미지정</h1>
-        </>
-      )}
+      {currentFile !== "" ? <WikiSubPage /> : <WikiDefaultPage />}
     </Container>
   );
 };

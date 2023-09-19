@@ -40,7 +40,7 @@ import {
 } from "firebase/firestore";
 
 // Interface
-import { IItem } from "./SubPage";
+import { IItem } from "./WikiSubPage";
 import { IItems } from "../../store/wiki";
 import { IWiki } from "../../store/wiki";
 
