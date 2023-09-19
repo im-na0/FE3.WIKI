@@ -1,6 +1,5 @@
 import { FormDataType } from "../type/form";
-import { AntDesignOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Divider, Tooltip, Col } from "antd";
+import { Avatar, Tooltip } from "antd";
 import React from "react";
 import { styled } from "styled-components";
 
@@ -11,7 +10,7 @@ const UserList = styled.ul`
 export const columns = [
   {
     title: "Team",
-    dataIndex: "teamName",
+    dataIndex: "name",
   },
   {
     title: "Member",

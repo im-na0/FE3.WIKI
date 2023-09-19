@@ -7,7 +7,7 @@ interface FormItemProps {
   name: string;
   disabled?: boolean;
   rules?: Rule[];
-  value?: string;
+  value?: string | string[];
 }
 
 function CustomInput({
@@ -33,10 +33,14 @@ function CustomSelect({
   disabled,
   defaultValue,
   readOnly,
+  value,
 }: FormItemProps & {
   options: Record<string, string>;
   defaultValue?: string;
   readOnly?: boolean;
+  mode?: string; // mode 속성 추가
+  placeholder?: string;
+  onChange?: (selectedUserIds: string[]) => void;
 }) {
   return (
     <Form.Item
@@ -45,7 +49,11 @@ function CustomSelect({
       rules={rules}
       initialValue={defaultValue}
     >
-      <Select disabled={disabled} className={readOnly ? "readOnly" : undefined}>
+      <Select
+        disabled={disabled}
+        className={readOnly ? "readOnly" : undefined}
+        value={value}
+      >
         {Object.entries(options).map(([key, val]) => (
           <Select.Option
             value={Number.isNaN(Number(key)) ? key : Number(key)}

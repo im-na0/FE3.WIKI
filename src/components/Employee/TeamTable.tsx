@@ -63,6 +63,8 @@ export default function TeamTable({
     // deleteData(id);
   };
 
+  console.log(filteredData);
+
   return (
     <>
       {loading ? (

@@ -9,6 +9,7 @@ import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import TeamTable from "./TeamTable";
+import AddTeamModal from "./AddTeamModal";
 
 const List = styled.div`
   background-color: #fff;
@@ -86,13 +87,13 @@ export default function TeamList() {
               Add
             </Button>
             <CustomForm.Modal
-              title="멤버 등록"
+              title="팀 등록"
               width={700}
               footer={null}
               open={isModalOpen}
               onCancel={closeModal}
             >
-              <AddMemberModal onCancel={closeModal} />
+              <AddTeamModal onCancel={closeModal} />
             </CustomForm.Modal>
             <Button
               danger={true}

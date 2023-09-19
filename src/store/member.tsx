@@ -9,3 +9,8 @@ export const formDataState = atom({
   key: "formDataState",
   default: {},
 });
+
+export const selectedUserIdsState = atom<string[]>({
+  key: "selectedUserIdsState",
+  default: [], // 초기값
+});

@@ -26,22 +26,31 @@ export function useFetchTeamData() {
           teamArray.map(async (team) => {
             const userIds = Array.isArray(team.userId)
               ? team.userId
-              : [team.userId];
+              : team.userId
+              ? [team.userId]
+              : []; // team.userId가 null 또는 undefined인 경우 빈 배열 반환
             const teamUserPromises = userIds.map(async (userId: string) => {
-              const userDoc = await getDoc(doc(db, "Users", userId));
-              if (userDoc.exists()) {
-                const userData = {
-                  id: userDoc.id,
-                  ...userDoc.data(),
-                } as FormDataType;
-                return userData;
+              let userData = {}; // 빈 객체로 초기화
+
+              if (userId) {
+                const userDocRef = doc(db, "Users", userId);
+                try {
+                  const userDoc = await getDoc(userDocRef);
+                  if (userDoc.exists()) {
+                    userData = {
+                      id: userDoc.id,
+                      ...userDoc.data(),
+                    } as FormDataType;
+                  }
+                } catch (error) {
+                  console.error("Error fetching user data:", error);
+                }
               }
-              return null;
+
+              return userData;
             });
 
-            const teamUsers = (await Promise.all(teamUserPromises)).filter(
-              Boolean,
-            );
+            const teamUsers = await Promise.all(teamUserPromises);
 
             return {
               ...team,
