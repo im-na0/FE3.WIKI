@@ -16,6 +16,7 @@ import {
   addDoc,
   query,
   where,
+  deleteDoc,
 } from "firebase/firestore";
 import { db, auth, storage } from "../../../libs/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -121,12 +122,17 @@ export default function UserRegister() {
   const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
   const [selectedPosition, setSelectedPosition] =
     useRecoilState(selectedPoState);
+  // 기존 부서 저장
+  const prevPartmentRef = useRef<string | undefined>(undefined);
+  const prevTeamRef = useRef<string | undefined>(selectedTeam);
   //  부서 선택하면 선택 부서 저장
   const handleSelectedPart = (value: string | undefined) => {
+    prevPartmentRef.current = selectedPart;
     setSelectedPart(value);
   };
   //  팀 선택하면 선택 팀 저장
   const handleSelectedTeam = (value: string | undefined) => {
+    prevTeamRef.current = selectedTeam;
     setSelectedTeam(value);
   };
   // 직급 선택하면 선택 직급 저장
@@ -207,6 +213,42 @@ export default function UserRegister() {
           position: selectedPosition,
           photo: input.photo,
         };
+        // const prevTeamQuery = query(
+        //   collection(db, "Teams"),
+        //   where("teamName", "==", prevTeamRef.current),
+        // );
+        // const prevTeamQuerySnapshot = await getDocs(prevTeamQuery);
+        // if (!prevTeamQuerySnapshot.empty) {
+        //   const prevTeamDoc = prevTeamQuerySnapshot.docs[0];
+        //   const prevTeamData = prevTeamDoc.data();
+        //   const updatedPrevTeamUserId = (prevTeamData.userId || []).filter(
+        //     (userId: string) => userId !== userUid,
+        //   );
+
+        //   await deleteDoc(prevTeamDoc.ref);
+        // }
+        const prevTeamName = prevTeamRef.current;
+        console.log(prevTeamName);
+        console.log(selectedTeam);
+        if (prevTeamName !== selectedTeam) {
+          if (prevTeamName) {
+            const prevTeamQuery = query(
+              collection(db, "Teams"),
+              where("teamName", "==", prevTeamName),
+            );
+            const prevTeamQuerySnapshot = await getDocs(prevTeamQuery);
+            if (!prevTeamQuerySnapshot.empty) {
+              const prevTeamDoc = prevTeamQuerySnapshot.docs[0];
+              const prevTeamData = prevTeamDoc.data();
+              const updatedUserId = (prevTeamData.userId || []).filter(
+                (userId: string) => userId !== userUid,
+              );
+              await updateDoc(prevTeamDoc.ref, {
+                userId: updatedUserId,
+              });
+            }
+          }
+        }
         await setDoc(userDB, newUser);
         const teamDB = collection(db, "Teams");
         const q = query(teamDB, where("teamName", "==", selectedTeam));
@@ -215,12 +257,12 @@ export default function UserRegister() {
           const teamDoc = querySnapshot.docs[0];
           const teamData = teamDoc.data();
           const updatedUserId = [...(teamData.userId || []), userUid];
-
           await updateDoc(teamDoc.ref, {
             userId: updatedUserId,
           });
         } else {
           const teamData = {
+            department: selectedPart,
             teamName: selectedTeam,
             userId: [userUid],
           };
