@@ -23,17 +23,18 @@ export default function MemberTable({
     ORDER: "name",
   };
   const { deleteData } = useDeleteData();
-  const initialUserData = useFetchData(fetchDataParams);
+  const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
   const [filteredData, setFilteredData] =
     useState<FormDataType[]>(initialUserData);
 
   useEffect(() => {
-    console.log(filterValue);
     const filteredByAccess = filterValue
-      ? initialUserData.filter((item) => item.access === filterValue)
+      ? initialUserData.filter(
+          (item: FormDataType) => item.access === filterValue,
+        )
       : initialUserData;
 
-    const searchedData = filteredByAccess.filter((item) => {
+    const searchedData = filteredByAccess.filter((item: FormDataType) => {
       if (!searchText) return true;
       const nameIncludes = item.name ? item.name.includes(searchText) : false;
       const departmentIncludes = item.department
@@ -75,6 +76,11 @@ export default function MemberTable({
         <Table
           dataSource={filteredData}
           columns={columns(handleDelete)}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            defaultPageSize: 8,
+            showSizeChanger: true,
+          }}
           rowSelection={{
             onChange: (
               selectedKeys: React.Key[],

@@ -31,8 +31,8 @@ const ListTable = styled.div`
 export default function MemberList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const [filterValue, setFilterValue] = useState(""); // 필터 상태 추가
-  const [sortValue, setSortValue] = useState(""); // 정렬 상태 추가
+  const [filterValue, setFilterValue] = useState("");
+  const [sortValue, setSortValue] = useState("");
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -72,7 +72,9 @@ export default function MemberList() {
             icon={<PlusOutlined />}
             onClick={openModal}
             size="large"
-          ></Button>
+          >
+            Add
+          </Button>
           <CustomForm.Modal
             title="멤버 등록"
             width={700}

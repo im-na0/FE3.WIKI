@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../../libs/firebase";
 import {
+  doc,
   collection,
   query,
   onSnapshot,
@@ -13,50 +14,79 @@ import { message } from "antd";
 
 interface FetchDataParams {
   COLLECTION_NAME: string;
-  ORDER: string;
+  ORDER?: string;
+  DOCUMENT_ID?: string;
 }
 
-export function useFetchData({ COLLECTION_NAME, ORDER }: FetchDataParams) {
+export function useFetchData({
+  COLLECTION_NAME,
+  ORDER,
+  DOCUMENT_ID,
+}: FetchDataParams): FormDataType[] {
   const [data, setData] = useState<FormDataType[]>([]);
 
   useEffect(() => {
-    let q = query(collection(db, COLLECTION_NAME));
-    if (ORDER) {
-      q = query(q, orderBy(ORDER));
-    }
-
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot: QuerySnapshot) => {
-        const list: FormDataType[] = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const selectedFields = {
-            id: doc.id,
-            ...data,
-          };
-          list.push(selectedFields);
-        });
-
-        const orderedData = list.map((item) => {
-          const orderedItem: FormDataType = { id: item.id };
-          for (const key of Object.keys(TABLE_TITLE)) {
-            orderedItem[key] = item[key];
+    // doc 단위
+    if (DOCUMENT_ID) {
+      const docRef = doc(db, COLLECTION_NAME, DOCUMENT_ID);
+      const unsubscribe = onSnapshot(
+        docRef,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const docData = snapshot.data();
+            setData(docData as FormDataType[]); // FIXME: 에러나면 고치기
+          } else {
+            console.log("문서를 찾을 수 없음");
           }
-          return orderedItem;
-        });
+        },
+        (error) => {
+          console.error("Error fetching data:", error);
+          message.error("데이터를 불러올 수 없습니다!");
+          return () => {
+            unsubscribe();
+          };
+        },
+      );
+    } else {
+      // collection 단위
+      let q = query(collection(db, COLLECTION_NAME));
+      if (ORDER) {
+        q = query(q, orderBy(ORDER));
+      }
 
-        setData(orderedData);
-      },
-      (error) => {
-        console.error("Error fetching data:", error);
-        message.error("데이터를 불러올 수 없습니다!");
-        return () => {
-          unsubscribe(); // 구독 해지
-        };
-      },
-    );
-  }, [COLLECTION_NAME, ORDER]);
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot: QuerySnapshot) => {
+          const list: FormDataType[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const selectedFields = {
+              id: doc.id,
+              ...data,
+            };
+            list.push(selectedFields);
+          });
+
+          const orderedData = list.map((item) => {
+            const orderedItem: FormDataType = { id: item.id };
+            for (const key of Object.keys(TABLE_TITLE)) {
+              orderedItem[key] = item[key];
+            }
+            return orderedItem;
+          });
+
+          setData(orderedData);
+        },
+        (error) => {
+          console.error("Error fetching data:", error);
+          message.error("데이터를 불러올 수 없습니다!");
+          return () => {
+            unsubscribe();
+          };
+        },
+      );
+    }
+  }, [COLLECTION_NAME, ORDER, DOCUMENT_ID]);
 
   return data;
 }

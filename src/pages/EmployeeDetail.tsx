@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import React from "react";
 import styled from "styled-components";
 import "../styles/Employee.css";
@@ -26,10 +25,6 @@ const Container = styled.div`
     max-width: 1200px;
   }
 `;
-const Header = styled.div`
-  font-size: 1.5rem;
-  font-weight: bold;
-`;
 
 const CardContainer = styled.div`
   background-color: #fff;
@@ -37,8 +32,8 @@ const CardContainer = styled.div`
   color: #526484;
   word-wrap: break-word;
 `;
+
 function EmployeeDetail() {
-  const { memberId } = useParams();
   return (
     <Container>
       <CardContainer className="card-container">

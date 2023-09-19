@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Dropdown, message } from "antd";
+import { Col, Dropdown, message, Row } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { FormDataType } from "../type/form";
@@ -28,13 +28,17 @@ export const columns = (handleDelete: (id: string) => void) => {
     {
       title: "Name",
       render: (record: FormDataType) => (
-        <div>
-          <Image className="profile">
-            <img src={record.photo} alt={record.name} />
-          </Image>{" "}
-          <div className="name">{record.name}</div>
-          <div className="email">{record.email}</div>
-        </div>
+        <Row gutter={16}>
+          <Col flex="0 1">
+            <Image className="profile">
+              <img src={record.photo} alt={record.name} />
+            </Image>{" "}
+          </Col>
+          <Col flex="auto">
+            <div className="name">{record.name}</div>
+            <div className="email">{record.email}</div>
+          </Col>
+        </Row>
       ),
     },
     {
