@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from "react";
+
+// Style
 import styled from "styled-components";
-
 import { EllipsisOutlined } from "@ant-design/icons";
-
-// Firebase
-import { db } from "../../libs/firebase";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  deleteDoc,
-} from "firebase/firestore";
 
 // Recoil
 import { useSetRecoilState } from "recoil";
@@ -21,6 +12,9 @@ import {
   deleteFolderState,
   SelectProps,
 } from "../../store/wiki";
+
+// api
+import { deleteFolder } from "../../hooks/Wiki/api";
 
 interface CustomSelectMenuProps {
   visible: boolean;
@@ -45,23 +39,6 @@ function WikiSelect({ title }: IProps) {
     setMenuVisible(false);
   };
 
-  const deleteFolder = async (folderName: string) => {
-    try {
-      const q = query(
-        collection(db, "WikiPage"),
-        where("title", "==", folderName),
-      );
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
-        const folderDoc = querySnapshot.docs[0];
-        await deleteDoc(folderDoc.ref);
-        setDeleteFolderState(false);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   useEffect(() => {
     console.log("Initialize");
   }, [deleteFolderState]);
@@ -84,7 +61,7 @@ function WikiSelect({ title }: IProps) {
           onClick={() => {
             handleItemClick(title);
             setDeleteFolderState(true);
-            deleteFolder(title);
+            deleteFolder(title, setDeleteFolderState);
           }}
         >
           폴더 삭제

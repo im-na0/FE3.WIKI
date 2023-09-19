@@ -5,13 +5,13 @@ import styled from "styled-components";
 
 // components
 import WikiNav from "../components/Wiki/WikiNav";
-import Page from "../components/Wiki/Page";
+import WikiPage from "../components/Wiki/WikiPage";
 
 const Wiki = () => {
   return (
     <StyledContainer>
       <WikiNav />
-      <Page />
+      <WikiPage />
     </StyledContainer>
   );
 };

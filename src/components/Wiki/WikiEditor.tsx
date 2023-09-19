@@ -9,7 +9,7 @@ import styled from "styled-components";
 import { Button, Space } from "antd";
 
 // Recoil
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   currentFolderTitle,
   currentFileTitle,
@@ -27,6 +27,8 @@ import {
   getDocs,
   updateDoc,
 } from "firebase/firestore";
+import { storage } from "../../libs/firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 // Interface
 import { IItems } from "../../store/wiki";
@@ -36,7 +38,7 @@ const WikiEditor = () => {
   const currentFolder = useRecoilValue(currentFolderTitle);
   const currentFile = useRecoilValue(currentFileTitle);
   const [item, setItem] = useRecoilState(currentItem);
-  const [editFile, setEditFile] = useRecoilState(editFileState);
+  const setEditFile = useSetRecoilState(editFileState);
   const [existSub, setExistSub] = useRecoilState(editFileSubName);
 
   const INIT = "마크다운 문법을 입력해보세요...";
@@ -89,6 +91,29 @@ const WikiEditor = () => {
     console.log(1);
   }, []);
 
+  const onUploadImage = async (
+    blob: Blob | File,
+    callback: (url: string, text?: string) => void,
+  ): Promise<void> => {
+    if (blob instanceof File) {
+      try {
+        const lastIndex = blob.name.lastIndexOf(".");
+        const fileName = blob.name.substring(0, lastIndex);
+        const ext = blob.name.substring(lastIndex);
+        const fullFileName = fileName + "-" + new Date().getTime() + ext;
+
+        const storageRef = ref(storage, `wiki/${fullFileName}`);
+        const uploadRef = await uploadBytes(storageRef, blob).then(
+          (snapshot) => snapshot.ref,
+        );
+        const url = await getDownloadURL(uploadRef);
+        callback(url, blob?.name);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return (
     <Container>
       <StyledTop>
@@ -104,6 +129,7 @@ const WikiEditor = () => {
         height="600px"
         initialEditType="markdown"
         useCommandShortcut={false}
+        hooks={{ addImageBlobHook: onUploadImage }}
       />
     </Container>
   );
