@@ -59,8 +59,6 @@ export default function TeamTable({
     setFilteredData(dataWithKeys);
   }, [teamData, filterValue, sortValue, searchText]);
 
-  console.log(filteredData);
-
   return (
     <>
       {loading ? (

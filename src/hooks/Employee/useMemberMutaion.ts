@@ -22,7 +22,7 @@ export function useUploadStorage() {
       const snapshot = await uploadTask;
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      console.log("업로드 성공!");
+      message.success("업로드 성공!");
       return downloadURL;
     } catch (error) {
       console.error("Error uploading file: ", error);
@@ -53,7 +53,8 @@ export function useUpdateData({ COLLECTION_NAME }: UseMemberMutationParams) {
         ...data,
         updatedAt: serverTimestamp(),
       });
-      console.log("데이터 업데이트 성공!");
+
+      message.success("업데이트 성공!");
     } catch (error) {
       console.error("Error updating member: ", error);
       message.error("데이터 업데이트 중 오류가 발생했습니다 ");

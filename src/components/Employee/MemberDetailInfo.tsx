@@ -12,23 +12,19 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
-import TeamForm from "./TeamForm";
 
-function MemberDetailInfo({ collectionName }: { collectionName: string }) {
+function MemberDetailInfo() {
   const Form = CustomForm.Form;
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const { memberId, teamId } = useParams<{
-    memberId: string;
-    teamId: string;
-  }>();
+  const [file, setFile] = useState<File | null>(null); // file 관리
+  const { memberId } = useParams<{ memberId: string }>();
   const fetchDataParams = {
-    COLLECTION_NAME: collectionName,
-    DOCUMENT_ID: memberId || teamId,
+    COLLECTION_NAME: "Users",
+    DOCUMENT_ID: memberId,
   };
   const userData: FormDataType | null = useFetchData(fetchDataParams);
-  const [cardName, setCardName] = useState(userData.name || userData.teamName);
+  const [cardName, setCardName] = useState(userData.name);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   useEffect(() => {
@@ -39,18 +35,16 @@ function MemberDetailInfo({ collectionName }: { collectionName: string }) {
           setPreviewUrl(userData[fieldName as string]);
         }
         setCardDepartment(userData.department);
-        setCardName(userData.name || userData.teamName);
+        setCardName(userData.name);
       });
     }
   }, [userData]);
-
-  console.log(cardName);
 
   const handleUpdate = async () => {
     try {
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
-      const { updateData } = useUpdateData({ COLLECTION_NAME: collectionName });
+      const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
       const fieldsValue = form.getFieldsValue();
 
       if (file) {
@@ -91,11 +85,7 @@ function MemberDetailInfo({ collectionName }: { collectionName: string }) {
       <div className="member-header">
         <div className="member-title">
           <h3>직원 정보</h3>
-          <span className="member-desc">
-            {userData?.name
-              ? `${userData.name} 님의 프로필`
-              : `${userData.teamName} 팀 프로필`}
-          </span>
+          <span className="member-desc">{userData?.name} 님의 프로필</span>
         </div>
         <div className="member-btn-area">
           <Button
@@ -128,11 +118,7 @@ function MemberDetailInfo({ collectionName }: { collectionName: string }) {
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            {memberId ? (
-              <MemberForm isEditMode={isEditMode} />
-            ) : teamId ? (
-              <TeamForm isEditMode={isEditMode} />
-            ) : null}
+            <MemberForm isEditMode={isEditMode} />
           </div>
         </div>
       </div>

@@ -2,9 +2,33 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
+import TeamDetailInfo from "../components/Employee/TeamDetailInfo"; // TeamDetailInfo 컴포넌트 추가
 import MemberSider from "../components/Employee/MemberSider";
 import { Layout } from "antd";
 import "../styles/Employee.css";
+
+function EmployeeDetail() {
+  const { memberId, teamId } = useParams();
+
+  return (
+    <Layout>
+      <MemberSider />
+      <Container>
+        <Wrap>
+          <Content className="card-container">
+            {memberId ? (
+              <MemberDetailInfo />
+            ) : teamId ? (
+              <TeamDetailInfo />
+            ) : null}
+          </Content>
+        </Wrap>
+      </Container>
+    </Layout>
+  );
+}
+
+export default EmployeeDetail;
 
 const Container = styled.div`
   padding: 0 1rem;
@@ -40,24 +64,3 @@ const Content = styled.div`
   color: #526484;
   word-wrap: break-word;
 `;
-
-function EmployeeDetail() {
-  const { memberId, teamId } = useParams();
-
-  const collectionName = memberId ? "Users" : teamId ? "Teams" : "";
-
-  return (
-    <Layout>
-      <MemberSider />
-      <Container>
-        <Wrap>
-          <Content className="card-container">
-            <MemberDetailInfo collectionName={collectionName} />
-          </Content>
-        </Wrap>
-      </Container>
-    </Layout>
-  );
-}
-
-export default EmployeeDetail;
