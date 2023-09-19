@@ -9,6 +9,8 @@ import {
   FolderOutlined,
   FileOutlined,
   FolderAddOutlined,
+  TeamOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 import { Input } from "antd";
 
@@ -198,111 +200,121 @@ const WikiNav = () => {
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="folders">
         {(provided) => (
-          <StyledContainer>
-            <StyledDiv>
-              <StyledForm
-                onClick={() => {
-                  setInputState((prev) => !prev);
-                }}
-              >
-                <FolderAddOutlined
-                  style={{ color: "white", fontSize: "15px" }}
-                />
-                <FormSpan>새 폴더 추가</FormSpan>
-              </StyledForm>
-              {inputState && (
-                <NewFolderContainer>
-                  <form onSubmit={onSubmitFolder}>
-                    <Input
-                      placeholder="새 폴더명을 입력해주세요"
-                      value={newFolder}
-                      onChange={onChangeFolder}
-                      style={{
-                        padding: "6.5px",
-                        borderRadius: "0",
-                        border: "none",
-                        borderBottom: "1px solid rgba(0,0,0,0.1)",
-                        paddingLeft: "25px",
-                      }}
-                    />
-                  </form>
-                </NewFolderContainer>
-              )}
-            </StyledDiv>
-            <StyledUl {...provided.droppableProps} ref={provided.innerRef}>
-              {items.map((item, index: number) => (
-                <Draggable
-                  key={item.title}
-                  draggableId={item.title + index}
-                  index={index}
+          <Container>
+            <StyledContainer>
+              <FolderWrapper>
+                <TeamOutlined />
+                <StyledFolderTitle>전체</StyledFolderTitle>
+              </FolderWrapper>
+              <StyledDiv>
+                <StyledForm
+                  onClick={() => {
+                    setInputState((prev) => !prev);
+                  }}
                 >
-                  {(provided) => (
-                    <ItemContainer key={item.title + index}>
-                      <li
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        onClick={() => handleLiClick(item.title)}
-                      >
-                        <StyledTitle>
-                          <div>
-                            {(folderState && currentFolder) === item.title ? (
-                              <form onSubmit={onSubmitFolderName}>
-                                <Input
-                                  defaultValue={item.title}
-                                  onChange={onChangeFolderName}
-                                  onClick={(e) => e.stopPropagation()}
-                                />
-                              </form>
-                            ) : (
-                              <>
-                                <FolderOutlined />
-                                <StyledSpan>{item.title}</StyledSpan>
-                              </>
+                  <FolderAddOutlined
+                    style={{ color: "white", fontSize: "15px" }}
+                  />
+                  <FormSpan>새 폴더 추가</FormSpan>
+                </StyledForm>
+                {inputState && (
+                  <NewFolderContainer>
+                    <form onSubmit={onSubmitFolder}>
+                      <Input
+                        placeholder="새 폴더명을 입력해주세요"
+                        value={newFolder}
+                        onChange={onChangeFolder}
+                        style={{
+                          padding: "6.5px",
+                          borderRadius: "0",
+                          border: "none",
+                          borderBottom: "1px solid rgba(0,0,0,0.1)",
+                          paddingLeft: "25px",
+                        }}
+                      />
+                    </form>
+                  </NewFolderContainer>
+                )}
+              </StyledDiv>
+              <StyledUl {...provided.droppableProps} ref={provided.innerRef}>
+                {items.map((item, index: number) => (
+                  <Draggable
+                    key={item.title}
+                    draggableId={item.title + index}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <ItemContainer key={item.title + index}>
+                        <li
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          onClick={() => handleLiClick(item.title)}
+                        >
+                          <StyledTitle>
+                            <div>
+                              {(folderState && currentFolder) === item.title ? (
+                                <form onSubmit={onSubmitFolderName}>
+                                  <Input
+                                    defaultValue={item.title}
+                                    onChange={onChangeFolderName}
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                </form>
+                              ) : (
+                                <>
+                                  <FolderOutlined />
+                                  <StyledSpan>{item.title}</StyledSpan>
+                                </>
+                              )}
+                            </div>
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleWikiSelectToggle(e);
+                              }}
+                            >
+                              <WikiSelect title={item.title} />
+                            </div>
+                          </StyledTitle>
+                          <StyledFile isopen={item.title === currentFolder}>
+                            {fileState && (
+                              <FormContainer>
+                                <FileOutlined style={{ fontSize: "14px" }} />
+                                <FileForm onSubmit={onSubmitFile}>
+                                  <Input
+                                    placeholder="새로운 파일"
+                                    onChange={onChangeFile}
+                                  />
+                                </FileForm>
+                              </FormContainer>
                             )}
-                          </div>
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleWikiSelectToggle(e);
-                            }}
-                          >
-                            <WikiSelect title={item.title} />
-                          </div>
-                        </StyledTitle>
-                        <StyledFile isopen={item.title === currentFolder}>
-                          {fileState && (
-                            <FormContainer>
-                              <FileOutlined style={{ fontSize: "14px" }} />
-                              <FileForm onSubmit={onSubmitFile}>
-                                <Input
-                                  placeholder="새로운 파일"
-                                  onChange={onChangeFile}
-                                />
-                              </FileForm>
-                            </FormContainer>
-                          )}
-                          {item.items &&
-                            item.items.map((v, fileIndex: number) => (
-                              <StyledItem
-                                key={v.name + fileIndex}
-                                onClick={() => handleFileClick(v.name)}
-                              >
-                                <div>
-                                  <FileOutlined />
-                                  <StyledSpan>{v.name}</StyledSpan>
-                                </div>
-                              </StyledItem>
-                            ))}
-                        </StyledFile>
-                      </li>
-                    </ItemContainer>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </StyledUl>
-          </StyledContainer>
+                            {item.items &&
+                              item.items.map((v, fileIndex: number) => (
+                                <StyledItem
+                                  key={v.name + fileIndex}
+                                  onClick={() => handleFileClick(v.name)}
+                                >
+                                  <div>
+                                    <FileOutlined />
+                                    <StyledSpan>{v.name}</StyledSpan>
+                                  </div>
+                                </StyledItem>
+                              ))}
+                          </StyledFile>
+                        </li>
+                      </ItemContainer>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </StyledUl>
+            </StyledContainer>
+            <FolderWrapper>
+              <LockOutlined />
+              <StyledFolderTitle>팀</StyledFolderTitle>
+            </FolderWrapper>
+          </Container>
         )}
       </Droppable>
     </DragDropContext>
@@ -311,13 +323,36 @@ const WikiNav = () => {
 
 export default WikiNav;
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const StyledContainer = styled.div`
   margin: 0;
   padding: 0;
   margin-right: 30px;
+  margin-bottom: 30px;
   width: 280px;
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
+`;
+
+const FolderWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-top: 3px;
+  margin-bottom: 8px;
+  color: black;
+  opacity: 0.7;
+  padding-bottom: 5px;
+`;
+
+const StyledFolderTitle = styled.div`
+  font-size: 13px;
+  font-weight: 900;
+  padding-left: 5px;
 `;
 
 const StyledDiv = styled.div`
