@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 // Style
 import styled from "styled-components";
@@ -11,6 +11,7 @@ import {
   editFolderState,
   deleteFolderState,
   SelectProps,
+  SelectState,
 } from "../../store/wiki";
 
 // api
@@ -24,20 +25,41 @@ interface IProps {
   title: string;
 }
 
-function WikiSelect({ title }: IProps) {
+const WikiSelect = ({ title }: IProps) => {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const setFileState = useSetRecoilState(newFileState);
   const setFolderState = useSetRecoilState(editFolderState);
   const setDeleteFolderState = useSetRecoilState(deleteFolderState);
   const setCurrentFolder = useSetRecoilState(SelectProps);
+  const setSelectState = useSetRecoilState(SelectState);
+  const menuRef = useRef(null);
 
   const handleButtonClick = () => {
     setMenuVisible(!isMenuVisible);
   };
 
-  const handleItemClick = (item: string) => {
+  const handleItemClick = () => {
     setMenuVisible(false);
   };
+
+  const handleOutsideClick = () => {
+    if (menuRef.current) {
+      setMenuVisible(false);
+      setSelectState(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isMenuVisible) {
+      document.addEventListener("click", handleOutsideClick);
+    } else {
+      document.removeEventListener("click", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [isMenuVisible]);
 
   useEffect(() => {
     console.log("Initialize");
@@ -46,10 +68,10 @@ function WikiSelect({ title }: IProps) {
   return (
     <Container>
       <EllipsisOutlined onClick={handleButtonClick} />
-      <CustomSelectMenu visible={isMenuVisible}>
+      <CustomSelectMenu ref={menuRef} visible={isMenuVisible}>
         <CustomSelectItem
           onClick={() => {
-            handleItemClick(title);
+            handleItemClick();
             setCurrentFolder(title);
             setFolderState((prev) => !prev);
             setCurrentFolder(title);
@@ -59,7 +81,7 @@ function WikiSelect({ title }: IProps) {
         </CustomSelectItem>
         <CustomSelectItem
           onClick={() => {
-            handleItemClick(title);
+            handleItemClick();
             setDeleteFolderState(true);
             deleteFolder(title, setDeleteFolderState);
           }}
@@ -68,7 +90,7 @@ function WikiSelect({ title }: IProps) {
         </CustomSelectItem>
         <CustomSelectItem
           onClick={() => {
-            handleItemClick(title);
+            handleItemClick();
             setFileState((prev) => !prev);
             setCurrentFolder(title);
           }}
@@ -78,7 +100,7 @@ function WikiSelect({ title }: IProps) {
       </CustomSelectMenu>
     </Container>
   );
-}
+};
 
 export default WikiSelect;
 
