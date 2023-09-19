@@ -7,6 +7,7 @@ import ProjectListSider from "../components/project/ProjectListSider";
 import { useRecoilValue } from "recoil";
 import { useQueryProject } from "../hooks/project/useQueryProject";
 import { isLoadingState } from "../store/project";
+import ProjectDetailDefault from "../components/project/ProjectDetailDefault";
 // import ProjectNewForm from "../components/project/ProjectNewForm";
 
 const { Content, Sider } = Layout;
@@ -31,6 +32,7 @@ const ProjectList = () => {
             padding: "10px",
           }}
         >
+          {projectDetail === undefined && <ProjectDetailDefault />}
           {!isLoading && projectDetail !== undefined && (
             <ProjectDetailInfo
               isLoading={isLoading}

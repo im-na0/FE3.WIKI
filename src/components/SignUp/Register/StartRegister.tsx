@@ -23,9 +23,12 @@ const StartBtn = styled.button`
   height: 50px;
   margin: 50px auto;
   border-radius: 10px;
+  border: none;
   text-align: center;
   font-size: 16px;
+  color: #fff;
   font-weight: bold;
+  background-color: #6c63ff;
   cursor: pointer;
   &:hover {
     color: #fff;

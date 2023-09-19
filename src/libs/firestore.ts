@@ -129,3 +129,68 @@ export const wikiListConverter: FirestoreDataConverter<WikiList> = {
     return new WikiList(data.items, data.title);
   },
 };
+
+// 팀, 멤버 컨버터를 위한 타입 정의
+export class TeamList {
+  constructor(
+    public teamName: string,
+    public userId: string[],
+  ) {}
+}
+
+export class UserList {
+  constructor(
+    public department: string,
+    public email: string,
+    public name: string,
+    public phonenumber: string,
+    public photoUrl: string,
+    public position: string,
+    public team: string,
+  ) {}
+}
+
+export const teamListConverter: FirestoreDataConverter<TeamList> = {
+  toFirestore: (docData: TeamList): DocumentData => {
+    return {
+      teamName: docData.teamName,
+      userId: docData.userId,
+    };
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions,
+  ) => {
+    const data = snapshot.data(options);
+    return new TeamList(data.teamName, data.userId);
+  },
+};
+
+export const userListConverter: FirestoreDataConverter<UserList> = {
+  toFirestore: (docData: UserList): DocumentData => {
+    return {
+      department: docData.department,
+      email: docData.email,
+      name: docData.name,
+      phonenumber: docData.phonenumber,
+      photoUrl: docData.photoUrl,
+      position: docData.position,
+      team: docData.team,
+    };
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions,
+  ) => {
+    const data = snapshot.data(options);
+    return new UserList(
+      data.department,
+      data.email,
+      data.name,
+      data.phonenumber,
+      data.photoUrl,
+      data.position,
+      data.team,
+    );
+  },
+};

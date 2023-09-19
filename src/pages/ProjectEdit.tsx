@@ -4,23 +4,22 @@ import ProjectSider from "../components/project/ProjectSider";
 // import { Layout, theme } from "antd";
 import { Layout } from "antd";
 import ProjectNewForm from "../components/project/ProjectNewForm";
-import { useQueryProject } from "../hooks/project/useQueryProject";
-import { isLoadingState } from "../store/project";
-import { useRecoilValue } from "recoil";
+import useQueryProjectEdit from "../hooks/project/useQueryProjectEdit";
 
 const ProjectEdit = ({ isEdit }: { isEdit: boolean }) => {
-  // const {
-  //   token: { colorBgContainer, colorPrimary },
-  // } = theme.useToken();
-  const isLoading = useRecoilValue(isLoadingState);
-  const projectDetail = useQueryProject();
+  const [teams, users, projectDetail, isLoaded] = useQueryProjectEdit();
   return (
     <>
-      {isLoading ? null : (
+      {!isLoaded ? null : (
         <Layout>
           <ProjectSider />
           {projectDetail !== undefined && (
-            <ProjectNewForm isEdit={isEdit} projectDetail={projectDetail} />
+            <ProjectNewForm
+              isEdit={isEdit}
+              teams={teams}
+              users={users}
+              projectDetail={projectDetail}
+            />
           )}
         </Layout>
       )}

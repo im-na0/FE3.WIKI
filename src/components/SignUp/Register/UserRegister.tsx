@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styled } from "styled-components";
 import { Button, Input, Select, Upload, message } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
@@ -7,19 +7,28 @@ import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../Navigation";
 import { motion } from "framer-motion";
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  updateDoc,
+  addDoc,
+  query,
+  where,
+} from "firebase/firestore";
 import { db, auth, storage } from "../../../libs/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRecoilState } from "recoil";
 import {
-  Department,
   Team,
-  departmentState,
   selectedPartState,
+  selectedPoState,
   selectedTeamState,
   teamState,
   userInfo,
 } from "../../../store/signup";
+import { SELECT_OPTIONS } from "../../../constant/member";
 
 const Container = styled.div`
   margin: 0;
@@ -32,6 +41,7 @@ const Container = styled.div`
 `;
 const UserInfoContainer = styled.div`
   border: 1px solid black;
+  border-radius: 10px;
   margin: 20px auto;
   display: flex;
   flex-direction: column;
@@ -62,7 +72,10 @@ const BtnContainer = styled.div`
 const BackBtn = styled.button`
   border: 1px solid black;
   width: 60px;
+  background-color: #6c63ff;
   font-size: 16px;
+  color: #fff;
+  font-weight: bold;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
   &:hover {
@@ -75,6 +88,9 @@ const SubmitBtn = styled.button`
   border: 1px solid black;
   width: 240px;
   font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  background-color: #6c63ff;
   cursor: pointer;
   &:hover {
     background-color: #000;
@@ -82,64 +98,51 @@ const SubmitBtn = styled.button`
   }
 `;
 
-// Departments Collection 진입
-async function getDepartments() {
-  const departmentRef = collection(db, "Department");
-  const querySnapshot = await getDocs(departmentRef);
-  const departments: Department[] = [];
-  querySnapshot.forEach((doc) => {
-    departments.push({ id: doc.id, ...doc.data() } as Department);
-    console.log(departments);
-  });
-  return departments;
-}
-// Departments ID => Teams Collection 진입
-async function getTeams(selectedPart: string | undefined) {
-  if (!selectedPart) {
-    return [];
-  }
-  const teamsRef = collection(db, "Department", selectedPart, "Teams");
-  const querySnapshot = await getDocs(teamsRef);
+// 부서 가져오기
+const departmentKey = Object.keys(SELECT_OPTIONS.department);
+const positionKey = Object.keys(SELECT_OPTIONS.position);
+// Teams 정보 가져오기
+async function getTeams() {
+  const teamRef = collection(db, "Teams");
+  const querySnapshot = await getDocs(teamRef);
   const teams: Team[] = [];
   querySnapshot.forEach((doc) => {
     teams.push({ id: doc.id, ...doc.data() } as Team);
-    console.log(teams);
   });
   return teams;
 }
 export default function UserRegister() {
+  getTeams();
   // 로그인 유저 정보 가져오기
   const user = auth.currentUser;
   const { moveStartRegister, moveEndRegister } = useNavigation();
-  const [departmentOptions, setDepartmentOptions] =
-    useRecoilState(departmentState);
   const [teamOptions, setTeamOptions] = useRecoilState(teamState);
   const [selectedPart, setSelectedPart] = useRecoilState(selectedPartState);
   const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
-  // 부서 선택하면 선택 부서 저장
+  const [selectedPosition, setSelectedPosition] =
+    useRecoilState(selectedPoState);
+  //  부서 선택하면 선택 부서 저장
   const handleSelectedPart = (value: string | undefined) => {
     setSelectedPart(value);
   };
-  // 팀 선택하면 선택 팀 저장
+  //  팀 선택하면 선택 팀 저장
   const handleSelectedTeam = (value: string | undefined) => {
     setSelectedTeam(value);
   };
+  // 직급 선택하면 선택 직급 저장
+  const handleSelectedPosition = (value: string | undefined) => {
+    setSelectedPosition(value);
+  };
   useEffect(() => {
-    async function fetchDepartment() {
-      const departments = await getDepartments();
-      setDepartmentOptions(departments);
-    }
-    fetchDepartment();
-  }, []);
-  useEffect(() => {
-    async function fetchTeam() {
-      const teams = await getTeams(selectedPart);
+    async function fetchTeams() {
+      const teams = await getTeams();
       setTeamOptions(teams);
     }
-    fetchTeam();
-  }, [selectedPart]);
-  const [input, setInput] = useRecoilState(userInfo);
+    fetchTeams();
+  }, []);
+
   // 유저 정보 input 값 저장
+  const [input, setInput] = useRecoilState(userInfo);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === "department") {
@@ -147,6 +150,9 @@ export default function UserRegister() {
     }
     if (name === "team") {
       setSelectedTeam(value);
+    }
+    if (name === "position") {
+      setSelectedPosition(value);
     }
     setInput((prevInput) => ({
       ...prevInput,
@@ -168,12 +174,13 @@ export default function UserRegister() {
           );
           const snapshot = await uploadBytes(storageRef, uploadFile);
           console.log("업로드 완료", snapshot);
+          alert("사진 업로드 완료");
           const downloadURL: string | undefined =
             await getDownloadURL(storageRef);
           console.log("URL : ", downloadURL);
           setInput((prevInput) => ({
             ...prevInput,
-            photoUrl: downloadURL,
+            photo: downloadURL,
           }));
         } else {
           console.error("로그아웃 상태");
@@ -190,32 +197,35 @@ export default function UserRegister() {
     try {
       if (user) {
         const userUid = user.uid; // uid 가져오기
-        const departmentPath = selectedPart ? `Department/${selectedPart}` : "";
-        const teamPath = selectedPart ? `Teams/${selectedTeam}/member` : "";
-        const path = `${departmentPath}/${teamPath}`;
         const userDB = doc(db, "Users", userUid);
         const newUser = {
           name: input.name,
           email: input.email,
-          phonenumber: input.phonenumber,
+          phone: input.phone,
           department: selectedPart,
           team: selectedTeam,
-          position: input.position,
-          photoUrl: input.photoUrl,
+          position: selectedPosition,
+          photo: input.photo,
         };
         await setDoc(userDB, newUser);
-        // 유저 Department/Teams 컬렉션에 member로 넣기
-        const teamDB = doc(db, path, userUid);
-        const teamData = {
-          name: input.name,
-          email: input.email,
-          phonenumber: input.phonenumber,
-          department: selectedPart,
-          team: selectedTeam,
-          position: input.position,
-          photoUrl: input.photoUrl,
-        };
-        await setDoc(teamDB, teamData);
+        const teamDB = collection(db, "Teams");
+        const q = query(teamDB, where("teamName", "==", selectedTeam));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const teamDoc = querySnapshot.docs[0];
+          const teamData = teamDoc.data();
+          const updatedUserId = [...(teamData.userId || []), userUid];
+
+          await updateDoc(teamDoc.ref, {
+            userId: updatedUserId,
+          });
+        } else {
+          const teamData = {
+            teamName: selectedTeam,
+            userId: [userUid],
+          };
+          await addDoc(teamDB, teamData);
+        }
         alert("업로드 성공");
         moveEndRegister();
       } else {
@@ -257,7 +267,7 @@ export default function UserRegister() {
           <UserPhoneCategory>
             <span>휴대폰 번호</span>
             <Input
-              name="phonenumber"
+              name="phone"
               style={{ width: "320px" }}
               placeholder="휴대폰 번호를 입력해주세요"
               onChange={handleInputChange}
@@ -273,14 +283,12 @@ export default function UserRegister() {
               filterOption={(input, option) =>
                 (option?.label ?? "").includes(input)
               }
-              filterSort={(optionA, optionB) =>
-                (optionA?.label ?? "")
-                  .toLowerCase()
-                  .localeCompare((optionB?.label ?? "").toLowerCase())
-              }
-              options={departmentOptions.map((department) => ({
-                value: department.id,
-                label: department.name,
+              options={departmentKey.map((key) => ({
+                label: key,
+                value:
+                  SELECT_OPTIONS.department[
+                    key as keyof typeof SELECT_OPTIONS.department
+                  ],
               }))}
               onChange={handleSelectedPart}
             />
@@ -301,19 +309,35 @@ export default function UserRegister() {
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
               options={teamOptions.map((team) => ({
-                value: team.id,
-                label: team.id,
+                value: team.teamName,
+                label: team.teamName,
               }))}
               onChange={handleSelectedTeam}
             />
           </UserTeamCategory>
           <UserPositionCategory>
             <span>직급</span>
-            <Input
-              name="position"
-              style={{ width: "320px" }}
-              placeholder="맡으신 직급을 입력해주세요"
-              onChange={handleInputChange}
+            <Select
+              showSearch
+              style={{ width: 320 }}
+              placeholder="직급을 골라주세요"
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                (option?.label ?? "").includes(input)
+              }
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? "")
+                  .toLowerCase()
+                  .localeCompare((optionB?.label ?? "").toLowerCase())
+              }
+              options={positionKey.map((key) => ({
+                label: key,
+                value:
+                  SELECT_OPTIONS.position[
+                    key as keyof typeof SELECT_OPTIONS.position
+                  ],
+              }))}
+              onChange={handleSelectedPosition}
             />
           </UserPositionCategory>
           <UserImageCategory>
