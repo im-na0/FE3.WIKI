@@ -41,21 +41,29 @@ function MemberDetailInfo() {
   }, [userData]);
 
   const handleUpdate = async () => {
-    const { uploadStorage } = useUploadStorage();
-    const { deleteStorage } = useDeleteStorage();
-    const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
-    const fieldsValue = form.getFieldsValue();
-    if (file != null) {
-      const downloadURL = await uploadStorage(file);
-      fieldsValue.photo = downloadURL ? downloadURL : fieldsValue.photo;
+    try {
+      const { uploadStorage } = useUploadStorage();
+      const { deleteStorage } = useDeleteStorage();
+      const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
+      const fieldsValue = form.getFieldsValue();
+
+      if (file) {
+        const downloadURL = await uploadStorage(file);
+        fieldsValue.photo = downloadURL || fieldsValue.photo!;
+        await deleteStorage(userData.photo!);
+      } else {
+        fieldsValue.photo = previewUrl || fieldsValue.photo;
+      }
+
+      if (memberId) {
+        await updateData(memberId, fieldsValue);
+      }
+
+      handleProfileCard();
+    } catch (error) {
+      console.error("Error updating member:", error);
+      message.error("데이터 업데이트 중 오류가 발생했습니다");
     }
-    if (userData && userData.photo) {
-      await deleteStorage(userData.photo);
-    }
-    if (memberId) {
-      await updateData(memberId, fieldsValue);
-    }
-    handleProfileCard();
   };
 
   const handleProfileCard = () => {

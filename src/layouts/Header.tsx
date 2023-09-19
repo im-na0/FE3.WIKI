@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/Header.css";
-import { Layout, theme } from "antd";
+import { Layout, theme, Modal } from "antd";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { authState } from "../store/signin";
 import { auth } from "../libs/firebase";
+import Timer from "../pages/Timer";
 interface MenuListItem {
   key: number;
   to: string;
@@ -38,6 +39,16 @@ const MainHeader = () => {
     //   text: "위키",
     // },
   ];
+
+  // 출퇴근 타이머 모달
+  const [isTimerOn, setIsTimerOn] = useState<boolean>(false);
+  const showTimerModal = () => {
+    setIsTimerOn(true);
+  };
+  const closeTimerModal = () => {
+    setIsTimerOn(false);
+  };
+
   const [isSignIn, setIsSignIn] = useRecoilState(authState);
   const handleSignOut = () => {
     const user = auth.currentUser;
@@ -67,9 +78,9 @@ const MainHeader = () => {
         <div className="header-user">
           <ul>
             <li>
-              <Link to={"/timer"} className="user-link timer-btn">
+              <button onClick={showTimerModal} className="user-link timer-btn">
                 출퇴근 타이머
-              </Link>
+              </button>
             </li>
             <li>
               {isSignIn ? (
@@ -88,6 +99,31 @@ const MainHeader = () => {
           </ul>
         </div>
       </div>
+
+      <Modal
+        title=""
+        open={isTimerOn}
+        onCancel={closeTimerModal}
+        footer={""}
+        width="340px"
+        style={{
+          position: "fixed",
+          top: "8%",
+          right: "9%",
+        }}
+      >
+        <div
+          className="TimerModalContent"
+          style={{ paddingRight: "1.3rem", paddingTop: "0.8rem" }}
+        >
+          <Timer />
+          <div style={{ textAlign: "center", marginTop: "0.3rem" }}>
+            <Link to="/WorkTime" onClick={closeTimerModal}>
+              출퇴근 기록 페이지
+            </Link>
+          </div>
+        </div>
+      </Modal>
     </Header>
   );
 };

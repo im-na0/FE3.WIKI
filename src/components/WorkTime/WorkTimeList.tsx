@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Pagination, Segmented, Table } from "antd";
+import { Segmented, Table } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import WorkCalendar from "./WorkCalendar";
 
 // firebase
-import { db } from "../../libs/firebase";
-import { collection, getDocs, Timestamp } from "firebase/firestore";
+import { db, auth } from "../../libs/firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  Timestamp,
+  DocumentData,
+  QueryDocumentSnapshot,
+  getDoc,
+  onSnapshot,
+} from "firebase/firestore";
 
 interface WorkTimeProps {
   fontSize?: string;
@@ -19,7 +28,6 @@ interface DataType {
   team: string;
   starttime: Timestamp;
   finishtime: Timestamp;
-  leave: string;
 }
 
 const Container = styled.div`
@@ -29,7 +37,7 @@ const Container = styled.div`
 `;
 
 const LeftContainer = styled.div`
-  flex: 6;
+  flex: 5;
 `;
 
 const WorkTimeText = styled.span<WorkTimeProps>`
@@ -48,14 +56,17 @@ const PaginationWrapper = styled.div`
 `;
 
 const RightContainer = styled.div`
-  flex: 4;
-  margin-left: 10px;
+  flex: 5;
+  margin-left: 5px;
 `;
 
-const WorkTimeList = () => {
-  const [workTimeData, setworkTimeData] = useState<DataType[]>([]);
+const WorkTimeList: React.FC = () => {
+  const [workTimeData, setWorkTimeData] = useState<DataType[]>([]);
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
+
+  const user = auth.currentUser;
+  const userUid = user ? user.uid : "ax2Eyczauq0NbDTfrB2i"; // 유저 Uid 샘플 테스트용
 
   const columns: ColumnsType<DataType> = [
     {
@@ -74,63 +85,104 @@ const WorkTimeList = () => {
       title: "출근 시간",
       dataIndex: "starttime",
       sorter: {
-        compare: (a, b) =>
-          a.starttime.toDate().getTime() - b.starttime.toDate().getTime(),
+        compare: (a, b) => {
+          const aTime = a.starttime ? a.starttime.toDate().getTime() : 0;
+          const bTime = b.starttime ? b.starttime.toDate().getTime() : 0;
+          return aTime - bTime;
+        },
         multiple: 1,
       },
       render: (starttime) =>
-        `${starttime && starttime.toDate().toLocaleDateString()}
-         ${starttime && starttime.toDate().toLocaleTimeString()}`,
+        starttime
+          ? `${starttime.toDate().toLocaleDateString()} ${
+              starttime && starttime.toDate().toLocaleTimeString()
+            }`
+          : "",
     },
     {
       title: "퇴근 시간",
       dataIndex: "finishtime",
       sorter: {
-        compare: (a, b) =>
-          a.finishtime.toDate().getTime() - b.finishtime.toDate().getTime(),
+        compare: (a, b) => {
+          const aTime = a.finishtime ? a.finishtime.toDate().getTime() : 0;
+          const bTime = b.finishtime ? b.finishtime.toDate().getTime() : 0;
+          return aTime - bTime;
+        },
         multiple: 2,
       },
       render: (finishtime) =>
-        `${finishtime && finishtime.toDate().toLocaleDateString()} 
-         ${finishtime && finishtime.toDate().toLocaleTimeString()}`,
-    },
-    {
-      title: "비고 (휴가 등)",
-      dataIndex: "leave",
+        finishtime
+          ? `${finishtime.toDate().toLocaleDateString()} ${
+              finishtime && finishtime.toDate().toLocaleTimeString()
+            }`
+          : "",
     },
   ];
 
   useEffect(() => {
     const fetchWorkTime = async () => {
-      const workTimeRef = collection(db, "Users");
-      const workTimeSnap = await getDocs(workTimeRef);
+      try {
+        const fetchedWorkTime: DataType[] = [];
 
-      const fetchedWorkTime: DataType[] = [];
+        if (workTimeFilter === "나의 출퇴근 현황") {
+          const userDocRef = doc(db, `Users/${userUid}`);
+          const userDocSnap = await getDoc(userDocRef);
+          const userData = userDocSnap.data() || {};
 
-      workTimeSnap.forEach((doc) => {
-        const workTimeData = doc.data();
-        if (
-          (workTimeFilter === "나의 출퇴근 현황" &&
-            workTimeData.name === "홍길동") ||
-          workTimeFilter === "우리팀 출퇴근 현황"
-        ) {
-          fetchedWorkTime.push({
-            key: doc.id,
-            name: workTimeData.name,
-            department: workTimeData.department,
-            team: workTimeData.team,
-            starttime: workTimeData.starttime,
-            finishtime: workTimeData.finishtime,
-            leave: workTimeData.leave,
+          const userWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
+          const userWorkTimeSnap = await getDocs(userWorkTimeRef);
+
+          const unsubscribe = onSnapshot(userWorkTimeRef, (snapshot) => {
+            const updatedUserWorkTime: DataType[] = [];
+            snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+              const userWorkTimeData = doc.data();
+              updatedUserWorkTime.push({
+                key: doc.id,
+                name: userData.name || "",
+                department: userData.department || "",
+                team: userData.team || "",
+                starttime: userWorkTimeData.starttime,
+                finishtime: userWorkTimeData.finishtime,
+              });
+            });
+            setWorkTimeData(updatedUserWorkTime);
           });
+
+          return () => {
+            unsubscribe();
+          };
+        } else if (workTimeFilter === "우리팀 출퇴근 현황") {
+          const teamWorkTimeRef = collection(db, "Users");
+          const teamWorkTimeSnap = await getDocs(teamWorkTimeRef);
+
+          const unsubscribe = onSnapshot(teamWorkTimeRef, (snapshot) => {
+            const updatedTeamWorkTime: DataType[] = [];
+            snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+              const teamWorkTimeData = doc.data();
+              updatedTeamWorkTime.push({
+                key: doc.id,
+                name: teamWorkTimeData.name || "",
+                department: teamWorkTimeData.department || "",
+                team: teamWorkTimeData.team || "",
+                starttime: teamWorkTimeData.starttime,
+                finishtime: teamWorkTimeData.finishtime,
+              });
+            });
+            setWorkTimeData(updatedTeamWorkTime);
+          });
+
+          return () => {
+            // Unsubscribe the listener when the component unmounts
+            unsubscribe();
+          };
         }
-      });
-      setworkTimeData(fetchedWorkTime);
-      console.log(fetchedWorkTime);
+      } catch (error) {
+        console.error("Error fetching worktime data", error);
+      }
     };
 
     fetchWorkTime();
-  }, [workTimeFilter]);
+  }, [workTimeFilter, userUid]);
 
   const onChange: TableProps<DataType>["onChange"] = (
     pagination,

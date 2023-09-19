@@ -1,5 +1,6 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
+// Components
 import WikiSelect from "./WikiSelect";
 
 // Style
@@ -30,9 +31,11 @@ import {
   query,
   where,
   getDocs,
-  addDoc,
   updateDoc,
 } from "firebase/firestore";
+
+// api
+import { addFile, addFolder } from "../../hooks/Wiki/api";
 
 // Interface
 import { IWiki } from "../../store/wiki";
@@ -79,43 +82,6 @@ const WikiNav = () => {
     setItems(folderData);
   };
 
-  const addFolder = async () => {
-    if (newFolder.length > 0) {
-      await addDoc(collection(db, "WikiPage"), {
-        title: newFolder,
-        items: [],
-      });
-      refreshFolders();
-    }
-  };
-
-  const addFile = async (current: string) => {
-    console.log(currentFolder);
-    try {
-      const q = query(
-        collection(db, "WikiPage"),
-        where("title", "==", current),
-      );
-      const querySnapshot = await getDocs(q);
-      const folderDoc = querySnapshot.docs[0];
-      const exist = folderDoc.data().items;
-      const date = new Date();
-      const newFileData = {
-        name: newFile.name,
-        subName: newFile.subName,
-        date: date,
-      };
-      exist.push(newFileData);
-      await updateDoc(folderDoc.ref, {
-        items: exist,
-      });
-
-      refreshFolders();
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const changeFolderName = async (
     currentFolderName: string,
     newFolderName: string,
@@ -140,7 +106,7 @@ const WikiNav = () => {
 
   const onSubmitFolder = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addFolder();
+    addFolder(newFolder, refreshFolders);
     setInputState(false);
   };
 
@@ -150,7 +116,7 @@ const WikiNav = () => {
 
   const onSubmitFile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (currentFolder) addFile(currentFolder);
+    if (currentFolder) addFile(currentFolder, newFile, refreshFolders);
     setFileState(false);
   };
 
