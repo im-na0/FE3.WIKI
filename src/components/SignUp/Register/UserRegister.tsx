@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styled } from "styled-components";
 import { Button, Input, Select, Upload, message } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
@@ -7,7 +7,15 @@ import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../Navigation";
 import { motion } from "framer-motion";
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  updateDoc,
+  getDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { db, auth, storage } from "../../../libs/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRecoilState } from "recoil";
@@ -32,6 +40,7 @@ const Container = styled.div`
 `;
 const UserInfoContainer = styled.div`
   border: 1px solid black;
+  border-radius: 10px;
   margin: 20px auto;
   display: flex;
   flex-direction: column;
@@ -62,7 +71,10 @@ const BtnContainer = styled.div`
 const BackBtn = styled.button`
   border: 1px solid black;
   width: 60px;
+  background-color: #6c63ff;
   font-size: 16px;
+  color: #fff;
+  font-weight: bold;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
   &:hover {
@@ -75,6 +87,9 @@ const SubmitBtn = styled.button`
   border: 1px solid black;
   width: 240px;
   font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  background-color: #6c63ff;
   cursor: pointer;
   &:hover {
     background-color: #000;
@@ -116,12 +131,17 @@ export default function UserRegister() {
   const [teamOptions, setTeamOptions] = useRecoilState(teamState);
   const [selectedPart, setSelectedPart] = useRecoilState(selectedPartState);
   const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
+  // 기존 부서, 팀 저장
+  const previousPartRef = useRef<string | undefined>(undefined);
+  const previousTeamRef = useRef<string | undefined>(undefined);
   // 부서 선택하면 선택 부서 저장
   const handleSelectedPart = (value: string | undefined) => {
+    previousPartRef.current = selectedPart;
     setSelectedPart(value);
   };
   // 팀 선택하면 선택 팀 저장
   const handleSelectedTeam = (value: string | undefined) => {
+    previousTeamRef.current = selectedTeam;
     setSelectedTeam(value);
   };
   useEffect(() => {
@@ -168,12 +188,13 @@ export default function UserRegister() {
           );
           const snapshot = await uploadBytes(storageRef, uploadFile);
           console.log("업로드 완료", snapshot);
+          alert("사진 업로드 완료");
           const downloadURL: string | undefined =
             await getDownloadURL(storageRef);
           console.log("URL : ", downloadURL);
           setInput((prevInput) => ({
             ...prevInput,
-            photoUrl: downloadURL,
+            photo: downloadURL,
           }));
         } else {
           console.error("로그아웃 상태");
@@ -201,9 +222,21 @@ export default function UserRegister() {
           department: selectedPart,
           team: selectedTeam,
           position: input.position,
-          photoUrl: input.photoUrl,
+          photo: input.photo,
         };
-        await setDoc(userDB, newUser);
+        if (previousPartRef.current !== "" && previousTeamRef.current !== "") {
+          const previousPath = `${
+            previousPartRef.current
+              ? `Department/${previousPartRef.current}`
+              : ""
+          }/${
+            previousTeamRef.current
+              ? `Teams/${previousTeamRef.current}/member`
+              : ""
+          }`;
+          const previousTeamDB = doc(db, previousPath, userUid);
+          await deleteDoc(previousTeamDB);
+        }
         // 유저 Department/Teams 컬렉션에 member로 넣기
         const teamDB = doc(db, path, userUid);
         const teamData = {
@@ -213,8 +246,9 @@ export default function UserRegister() {
           department: selectedPart,
           team: selectedTeam,
           position: input.position,
-          photoUrl: input.photoUrl,
+          photo: input.photo,
         };
+        await setDoc(userDB, newUser);
         await setDoc(teamDB, teamData);
         alert("업로드 성공");
         moveEndRegister();

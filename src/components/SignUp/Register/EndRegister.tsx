@@ -27,9 +27,12 @@ const EndBtnContainer = styled.div`
 const EndBtn = styled.button`
   width: 200px;
   height: 50px;
+  border: none;
   border-radius: 10px;
   text-align: center;
   font-size: 16px;
+  background-color: #6c63ff;
+  color: #fff;
   font-weight: bold;
   cursor: pointer;
   &:hover {

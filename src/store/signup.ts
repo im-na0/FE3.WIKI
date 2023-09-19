@@ -18,7 +18,7 @@ export interface User {
   department: string;
   team: string;
   position: string;
-  photoUrl: string;
+  photo: string;
 }
 
 // 부서 상태 전역 관리
@@ -55,6 +55,6 @@ export const userInfo = atom<User>({
     department: "",
     team: "",
     position: "",
-    photoUrl: "",
+    photo: "",
   },
 });
