@@ -20,11 +20,18 @@ import { IWiki } from "../../store/wiki";
 
 // Firebase
 import { db } from "../../libs/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  Timestamp,
+} from "firebase/firestore";
 
 export interface IItem {
   name: string;
   subName: string;
+  date?: Timestamp;
 }
 
 const SubPage = () => {
@@ -40,8 +47,6 @@ const SubPage = () => {
     const querySnapshot = await getDocs(q);
     const FolderDoc = querySnapshot.docs[0];
     if (FolderDoc === undefined) {
-      // 초기화면에서 전역값이 null이여서 에러 발생
-      // 기본값 Fix 필요
       const q = query(collection(db, "WikiPage"));
       const querySnapshot = await getDocs(q);
       querySnapshot.docs.map((doc) => doc.data() as IWiki);
