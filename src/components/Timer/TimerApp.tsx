@@ -179,7 +179,7 @@ const TimerApp = () => {
 
   return (
     <form>
-      환영합니다. {userName} 님!
+      {userName ? `환영합니다. ${userName} 님!` : "환영합니다."}
       <TimerAlign>
         <div>
           <div>
