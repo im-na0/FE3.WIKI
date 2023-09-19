@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import { Button, message } from "antd";
-import UserSelect from "./MemberSelect";
 import { collection, addDoc } from "firebase/firestore";
 import { db, storage } from "../../libs/firebase";
-import TeamForm from "./TeamForm"; // 기존 팀 폼 컴포넌트를 가져옵니다.
+import TeamForm from "./TeamForm";
 import { FormDataType } from "../../type/form";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
-import MemberProfile from "./MemberProfile";
 import { useRecoilState } from "recoil";
 import { selectedUserIdsState } from "../../store/member";
 

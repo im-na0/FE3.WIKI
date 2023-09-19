@@ -28,10 +28,9 @@ export function useFetchTeamData() {
               ? team.userId
               : team.userId
               ? [team.userId]
-              : []; // team.userId가 null 또는 undefined인 경우 빈 배열 반환
+              : []; // FIXME:
             const teamUserPromises = userIds.map(async (userId: string) => {
-              let userData = {}; // 빈 객체로 초기화
-
+              let userData = {};
               if (userId) {
                 const userDocRef = doc(db, "Users", userId);
                 try {
