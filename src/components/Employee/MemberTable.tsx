@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Spin, Table } from "antd";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import { FormDataType } from "../../type/form";
 import { columns } from "../../data/tableColumns";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
@@ -22,7 +23,7 @@ export default function MemberTable({
     COLLECTION_NAME: "Users",
     ORDER: "name",
   };
-  const { loading, data } = useFetchData(fetchDataParams);
+  const data = useFetchData(fetchDataParams);
   // const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
   const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
   const navigate = useNavigate();
@@ -66,31 +67,27 @@ export default function MemberTable({
 
   return (
     <>
-      {loading ? (
-        <Spin size="large" />
-      ) : (
-        filteredData && (
-          <Table
-            dataSource={filteredData}
-            columns={columns(navigate)}
-            scroll={{ x: "max-content" }}
-            pagination={{
-              defaultPageSize: 8,
-              showSizeChanger: true,
-            }}
-            rowSelection={{
-              onChange: (
-                selectedKeys: React.Key[],
-                selectedRows: FormDataType[],
-              ) => {
-                const selectedIds = selectedRows
-                  .filter((row) => typeof row.id !== "undefined")
-                  .map((row) => row.id) as string[];
-                setSelectedRowKeys(selectedIds);
-              },
-            }}
-          />
-        )
+      {filteredData && (
+        <Table
+          dataSource={filteredData}
+          columns={columns(navigate)}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            defaultPageSize: 8,
+            showSizeChanger: true,
+          }}
+          rowSelection={{
+            onChange: (
+              selectedKeys: React.Key[],
+              selectedRows: FormDataType[],
+            ) => {
+              const selectedIds = selectedRows
+                .filter((row) => typeof row.id !== "undefined")
+                .map((row) => row.id) as string[];
+              setSelectedRowKeys(selectedIds);
+            },
+          }}
+        />
       )}
     </>
   );

@@ -22,9 +22,8 @@ export function useFetchData({
   COLLECTION_NAME,
   ORDER,
   DOCUMENT_ID,
-}: FetchDataParams): { loading: boolean; data: FormDataType[] } {
+}: FetchDataParams): FormDataType[] {
   const [data, setData] = useState<FormDataType[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // doc 단위
@@ -77,7 +76,6 @@ export function useFetchData({
           });
 
           setData(orderedData);
-          setLoading(false);
         },
         (error) => {
           console.error("Error fetching data:", error);
@@ -90,5 +88,5 @@ export function useFetchData({
     }
   }, [COLLECTION_NAME, ORDER, DOCUMENT_ID]);
 
-  return { loading, data };
+  return data;
 }

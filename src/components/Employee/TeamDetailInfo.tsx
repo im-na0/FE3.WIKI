@@ -5,7 +5,6 @@ import { FormDataType } from "../../type/form";
 import { Button, message } from "antd";
 import CustomForm from "../common/CustomForm";
 import { EditOutlined } from "@ant-design/icons";
-import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
 import {
   useUpdateData,
@@ -13,6 +12,8 @@ import {
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
 import TeamForm from "./TeamForm";
+import { useRecoilState } from "recoil";
+import { userIdsState } from "../../store/member";
 
 function TeamDetailInfo() {
   const Form = CustomForm.Form;
@@ -30,6 +31,9 @@ function TeamDetailInfo() {
   const [cardName, setCardName] = useState(userData.name || userData.teamName);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const [prevUserIds, setPrevUserIds] = useRecoilState(userIdsState);
+
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
@@ -39,6 +43,7 @@ function TeamDetailInfo() {
         }
         setCardDepartment(userData.department);
         setCardName(userData.name || userData.teamName);
+        setPrevUserIds(userData.userId);
       });
     }
   }, [userData]);

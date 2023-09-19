@@ -20,7 +20,7 @@ export const columns = (navigate: any) => {
   const handleMenuClick = (record: FormDataType, key: string) => {
     if (key === "view") {
       if (record.id) {
-        navigate(`/employee/team/${record.id}`);
+        navigate(`/employee/${record.id}`);
       }
     }
     if (key === "delete") {

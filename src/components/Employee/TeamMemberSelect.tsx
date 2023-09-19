@@ -4,6 +4,8 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../libs/firebase";
 import { Rule } from "antd/lib/form";
 import CustomForm from "../common/CustomForm";
+import { userIdsState } from "../../store/member";
+import { useRecoilState } from "recoil";
 
 interface MemberSelectProps {
   onChange: (selectedUserIds: string[]) => void;
@@ -18,6 +20,7 @@ interface UserData {
 function TeamMemberSelect({ onChange }: MemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
+  const [prevUserIds, setPrevUserIds] = useRecoilState(userIdsState);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -30,10 +33,18 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
         userArray.push(userData);
       });
       setUsers(userArray);
+
+      if (prevUserIds && prevUserIds.length > 0) {
+        const selectedKeys = userArray
+          .filter((user) => prevUserIds.includes(user.key))
+          .map((user) => user.key);
+
+        setSelectedUserKeys(selectedKeys);
+      }
     };
 
     fetchUsers();
-  }, []);
+  }, [prevUserIds]);
 
   const handleUserChange = (nextSelectedKeys: string[]) => {
     setSelectedUserKeys(nextSelectedKeys);

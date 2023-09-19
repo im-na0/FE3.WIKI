@@ -3,19 +3,12 @@ import { Divider } from "antd";
 import CustomForm from "../common/CustomForm";
 import { teamInputs, teamSelect } from "../../data/formSource";
 import { useRecoilState } from "recoil";
-import { formDataState, selectedUserIdsState } from "../../store/member";
+import { selectedUserIdsState } from "../../store/member";
 import TeamMemberSelect from "./TeamMemberSelect";
 
 function TeamForm({ isEditMode }: { isEditMode: boolean }) {
-  const [data, setData] = useRecoilState(formDataState);
   const [selectedUserIds, setSelectedUserIds] =
     useRecoilState(selectedUserIdsState);
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setData({ ...data, [name]: value });
-  };
 
   return (
     <>
@@ -27,7 +20,6 @@ function TeamForm({ isEditMode }: { isEditMode: boolean }) {
           name={input.name || ""}
           rules={input.rules}
           readOnly={!isEditMode}
-          onChange={handleInput}
         />
       ))}{" "}
       {teamSelect.map((select) => (
