@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { styled } from "styled-components";
 import SignInEmailModal from "../components/Signin/SignInEmail";
 import { Modal } from "antd";
-import signInGoogle from "../components/Signin/SignInGoogle";
+import SignInGoogle from "../components/Signin/SignInGoogle";
 import { Link } from "react-router-dom";
 import { MainTitle } from "../components/SignUp/Title";
 import { motion } from "framer-motion";
@@ -26,12 +26,7 @@ const SignIn = () => {
               <br />
               시작하시기 전에 로그인을 해주세요!
             </MainTitle>
-            <GoogleLogin onClick={signInGoogle}>
-              <IconContainer>
-                <GoogleOutlined />
-              </IconContainer>
-              <span>Google로 로그인</span>
-            </GoogleLogin>
+            <SignInGoogle />
             <span>OR</span>
             <EmailLogin onClick={showModal}>
               <IconContainer>

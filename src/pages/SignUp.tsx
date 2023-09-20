@@ -2,7 +2,7 @@ import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { styled } from "styled-components";
 import { Modal } from "antd";
-import signInGoogle from "../components/Signin/SignInGoogle";
+import SignInGoogle from "../components/Signin/SignInGoogle";
 import { Link } from "react-router-dom";
 import SignUpEmailModal from "../components/SignUp/SignUpEmail";
 import { MainTitle } from "../components/SignUp/Title";
@@ -26,12 +26,7 @@ const SignUp = () => {
               <br />
               시작하시기 전에 회원가입을 해주세요!
             </MainTitle>
-            <GoogleLogin onClick={signInGoogle}>
-              <IconContainer>
-                <GoogleOutlined />
-              </IconContainer>
-              <span>Google로 가입</span>
-            </GoogleLogin>
+            <SignInGoogle />
             <span>OR</span>
             <EmailLogin onClick={showModal}>
               <IconContainer>

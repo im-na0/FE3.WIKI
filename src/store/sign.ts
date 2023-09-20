@@ -1,8 +1,12 @@
 import { atom } from "recoil";
+import { recoilPersist } from "recoil-persist";
+
+const { persistAtom } = recoilPersist();
 //유저 로그인 상태 유무 확인
 export const authState = atom<boolean>({
   key: "authstate",
   default: false,
+  effects_UNSTABLE: [persistAtom],
 });
 // 이메일 비밀번호 상태 전역 관리
 export const emailState = atom<string>({
