@@ -45,7 +45,7 @@ const MainWikiWidget = () => {
     const q = query(
       collection(db, "WikiPage"),
       orderBy("order"),
-      where("title", "==", "FE3 WIKI 가이드북"),
+      where("title", "==", "FE3 WIKI 가이드"),
     );
 
     const fetchWikiData = async () => {
@@ -69,7 +69,7 @@ const MainWikiWidget = () => {
   }, []);
 
   const handleFileClick = (fileName: string) => {
-    setCurrentFolderTitle("FE3 WIKI 가이드북");
+    setCurrentFolderTitle("FE3 WIKI 가이드");
     setCurrentFileTitle(fileName);
   };
 

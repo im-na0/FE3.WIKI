@@ -199,15 +199,19 @@ export const deleteFolder = async (
   state: (value: boolean) => void,
 ) => {
   try {
-    const q = query(
-      collection(db, "WikiPage"),
-      where("title", "==", folderName),
-    );
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const folderDoc = querySnapshot.docs[0];
-      await deleteDoc(folderDoc.ref);
-      state(false);
+    if (folderName === "FE3 WIKI 가이드") {
+      alert("현재 폴더는 가이드 폴더이므로 삭제할 수 없습니다.");
+    } else {
+      const q = query(
+        collection(db, "WikiPage"),
+        where("title", "==", folderName),
+      );
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const folderDoc = querySnapshot.docs[0];
+        await deleteDoc(folderDoc.ref);
+        state(false);
+      }
     }
   } catch (e) {
     console.error(e);

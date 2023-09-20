@@ -27,6 +27,7 @@ import {
   deleteFolderState,
   SelectProps,
   SelectState,
+  userTeamName,
 } from "../../store/wiki";
 
 // Firebase
@@ -92,6 +93,7 @@ const WikiNav = () => {
 
   const [teamName, setTeamName] = useState<string | null>("");
   const [teamInfo, setTeamInfo] = useState<ITeamProps | null>(null);
+  const setUserTeam = useSetRecoilState(userTeamName);
 
   const refreshFolders = async () => {
     const q = query(
@@ -226,6 +228,7 @@ const WikiNav = () => {
       const teamName = querySnapshot.docs[0].data().teamName;
       if (teamName) {
         setTeamName(teamName);
+        setUserTeam(teamName);
         setTeamInfo({ name: "김범수", department: "BE", position: "Senior" });
         console.log(teamInfo, teamName);
       }

@@ -73,8 +73,14 @@ const WikiSelect = ({ title }: IProps) => {
           onClick={() => {
             handleItemClick();
             setCurrentFolder(title);
-            setFolderState((prev) => !prev);
-            setCurrentFolder(title);
+            if (title === "FE3 WIKI 가이드") {
+              alert(
+                "현재 폴더는 위키 가이드 폴더이므로 새로운 파일을 생성할 수 없습니다.",
+              );
+            } else {
+              setFolderState((prev) => !prev);
+              setCurrentFolder(title);
+            }
           }}
         >
           폴더 이름 변경
@@ -91,8 +97,14 @@ const WikiSelect = ({ title }: IProps) => {
         <CustomSelectItem
           onClick={() => {
             handleItemClick();
-            setFileState((prev) => !prev);
-            setCurrentFolder(title);
+            if (title === "FE3 WIKI 가이드") {
+              alert(
+                "현재 폴더는 위키 가이드 폴더이므로 새로운 파일을 생성할 수 없습니다.",
+              );
+            } else {
+              setFileState((prev) => !prev);
+              setCurrentFolder(title);
+            }
           }}
         >
           새로운 파일

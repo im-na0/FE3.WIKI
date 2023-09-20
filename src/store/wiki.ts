@@ -132,3 +132,8 @@ export const SelectState = atom<boolean>({
   key: "isClickOutsideState",
   default: false,
 });
+
+export const userTeamName = atom<string>({
+  key: "userTeamName",
+  default: "",
+});
