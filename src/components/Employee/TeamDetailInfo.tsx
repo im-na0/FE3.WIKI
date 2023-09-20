@@ -129,6 +129,7 @@ function TeamDetailInfo() {
           <div className="member-info-wrap">
             <TeamForm isEditMode={isEditMode} />
             <EditMemberSelect
+              isEditMode={isEditMode}
               onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
               prevUserIds={prevUserIds}
             />
