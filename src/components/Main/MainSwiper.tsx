@@ -62,6 +62,8 @@ const MainSwiper = () => {
   return (
     <section style={{ margin: "0 -24px" }}>
       <Swiper
+        loop={true}
+        loopedSlides={1}
         className="main-swiper"
         modules={[Navigation]}
         navigation
