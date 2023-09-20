@@ -29,9 +29,12 @@ import {
 } from "firebase/firestore";
 
 export interface IItem {
-  name: string;
+  fileName: string;
   subName: string;
   date?: Timestamp;
+  name?: string;
+  position?: string;
+  department?: string;
 }
 
 const SubPage = () => {
@@ -52,20 +55,22 @@ const SubPage = () => {
       querySnapshot.docs.map((doc) => doc.data() as IWiki);
     } else {
       const items = FolderDoc.data().items || [];
-      const item = await items.find((item: IItem) => item.name === currentFile);
+      const item = await items.find(
+        (item: IItem) => item.fileName === currentFile,
+      );
       setItem(item);
     }
   };
 
   useEffect(() => {
     refreshFile();
-  }, [currentFile, currentFolder]);
+  }, [currentFile]);
 
   return (
     <Container>
-      <span>
+      <StyledCurrent>
         {currentFolder} / {currentFile}
-      </span>
+      </StyledCurrent>
       <br />
       <div>
         {item && (
@@ -89,4 +94,9 @@ const Container = styled.div`
     opacity: 0.4;
     font-size: 0.85rem;
   }
+`;
+const StyledCurrent = styled.div`
+  margin-top: 8px;
+  opacity: 0.4;
+  font-size: 0.85rem;
 `;
