@@ -13,7 +13,8 @@ import {
 } from "../../hooks/Employee/useMemberMutaion";
 import TeamForm from "./TeamForm";
 import { useRecoilState } from "recoil";
-import { userIdsState } from "../../store/member";
+import { selectedUserIdsState, userIdsState } from "../../store/member";
+import EditMemberSelect from "./EditMemberSelect";
 
 function TeamDetailInfo() {
   const Form = CustomForm.Form;
@@ -31,8 +32,10 @@ function TeamDetailInfo() {
   const [cardName, setCardName] = useState(userData.name || userData.teamName);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] =
+    useRecoilState(selectedUserIdsState);
 
-  const [prevUserIds, setPrevUserIds] = useRecoilState(userIdsState);
+  const [prevUserIds, setPrevUserIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (userData) {
@@ -125,6 +128,10 @@ function TeamDetailInfo() {
         <div className="member-info-area">
           <div className="member-info-wrap">
             <TeamForm isEditMode={isEditMode} />
+            <EditMemberSelect
+              onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
+              prevUserIds={prevUserIds}
+            />
           </div>
         </div>
       </div>
