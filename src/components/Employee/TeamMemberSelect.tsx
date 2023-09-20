@@ -22,7 +22,7 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
   const [prevUserIds, setPrevUserIds] = useRecoilState(userIdsState);
-  const teamUserIds = useTeamUserIds(); // useTeamUserIds 훅을 사용하여 각 팀에 속한 사용자 ID를 가져옵니다.
+  const teamUserIds = useTeamUserIds();
 
   useEffect(() => {
     const fetchUsers = async () => {
