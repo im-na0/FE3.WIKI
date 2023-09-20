@@ -10,7 +10,6 @@ const useQueryProjectAllList = () => {
   const [projects, setProjects] = useRecoilState(projectListState);
 
   useEffect(() => {
-    setIsLoading(true);
     (async () => {
       try {
         const projectPlus: ProjectInfo[] = [];
@@ -40,12 +39,15 @@ const useQueryProjectAllList = () => {
           progress: projectProgress,
           completed: projectCompleted,
         });
-        setIsLoading(false);
       } catch (error) {
-        setIsLoading(false);
         if (error instanceof Error) console.log(error.message);
+      } finally {
+        setIsLoading(false);
       }
     })();
+    return () => {
+      setIsLoading(true);
+    };
   }, []);
   return projects;
 };
