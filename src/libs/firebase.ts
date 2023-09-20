@@ -5,7 +5,11 @@ import {
   initializeFirestore,
   persistentLocalCache,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import {
+  browserSessionPersistence,
+  getAuth,
+  setPersistence,
+} from "firebase/auth";
 import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -26,3 +30,11 @@ export const firestoreDb = initializeFirestore(app, {
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const auth = getAuth(app);
+
+// setPersistence(auth, browserSessionPersistence) // broswerSessionPersistence
+//   .then(() => {
+//     console.log("로그인 유지 설정 완료");
+//   })
+//   .catch((error) => {
+//     console.error("로그인 유지 설정 오류:", error);
+//   });

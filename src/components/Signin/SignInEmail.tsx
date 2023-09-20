@@ -1,31 +1,19 @@
 import React, { useState } from "react";
 import { Button, Modal, Checkbox, Form, Input } from "antd";
 import { styled } from "styled-components";
-import { auth } from "../../libs/firebase";
+import { auth, db } from "../../libs/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigation } from "../../hooks/SignIn/Navigation";
+import { getDoc, doc } from "firebase/firestore";
+import { useRecoilState } from "recoil";
+import { emailState, passwordState } from "../../store/sign";
 
 interface FieldType {
   userEmail?: string;
   password?: string;
   remember?: string;
 }
-const Container = styled.div`
-  margin: 0;
-  padding: 0;
-`;
-const ModalContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 20px;
-  text-align: start;
-`;
-const ModalTitle = styled.p`
-  font-size: 20px;
-  margin-top: 50px;
-  margin-bottom: 0;
-  text-align: center;
-`;
+// antd Finish 함수
 const onFinish = (values: any) => {
   console.log("Success: ", values);
 };
@@ -34,9 +22,10 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 const SignInEmailModal = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const { moveStartRegister, moveMain } = useNavigation();
+  const [email, setEmail] = useRecoilState(emailState);
+  const [password, setPassword] = useRecoilState(passwordState);
+  // 이메일, 비밀번호 입력
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -44,7 +33,7 @@ const SignInEmailModal = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
-
+  // 이메일 로그인 기능
   const handleSignIn = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -53,10 +42,21 @@ const SignInEmailModal = () => {
         password,
       );
       const user = userCredential.user;
-      const uid = user.uid;
-      localStorage.setItem("uid", uid); // uid 내보내기
-      console.log("로그인 성공:", user);
-      console.log(uid);
+      const userUid = user.uid;
+      const userDocRef = doc(db, "Users", userUid);
+      const userDocSnapShot = await getDoc(userDocRef);
+      if (userDocSnapShot.exists()) {
+        const userInfo = userDocSnapShot.data();
+        const userData = {
+          newUser: userInfo,
+          userUid: userUid,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData)); // 로컬스토리지로 보내기
+        moveMain();
+      } else {
+        console.log("정보 입력 단계 시작");
+        moveStartRegister();
+      }
     } catch (error) {
       alert("회원가입부터 진행해주세요");
       console.error("로그인 실패:", error);
@@ -113,3 +113,21 @@ const SignInEmailModal = () => {
   );
 };
 export default SignInEmailModal;
+
+const Container = styled.div`
+  margin: 0;
+  padding: 0;
+`;
+const ModalContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 20px;
+  text-align: start;
+`;
+const ModalTitle = styled.p`
+  font-size: 20px;
+  margin-top: 50px;
+  margin-bottom: 0;
+  text-align: center;
+`;

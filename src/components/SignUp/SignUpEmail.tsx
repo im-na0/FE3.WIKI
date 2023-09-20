@@ -4,6 +4,7 @@ import { styled } from "styled-components";
 import { auth } from "../../libs/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigation } from "../../hooks/SignIn/Navigation";
 
 interface FieldType {
   userEmail?: string;
@@ -35,6 +36,7 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 const SignUpEmailModal = () => {
+  const { moveStartRegister } = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -56,6 +58,7 @@ const SignUpEmailModal = () => {
       const user = userCredential.user;
       console.log("로그인 성공:", user);
       alert("회원가입 완료되었습니다!");
+      moveStartRegister();
     } catch (error) {
       console.error("로그인 실패:", error);
     }

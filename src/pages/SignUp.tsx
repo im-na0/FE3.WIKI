@@ -7,81 +7,10 @@ import { Link } from "react-router-dom";
 import SignUpEmailModal from "../components/SignUp/SignUpEmail";
 import { MainTitle } from "../components/SignUp/Title";
 import { motion } from "framer-motion";
-const Container = styled.div`
-  margin: 0;
-  padding: 0;
-  width: 100vw;
-`;
-const SignUpContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border: 1px solid black;
-  border-radius: 20px;
-  width: 50vw;
-  margin: 100px auto;
-  text-align: center;
-`;
-const Logo = styled.img`
-  width: 150px;
-  height: 50px;
-  margin: 60px auto 0;
-  text-align: center;
-`;
-const LoginBtnContainer = styled.div`
-  margin-top: 50px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-`;
-const GoogleLogin = styled.button`
-  border: 1px solid black;
-  border-radius: 10px;
-  width: 330px;
-  height: 40px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  padding-left: 5px;
-  margin: 30px auto;
-  cursor: pointer;
-  &:hover {
-    background-color: grey;
-  }
-  span {
-    padding-left: 35px;
-  }
-`;
-const EmailLogin = styled(GoogleLogin)`
-  margin-bottom: 20px;
-`;
+import useModal from "../hooks/SignIn/useModal";
 
-const IconContainer = styled.div`
-  margin-right: 20px;
-`;
-const MoveSingIn = styled(Link)`
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 12px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #1c49ff;
-  span {
-    color: #909090;
-    font-weight: normal;
-  }
-`;
 const SignUp = () => {
-  const [isEmailModalOpen, setEmailModalOpen] = useState(false);
-  const showModal = () => {
-    setEmailModalOpen(true);
-  };
-  const handleCancel = () => {
-    setEmailModalOpen(false);
-  };
-  const handleOk = () => {
-    setEmailModalOpen(false);
-  };
+  const { isEmailModalOpen, showModal, handleCancel, handleOk } = useModal();
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -124,3 +53,71 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
+const Container = styled.div`
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+`;
+const SignUpContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid black;
+  border-radius: 20px;
+  width: 50vw;
+  margin: 100px auto;
+  text-align: center;
+`;
+const Logo = styled.img`
+  width: 150px;
+  height: 50px;
+  margin: 60px auto 0;
+  text-align: center;
+`;
+const LoginBtnContainer = styled.div`
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+`;
+const GoogleLogin = styled.button`
+  border: none;
+  border-radius: 10px;
+  width: 330px;
+  height: 40px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  background-color: #6c63ff;
+  color: #fff;
+  font-weight: bold;
+  padding-left: 5px;
+  margin: 30px auto;
+  cursor: pointer;
+  &:hover {
+    background-color: grey;
+  }
+  span {
+    padding-left: 35px;
+  }
+`;
+const EmailLogin = styled(GoogleLogin)`
+  margin-bottom: 20px;
+`;
+
+const IconContainer = styled.div`
+  margin-right: 20px;
+`;
+const MoveSingIn = styled(Link)`
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #1c49ff;
+  span {
+    color: #909090;
+    font-weight: normal;
+  }
+`;

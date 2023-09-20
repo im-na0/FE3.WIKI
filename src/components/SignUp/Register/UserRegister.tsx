@@ -5,7 +5,7 @@ import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
-import { useNavigation } from "../Navigation";
+import { useNavigation } from "../../../hooks/SignIn/Navigation";
 import { motion } from "framer-motion";
 import {
   collection,
@@ -16,7 +16,6 @@ import {
   addDoc,
   query,
   where,
-  deleteDoc,
 } from "firebase/firestore";
 import { db, auth, storage } from "../../../libs/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -28,80 +27,13 @@ import {
   selectedTeamState,
   teamState,
   userInfo,
-} from "../../../store/signup";
+} from "../../../store/sign";
 import { SELECT_OPTIONS } from "../../../constant/member";
-
-const Container = styled.div`
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-top: 80px;
-`;
-const UserInfoContainer = styled.div`
-  border: 1px solid black;
-  border-radius: 10px;
-  margin: 20px auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: start;
-  span {
-    font-weight: 500;
-  }
-`;
-const UserNameCategory = styled.div`
-  margin: 20px 20px;
-  display: flex;
-  flex-direction: column;
-`;
-const UserEmailCategory = styled(UserNameCategory)``;
-const UserPhoneCategory = styled(UserNameCategory)``;
-const UserTeamCategory = styled(UserNameCategory)``;
-const UserPositionCategory = styled(UserNameCategory)``;
-const UserImageCategory = styled(UserNameCategory)``;
-const UserDepartmentCategory = styled(UserNameCategory)``;
-const BtnContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px;
-  height: 30px;
-`;
-const BackBtn = styled.button`
-  border: 1px solid black;
-  width: 60px;
-  background-color: #6c63ff;
-  font-size: 16px;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.3s ease-in-out;
-  &:hover {
-    background-color: #000;
-    color: #fff;
-    transform: translateX(-5px);
-  }
-`;
-const SubmitBtn = styled.button`
-  border: 1px solid black;
-  width: 240px;
-  font-size: 16px;
-  color: #fff;
-  font-weight: bold;
-  background-color: #6c63ff;
-  cursor: pointer;
-  &:hover {
-    background-color: #000;
-    color: #fff;
-  }
-`;
 
 // 부서 가져오기
 const departmentKey = Object.keys(SELECT_OPTIONS.department);
 const positionKey = Object.keys(SELECT_OPTIONS.position);
+
 // Teams 정보 가져오기
 async function getTeams() {
   const teamRef = collection(db, "Teams");
@@ -113,7 +45,6 @@ async function getTeams() {
   return teams;
 }
 export default function UserRegister() {
-  getTeams();
   // 로그인 유저 정보 가져오기
   const user = auth.currentUser;
   const { moveStartRegister, moveEndRegister } = useNavigation();
@@ -122,19 +53,23 @@ export default function UserRegister() {
   const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
   const [selectedPosition, setSelectedPosition] =
     useRecoilState(selectedPoState);
+
   // 기존 부서 저장
   const prevPartmentRef = useRef<string | undefined>(undefined);
   const prevTeamRef = useRef<string | undefined>(selectedTeam);
+
   //  부서 선택하면 선택 부서 저장
   const handleSelectedPart = (value: string | undefined) => {
     prevPartmentRef.current = selectedPart;
     setSelectedPart(value);
   };
+
   //  팀 선택하면 선택 팀 저장
   const handleSelectedTeam = (value: string | undefined) => {
     prevTeamRef.current = selectedTeam;
     setSelectedTeam(value);
   };
+
   // 직급 선택하면 선택 직급 저장
   const handleSelectedPosition = (value: string | undefined) => {
     setSelectedPosition(value);
@@ -165,6 +100,7 @@ export default function UserRegister() {
       [name]: value,
     }));
   };
+
   // upload 컴포넌트 props 값 => 이미지 업로드
   const props: UploadProps = {
     name: "file",
@@ -198,6 +134,7 @@ export default function UserRegister() {
     },
     showUploadList: false,
   };
+
   // firebase에 로그인 uid 이름으로 업로드
   const handleUpload = async () => {
     try {
@@ -213,20 +150,6 @@ export default function UserRegister() {
           position: selectedPosition,
           photo: input.photo,
         };
-        // const prevTeamQuery = query(
-        //   collection(db, "Teams"),
-        //   where("teamName", "==", prevTeamRef.current),
-        // );
-        // const prevTeamQuerySnapshot = await getDocs(prevTeamQuery);
-        // if (!prevTeamQuerySnapshot.empty) {
-        //   const prevTeamDoc = prevTeamQuerySnapshot.docs[0];
-        //   const prevTeamData = prevTeamDoc.data();
-        //   const updatedPrevTeamUserId = (prevTeamData.userId || []).filter(
-        //     (userId: string) => userId !== userUid,
-        //   );
-
-        //   await deleteDoc(prevTeamDoc.ref);
-        // }
         const prevTeamName = prevTeamRef.current;
         console.log(prevTeamName);
         console.log(selectedTeam);
@@ -246,6 +169,7 @@ export default function UserRegister() {
               await updateDoc(prevTeamDoc.ref, {
                 userId: updatedUserId,
               });
+              moveEndRegister();
             }
           }
         }
@@ -268,6 +192,12 @@ export default function UserRegister() {
           };
           await addDoc(teamDB, teamData);
         }
+        // localStorage에 user 정보 올리기
+        const userData = {
+          newUser: newUser,
+          userUid: userUid,
+        };
+        localStorage.setItem("userData", JSON.stringify(userData));
         alert("업로드 성공");
         moveEndRegister();
       } else {
@@ -404,3 +334,71 @@ export default function UserRegister() {
     </motion.div>
   );
 }
+
+const Container = styled.div`
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 80px;
+`;
+const UserInfoContainer = styled.div`
+  border: 1px solid black;
+  border-radius: 10px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: start;
+  span {
+    font-weight: 500;
+  }
+`;
+const UserNameCategory = styled.div`
+  margin: 20px 20px;
+  display: flex;
+  flex-direction: column;
+`;
+const UserEmailCategory = styled(UserNameCategory)``;
+const UserPhoneCategory = styled(UserNameCategory)``;
+const UserTeamCategory = styled(UserNameCategory)``;
+const UserPositionCategory = styled(UserNameCategory)``;
+const UserImageCategory = styled(UserNameCategory)``;
+const UserDepartmentCategory = styled(UserNameCategory)``;
+const BtnContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px;
+  height: 30px;
+`;
+const BackBtn = styled.button`
+  border: 1px solid black;
+  width: 60px;
+  background-color: #6c63ff;
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  &:hover {
+    background-color: #000;
+    color: #fff;
+    transform: translateX(-5px);
+  }
+`;
+const SubmitBtn = styled.button`
+  border: 1px solid black;
+  width: 240px;
+  font-size: 16px;
+  color: #fff;
+  font-weight: bold;
+  background-color: #6c63ff;
+  cursor: pointer;
+  &:hover {
+    background-color: #000;
+    color: #fff;
+  }
+`;

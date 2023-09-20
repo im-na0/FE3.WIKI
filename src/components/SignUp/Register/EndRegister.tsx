@@ -1,9 +1,41 @@
 import React from "react";
 import { styled } from "styled-components";
 import { ActiveDot, Dot, SlideCounter } from "../Pagination";
-import { useNavigation } from "../Navigation";
+import { useNavigation } from "../../../hooks/SignIn/Navigation";
 import { EndSubTitle, EndTitle } from "../Title";
 import { motion } from "framer-motion";
+
+export default function EndRegister() {
+  const { moveMain, moveMyTeam } = useNavigation();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Container>
+        <EndContainer>
+          <EndTitle>
+            이제 Wiki를 통해
+            <br />
+            일의 능률을 향상시켜보세요!
+          </EndTitle>
+          <EndSubTitle>아래 버튼을 누르시면 이동됩니다!</EndSubTitle>
+          <EndBtnContainer>
+            <EndBtn onClick={moveMain}>Home</EndBtn>
+            <EndBtn onClick={moveMyTeam}>My Team</EndBtn>
+          </EndBtnContainer>
+        </EndContainer>
+        <SlideCounter>
+          <Dot />
+          <Dot />
+          <ActiveDot />
+        </SlideCounter>
+      </Container>
+    </motion.div>
+  );
+}
+
 const Container = styled.div`
   margin: 0;
   padding: 0;
@@ -40,33 +72,3 @@ const EndBtn = styled.button`
     background-color: #000;
   }
 `;
-export default function EndRegister() {
-  const { moveMain, moveMyTeam } = useNavigation();
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Container>
-        <EndContainer>
-          <EndTitle>
-            이제 Wiki를 통해
-            <br />
-            일의 능률을 향상시켜보세요!
-          </EndTitle>
-          <EndSubTitle>아래 버튼을 누르시면 이동됩니다!</EndSubTitle>
-          <EndBtnContainer>
-            <EndBtn onClick={moveMain}>Home</EndBtn>
-            <EndBtn onClick={moveMyTeam}>My Team</EndBtn>
-          </EndBtnContainer>
-        </EndContainer>
-        <SlideCounter>
-          <Dot />
-          <Dot />
-          <ActiveDot />
-        </SlideCounter>
-      </Container>
-    </motion.div>
-  );
-}
