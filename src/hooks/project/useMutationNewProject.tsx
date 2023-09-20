@@ -19,8 +19,6 @@ import { ProjectDetail, projectDetailConverter } from "../../libs/firestore";
 import { useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-// import { useRecoilState } from "recoil";
-// import { isModifingState } from "../../store/project";
 
 type formValues = Pick<
   ProjectDetail,

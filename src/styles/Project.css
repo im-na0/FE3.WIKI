@@ -40,3 +40,11 @@
     padding-right: 24px;
     padding-bottom: 24px;
 }
+
+.project__filter{
+    height: 43px;
+    padding: 6px 12px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+}

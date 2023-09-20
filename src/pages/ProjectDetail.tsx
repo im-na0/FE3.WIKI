@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/Project.css";
 import ProjectSider from "../components/project/ProjectSider";
-import { Layout } from "antd";
+import { Layout, Skeleton } from "antd";
 import ProjectDetailInfo from "../components/project/ProjectDetailInfo";
 import ProjectListSider from "../components/project/ProjectListSider";
 import { useQueryProject } from "../hooks/project/useQueryProject";
@@ -12,7 +12,6 @@ const { Content, Sider } = Layout;
 const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
   const [projectDetail, isLoaded] = useQueryProject();
 
-  console.log(isLoaded);
   return (
     <Layout>
       <ProjectSider />
@@ -32,7 +31,14 @@ const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
             <ProjectDetailDefault />
           ) : isLoaded ? (
             <ProjectDetailInfo projectDetail={projectDetail} />
-          ) : null}
+          ) : (
+            <div className="project-container">
+              <div className="project__top-title">
+                <h3>프로젝트 상세 정보</h3>
+              </div>
+              <Skeleton title={true} />
+            </div>
+          )}
         </Content>
       </Layout>
     </Layout>
