@@ -19,18 +19,10 @@ import ProjectEdit from "../pages/ProjectEdit";
 import { setPersistence, browserSessionPersistence } from "@firebase/auth";
 import { auth } from "../libs/firebase";
 import EmployeeDetail from "../pages/EmployeeDetail";
+import { browserLocalPersistence } from "firebase/auth";
+import AuthStateChanged from "../components/Signin/AuthStateChanged";
 
 const Router = () => {
-  useEffect(() => {
-    setPersistence(auth, browserSessionPersistence) // broswerSessionPersistence
-      .then(() => {
-        console.log("로그인 유지 설정 완료");
-      })
-      .catch((error) => {
-        console.error("로그인 유지 설정 오류:", error);
-      });
-  }, []);
-
   return (
     <Routes>
       <Route path="/signin" element={<SignIn />}></Route>

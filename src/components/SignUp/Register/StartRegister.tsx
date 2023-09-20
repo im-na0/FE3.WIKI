@@ -1,9 +1,34 @@
 import React from "react";
 import { styled } from "styled-components";
 import { ActiveDot, Dot, SlideCounter } from "../Pagination";
-import { useNavigation } from "../Navigation";
+import { useNavigation } from "../../../hooks/SignIn/Navigation";
 import { StartSubTitle, StartTitle } from "../Title";
 import { motion } from "framer-motion";
+
+export default function StartRegister() {
+  const { moveUserRegister } = useNavigation();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Container>
+        <StartContainer>
+          <StartTitle>Wiki에 오신 것을 환영합니다!</StartTitle>
+          <StartSubTitle>아래 버튼을 통해 정보를 입력해주세요!</StartSubTitle>
+          <StartBtn onClick={moveUserRegister}>시작하기</StartBtn>
+        </StartContainer>
+        <SlideCounter>
+          <ActiveDot />
+          <Dot />
+          <Dot />
+        </SlideCounter>
+      </Container>
+    </motion.div>
+  );
+}
+
 const Container = styled.div`
   margin: 0;
   padding: 0;
@@ -35,26 +60,3 @@ const StartBtn = styled.button`
     background-color: #000;
   }
 `;
-export default function StartRegister() {
-  const { moveUserRegister } = useNavigation();
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Container>
-        <StartContainer>
-          <StartTitle>Wiki에 오신 것을 환영합니다!</StartTitle>
-          <StartSubTitle>아래 버튼을 통해 정보를 입력해주세요!</StartSubTitle>
-          <StartBtn onClick={moveUserRegister}>시작하기</StartBtn>
-        </StartContainer>
-        <SlideCounter>
-          <ActiveDot />
-          <Dot />
-          <Dot />
-        </SlideCounter>
-      </Container>
-    </motion.div>
-  );
-}

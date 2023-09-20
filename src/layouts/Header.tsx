@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/Header.css";
 import { Layout, theme, Modal } from "antd";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { authState } from "../store/signin";
+import { authState } from "../store/sign";
 import { auth } from "../libs/firebase";
 import Timer from "../pages/Timer";
 interface MenuListItem {
@@ -48,12 +48,13 @@ const MainHeader = () => {
   const closeTimerModal = () => {
     setIsTimerOn(false);
   };
-
+  // 로그아웃
   const [isSignIn, setIsSignIn] = useRecoilState(authState);
   const handleSignOut = () => {
     const user = auth.currentUser;
     if (user) {
       setIsSignIn(false);
+      localStorage.removeItem("userData");
       auth.signOut();
       alert("로그아웃 되었습니다!");
     }
@@ -62,7 +63,7 @@ const MainHeader = () => {
     <Header style={{ background: colorBgContainer }}>
       <div className="header-wrap">
         <h1 className="header-logo fe3-wiki-logo">
-          <a href="/">Logo</a>
+          <Link to="/">Logo</Link>
         </h1>
         <div className="header-nav">
           <nav>
@@ -84,12 +85,17 @@ const MainHeader = () => {
             </li>
             <li>
               {isSignIn ? (
-                <button
-                  className="user-link signin-link"
-                  onClick={handleSignOut}
-                >
-                  로그아웃
-                </button>
+                <>
+                  <button
+                    className="user-link signin-link"
+                    onClick={handleSignOut}
+                  >
+                    로그아웃
+                  </button>
+                  <Link to={"/user-register"} className="user-link info-link">
+                    내 정보 수정
+                  </Link>
+                </>
               ) : (
                 <Link to={"/signin"} className="user-link signin-link">
                   로그인

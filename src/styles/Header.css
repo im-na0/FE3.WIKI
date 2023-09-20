@@ -55,3 +55,10 @@
     color: #fff;
     border: none;
 }
+.header-user .info-link{
+    background-color: #6C63FF;
+    color: #fff;
+    border: none;
+    margin-left: 10px;
+
+}
