@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../type/form";
 import { Button, message } from "antd";
 import CustomForm from "../common/CustomForm";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
 import {
@@ -18,6 +18,7 @@ function MemberDetailInfo() {
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
   const [file, setFile] = useState<File | null>(null); // file 관리
+  const navigate = useNavigate();
   const { memberId } = useParams<{ memberId: string }>();
   const fetchDataParams = {
     COLLECTION_NAME: "Users",
@@ -88,6 +89,14 @@ function MemberDetailInfo() {
           <span className="member-desc">{userData?.name} 님의 프로필</span>
         </div>
         <div className="member-btn-area">
+          <Button
+            icon={<UnorderedListOutlined />}
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
+            목록
+          </Button>
           <Button
             type="primary"
             icon={<EditOutlined />}

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../type/form";
 import { Button, message } from "antd";
 import CustomForm from "../common/CustomForm";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import MemberProfile from "./MemberProfile";
 import {
   useUpdateData,
@@ -21,6 +21,7 @@ function TeamDetailInfo() {
   const [form] = Form.useForm();
   const [isEditMode, setIsEditMode] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const navigate = useNavigate();
   const { teamId } = useParams<{
     teamId: string;
   }>();
@@ -97,6 +98,14 @@ function TeamDetailInfo() {
           <span className="member-desc">{userData.teamName} 팀 프로필</span>
         </div>
         <div className="member-btn-area">
+          <Button
+            icon={<UnorderedListOutlined />}
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
+            목록
+          </Button>
           <Button
             type="primary"
             icon={<EditOutlined />}
