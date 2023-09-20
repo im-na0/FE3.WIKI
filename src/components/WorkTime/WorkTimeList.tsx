@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Segmented, Table } from "antd";
+import { Segmented, Table, Alert, Space, Spin } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import WorkCalendar from "./WorkCalendar";
+import "../../styles/WorkTime.css";
 
 // firebase
 import { db, auth } from "../../libs/firebase";
@@ -15,20 +16,13 @@ import {
   QueryDocumentSnapshot,
   getDoc,
   onSnapshot,
+  where,
+  query,
 } from "firebase/firestore";
 
 interface WorkTimeProps {
   fontSize?: string;
 }
-
-type teamDataType = {
-  key: string;
-  name: string;
-  department: string;
-  team: string;
-  starttime?: Timestamp;
-  finishtime?: Timestamp;
-};
 
 interface DataType {
   key?: string;
@@ -38,11 +32,22 @@ interface DataType {
   starttime: Timestamp;
   finishtime: Timestamp;
 }
+interface TeamDataType {
+  tkey?: string;
+  tname?: string;
+  tdepartment?: string;
+  tteam?: string;
+  starttime: Timestamp;
+  finishtime: Timestamp;
+}
 
 const WorkTimeList: React.FC = () => {
-  const [workTimeData, setWorkTimeData] = useState<DataType[]>([]);
+  const [myWorkTimeData, setMyWorkTimeData] = useState<DataType[]>([]);
+  const [teamWorkTimeData, setTeamWorkTimeData] = useState<TeamDataType[]>([]);
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [myTeam, setMyTeam] = useState<string>("");
 
   const user = auth.currentUser;
   const userUid = user ? user.uid : null;
@@ -50,15 +55,16 @@ const WorkTimeList: React.FC = () => {
   const columns: ColumnsType<DataType> = [
     {
       title: "이름",
-      dataIndex: "name",
+      dataIndex: workTimeFilter === "나의 출퇴근 현황" ? "name" : "tname",
     },
     {
       title: "부서",
-      dataIndex: "department",
+      dataIndex:
+        workTimeFilter === "나의 출퇴근 현황" ? "department" : "tdepartment",
     },
     {
       title: "소속팀",
-      dataIndex: "team",
+      dataIndex: workTimeFilter === "나의 출퇴근 현황" ? "team" : "tteam",
     },
     {
       title: "출근 시간",
@@ -101,13 +107,15 @@ const WorkTimeList: React.FC = () => {
   useEffect(() => {
     const fetchWorkTime = async () => {
       try {
+        setIsLoading(true);
         if (workTimeFilter === "나의 출퇴근 현황") {
           const myDocRef = doc(db, `Users/${userUid}`);
           const myDocSnap = await getDoc(myDocRef);
           const myDocData = myDocSnap.data() || {};
+          const myTeam = myDocData.team;
+          setMyTeam(myTeam);
 
           const myWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
-          const myWorkTimeSnap = await getDocs(myWorkTimeRef);
 
           const unsubscribe = onSnapshot(myWorkTimeRef, (snapshot) => {
             const updatedMyWorkTime: DataType[] = [];
@@ -122,60 +130,56 @@ const WorkTimeList: React.FC = () => {
                 finishtime: myWorkTimeData.finishtime,
               });
             });
-            setWorkTimeData(updatedMyWorkTime);
+            setIsLoading(false);
+            setMyWorkTimeData(updatedMyWorkTime);
           });
 
           return () => {
             unsubscribe();
           };
         } else if (workTimeFilter === "우리팀 출퇴근 현황") {
-          const teamDocRef = collection(db, "Users");
-          const teamDocSnap = await getDocs(teamDocRef);
+          const teamDocQuery = query(
+            collection(db, "Users"),
+            where("team", "==", myTeam),
+          );
+          const teamDocSnapshot = await getDocs(teamDocQuery);
 
-          const unsubscribe = onSnapshot(teamDocRef, async (snapshot) => {
-            const updatedTeamWorkTime: DataType[] = [];
-            const teamDocData: teamDataType[] = [];
+          const updatedTeamWorkTime: TeamDataType[] = [];
 
-            const teamUserDocs = snapshot.docs;
-
-            for (const teamUserDoc of teamUserDocs) {
-              const teamUserId = teamUserDoc.id;
-              const teamWorkTimeRef = collection(
-                db,
-                "Users",
-                teamUserId,
-                "worktime",
-              );
-              const teamWorkTimeSnap = await getDocs(teamWorkTimeRef);
-
-              teamWorkTimeSnap.forEach((doc) => {
-                const teamUserData = teamUserDoc.data();
-                const teamWorkTimeData = doc.data();
-                updatedTeamWorkTime.push({
-                  key: doc.id,
-                  name: teamUserData.name || "",
-                  department: teamUserData.department || "",
-                  team: teamUserData.team || "",
-                  starttime: teamWorkTimeData.starttime,
-                  finishtime: teamWorkTimeData.finishtime,
-                });
+          for (const doc of teamDocSnapshot.docs) {
+            const teamUserData = doc.data();
+            const teamUserId = doc.id;
+            const teamWorkTimeRef = collection(
+              db,
+              "Users",
+              teamUserId,
+              "worktime",
+            );
+            console.log(teamUserData);
+            const teamWorkTimeSnapshot = await getDocs(teamWorkTimeRef);
+            teamWorkTimeSnapshot.forEach((subDoc) => {
+              const teamWorkTimeData = subDoc.data();
+              updatedTeamWorkTime.push({
+                tkey: doc.id,
+                tname: teamUserData.name || "",
+                tdepartment: teamUserData.department || "",
+                tteam: teamUserData.team || "",
+                starttime: teamWorkTimeData.starttime || null,
+                finishtime: teamWorkTimeData.finishtime || null,
               });
-            }
-            setWorkTimeData(updatedTeamWorkTime);
-          });
-
-          return () => {
-            // Unsubscribe the listener when the component unmounts
-            unsubscribe();
-          };
+            });
+          }
+          setIsLoading(false);
+          setTeamWorkTimeData(updatedTeamWorkTime);
         }
       } catch (error) {
-        console.error("Error fetching worktime data", error);
+        setIsLoading(false);
+        console.error("Error fetching Team worktime data", error);
       }
     };
 
     fetchWorkTime();
-  }, [workTimeFilter, userUid]);
+  }, [workTimeFilter, userUid, myTeam]);
 
   const onChange: TableProps<DataType>["onChange"] = (
     pagination,
@@ -202,12 +206,49 @@ const WorkTimeList: React.FC = () => {
           onChange={(value) => setWorkTimeFilter(value as string)}
         />
         <TableWrapper>
-          <Table
-            columns={columns}
-            dataSource={workTimeData}
-            onChange={onChange}
-            pagination={{ position: ["bottomCenter"] }}
-          />
+          {workTimeFilter === "나의 출퇴근 현황" && (
+            <Table
+              columns={columns}
+              dataSource={myWorkTimeData.map((item, index) => ({
+                ...item,
+                key: `myWorkTime_${item.key || index}`,
+              }))}
+              onChange={onChange}
+              pagination={{ position: ["bottomCenter"] }}
+            />
+          )}
+          {workTimeFilter === "우리팀 출퇴근 현황" && (
+            <Table
+              columns={columns}
+              dataSource={teamWorkTimeData.map((item, index) => ({
+                ...item,
+                key: `teamWorkTime_${item.tkey}_${index}_${Math.random()
+                  .toString(36)
+                  .substr(2, 9)}`,
+              }))}
+              onChange={onChange}
+              pagination={{ position: ["bottomCenter"] }}
+            />
+          )}
+          <Space
+            direction="vertical"
+            style={{
+              width: "350px",
+              position: "absolute",
+              top: "50%",
+              left: "20%",
+            }}
+          >
+            <Spin
+              size="large"
+              tip="데이터를 불러오는 중입니다. 잠시만 기다려주세요..."
+              spinning={isLoading}
+              className="ant-spin-text"
+              style={{ margin: 0, padding: 0 }}
+            >
+              <div className="content" />
+            </Spin>
+          </Space>
           <PaginationWrapper></PaginationWrapper>
         </TableWrapper>
       </LeftContainer>
@@ -236,7 +277,6 @@ const TableWrapper = styled.div`
   width: 100%;
   padding: 1rem;
 `;
-
 const PaginationWrapper = styled.div`
   display: flex;
   justify-content: center;
