@@ -12,6 +12,7 @@ export interface IWiki {
   title: string;
   order: number;
   items: IWikiItem[];
+  teamName: null | string;
 }
 
 // 현재 선택한 폴더명
@@ -37,12 +38,27 @@ export const currentItem = atom<IItems>({
   default: { name: "", subName: "" },
 });
 
+// 전체 Item
 export const totalItems = atom<IWiki[]>({
   key: "navItemList",
   default: [
     {
       title: "",
       order: 0,
+      teamName: null,
+      items: [{ name: "", subName: "", date: Timestamp.fromDate(new Date()) }],
+    },
+  ],
+});
+
+// 팀 Item
+export const totalTeamItems = atom<IWiki[]>({
+  key: "navTeamItemList",
+  default: [
+    {
+      title: "",
+      order: 0,
+      teamName: "",
       items: [{ name: "", subName: "", date: Timestamp.fromDate(new Date()) }],
     },
   ],

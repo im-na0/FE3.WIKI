@@ -17,8 +17,8 @@ interface IState {
 
 type RefreshFunction = () => void;
 
-// 새로운 폴더 생성
-export const addFolder = async (
+// 새로운 전체 폴더 생성
+export const addAllFolder = async (
   folderName: string,
   refreshFc: RefreshFunction,
 ): Promise<void> => {
@@ -37,11 +37,48 @@ export const addFolder = async (
     } else {
       const order = foldersQuerySnapshot.size;
 
-      await addDoc(collection(db, "WikiPage"), {
+      const folderData = {
         title: folderName,
         items: [],
         order: order,
-      });
+      };
+
+      await addDoc(collection(db, "WikiPage"), folderData);
+
+      refreshFc();
+    }
+  }
+};
+
+// 새로운 팀 폴더 생성
+export const addTeamFolder = async (
+  folderName: string,
+  refreshFc: RefreshFunction,
+  userTeamName: string | null,
+): Promise<void> => {
+  if (folderName.length > 0) {
+    const foldersRef = collection(db, "WikiPage");
+    const foldersQuery = query(foldersRef);
+    const foldersQuerySnapshot = await getDocs(foldersQuery);
+    const existFolderNames: string[] = [];
+
+    foldersQuerySnapshot.forEach((doc) =>
+      existFolderNames.push(doc.data().title),
+    );
+
+    if (existFolderNames.includes(folderName)) {
+      alert("이미 같은 이름의 폴더가 존재합니다.");
+    } else {
+      const order = foldersQuerySnapshot.size;
+
+      const folderData = {
+        title: folderName,
+        items: [],
+        order: order,
+        teamName: userTeamName,
+      };
+
+      await addDoc(collection(db, "WikiPage"), folderData);
 
       refreshFc();
     }
