@@ -51,21 +51,33 @@ import { IWiki } from "../../store/wiki";
 import { DropResult } from "react-beautiful-dnd";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
-interface NewFile {
-  name: string;
+export interface NewFile {
+  fileName: string;
   subName: string;
+  name: null;
+  department: null;
+  position: null;
 }
 
 interface isOpenProps {
-  isopen: boolean;
+  isopen: "true" | "false";
+}
+
+export interface ITeamProps {
+  name: string | null;
+  department: string | null;
+  position: string | null;
 }
 
 const WikiNav = () => {
   const [newFolder, setNewFolder] = useState<string>("");
   const [folderName, setFolderName] = useState<string>("");
   const [newFile, setNewFile] = useState<NewFile>({
-    name: "",
+    fileName: "",
     subName: "",
+    name: null,
+    department: null,
+    position: null,
   });
   const [inputState, setInputState] = useState<boolean>(false);
   const [isWikiSelectOpen, setIsWikiSelectOpen] = useRecoilState(SelectState);
@@ -77,7 +89,9 @@ const WikiNav = () => {
   const [folderState, setFolderState] = useRecoilState(editFolderState);
   const setCurrentTarget = useSetRecoilState(currentFolderTitle);
   const deleteState = useRecoilValue(deleteFolderState);
-  const [teamName, setTeamName] = useState<string | null>(null);
+
+  const [teamName, setTeamName] = useState<string | null>("");
+  const [teamInfo, setTeamInfo] = useState<ITeamProps | null>(null);
 
   const refreshFolders = async () => {
     const q = query(
@@ -86,6 +100,7 @@ const WikiNav = () => {
       where("teamName", "==", null),
     );
     const querySnapshot = await getDocs(q);
+
     const folderData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
     setItems(folderData);
   };
@@ -130,7 +145,7 @@ const WikiNav = () => {
   };
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewFile({ ...newFile, name: e.target.value });
+    setNewFile({ ...newFile, fileName: e.target.value });
   };
 
   const handleFolderClick = (current: string) => {
@@ -197,7 +212,8 @@ const WikiNav = () => {
   };
 
   // 유저 검증 및 팀 확인
-  const userUid = localStorage.getItem("uid");
+  // const userUid = localStorage.getItem("uid");
+  const userUid = "ILDsVGrPboZCnYsqZdw9Z3x3QD53";
 
   const validTeamUser = async () => {
     const q = query(
@@ -208,7 +224,11 @@ const WikiNav = () => {
 
     if (!querySnapshot.empty) {
       const teamName = querySnapshot.docs[0].data().teamName;
-      setTeamName(teamName);
+      if (teamName) {
+        setTeamName(teamName);
+        setTeamInfo({ name: "김범수", department: "BE", position: "Senior" });
+        console.log(teamInfo, teamName);
+      }
     }
   };
 
@@ -220,7 +240,7 @@ const WikiNav = () => {
   useEffect(() => {
     refreshFolders();
     validTeamUser();
-  }, [currentTargetFile, deleteState, userUid]);
+  }, [currentTargetFile, deleteState]);
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
@@ -303,7 +323,11 @@ const WikiNav = () => {
                               <WikiSelect title={item.title} />
                             </div>
                           </StyledTitle>
-                          <StyledFile isopen={item.title === currentFolder}>
+                          <StyledFile
+                            isopen={
+                              item.title === currentFolder ? "true" : "false"
+                            }
+                          >
                             {fileState && (
                               <FormContainer>
                                 <FileOutlined style={{ fontSize: "14px" }} />
@@ -318,12 +342,12 @@ const WikiNav = () => {
                             {item.items &&
                               item.items.map((v, fileIndex: number) => (
                                 <StyledItem
-                                  key={v.name + fileIndex}
-                                  onClick={() => handleFileClick(v.name)}
+                                  key={v.fileName + fileIndex}
+                                  onClick={() => handleFileClick(v.fileName)}
                                 >
                                   <div>
                                     <FileOutlined />
-                                    <StyledSpan>{v.name}</StyledSpan>
+                                    <StyledSpan>{v.fileName}</StyledSpan>
                                   </div>
                                 </StyledItem>
                               ))}
@@ -348,9 +372,10 @@ const WikiNav = () => {
                   )}
                 </StyledFolderTitle>
               </FolderWrapper>
-              <FolderAddOutlined style={{ color: "white", fontSize: "15px" }} />
             </StyledTeamContainer>
-            {teamName !== null && <WikiTeamNav teamName={teamName} />}
+            {teamName !== null && teamInfo !== null ? (
+              <WikiTeamNav teamName={teamName} teamInfos={teamInfo} />
+            ) : null}
           </Container>
         )}
       </Droppable>
@@ -384,6 +409,7 @@ const FolderWrapper = styled.div`
   color: black;
   opacity: 0.7;
   padding-bottom: 5px;
+  padding-top: 3px;
 `;
 
 const StyledFolderTitle = styled.div`
@@ -395,6 +421,7 @@ const StyledFolderTitle = styled.div`
 const StyledDiv = styled.div`
   margin-bottom: 0;
 `;
+
 const NewFolderContainer = styled.div`
   margin-top: 5px;
 `;
@@ -455,16 +482,19 @@ const StyledFile = styled.ul<isOpenProps>`
   cursor: pointer;
   margin-top: 3px;
   color: rgba(0, 0, 0, 0.85);
-  max-height: ${(props) => (props.isopen ? "500px" : "0")};
+  max-height: ${(props) => (props.isopen === "true" ? "500px" : "0")};
   overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
+
   div {
-    opacity: ${(props) => (props.isopen ? "1" : "0")};
+    opacity: ${(props) => (props.isopen === "true" ? "1" : "0")};
     transition: opacity 0.3s;
   }
 `;
+
+StyledFile.shouldForwardProp = (prop) => prop !== "$isopen";
 
 const StyledItem = styled.li`
   width: 85%;
@@ -500,4 +530,5 @@ const StyledTeamContainer = styled.div`
   width: 280px;
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
 `;
