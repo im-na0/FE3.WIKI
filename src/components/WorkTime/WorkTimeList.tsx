@@ -24,15 +24,6 @@ interface WorkTimeProps {
   fontSize?: string;
 }
 
-type teamDataType = {
-  key: string;
-  name: string;
-  department: string;
-  team: string;
-  starttime?: Timestamp;
-  finishtime?: Timestamp;
-};
-
 interface DataType {
   key?: string;
   name?: string;
@@ -41,9 +32,18 @@ interface DataType {
   starttime: Timestamp;
   finishtime: Timestamp;
 }
+interface TeamDataType {
+  tkey?: string;
+  tname?: string;
+  tdepartment?: string;
+  tteam?: string;
+  starttime: Timestamp;
+  finishtime: Timestamp;
+}
 
 const WorkTimeList: React.FC = () => {
-  const [workTimeData, setWorkTimeData] = useState<DataType[]>([]);
+  const [myWorkTimeData, setMyWorkTimeData] = useState<DataType[]>([]);
+  const [teamWorkTimeData, setTeamWorkTimeData] = useState<TeamDataType[]>([]);
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -55,15 +55,16 @@ const WorkTimeList: React.FC = () => {
   const columns: ColumnsType<DataType> = [
     {
       title: "이름",
-      dataIndex: "name",
+      dataIndex: workTimeFilter === "나의 출퇴근 현황" ? "name" : "tname",
     },
     {
       title: "부서",
-      dataIndex: "department",
+      dataIndex:
+        workTimeFilter === "나의 출퇴근 현황" ? "department" : "tdepartment",
     },
     {
       title: "소속팀",
-      dataIndex: "team",
+      dataIndex: workTimeFilter === "나의 출퇴근 현황" ? "team" : "tteam",
     },
     {
       title: "출근 시간",
@@ -115,13 +116,11 @@ const WorkTimeList: React.FC = () => {
           setMyTeam(myTeam);
 
           const myWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
-          const myWorkTimeSnap = await getDocs(myWorkTimeRef);
 
           const unsubscribe = onSnapshot(myWorkTimeRef, (snapshot) => {
             const updatedMyWorkTime: DataType[] = [];
             snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
               const myWorkTimeData = doc.data();
-              console.log(myWorkTimeData.team);
               updatedMyWorkTime.push({
                 key: doc.id,
                 name: myDocData.name || "",
@@ -132,59 +131,50 @@ const WorkTimeList: React.FC = () => {
               });
             });
             setIsLoading(false);
-            setWorkTimeData(updatedMyWorkTime);
+            setMyWorkTimeData(updatedMyWorkTime);
           });
 
           return () => {
             unsubscribe();
           };
         } else if (workTimeFilter === "우리팀 출퇴근 현황") {
-          const teamDocRef = collection(db, "Users");
-          const teamDocQuery = query(teamDocRef, where("team", "==", myTeam));
-          console.log(teamDocQuery);
-          const unsubscribe = onSnapshot(teamDocQuery, async (snapshot) => {
-            const updatedTeamWorkTime: DataType[] = [];
+          const teamDocQuery = query(
+            collection(db, "Users"),
+            where("team", "==", myTeam),
+          );
+          const teamDocSnapshot = await getDocs(teamDocQuery);
 
-            snapshot.forEach((doc) => {
-              const teamUserData = doc.data();
-              const teamUserId = doc.id;
-              const teamWorkTimeRef = collection(
-                db,
-                "Users",
-                teamUserId,
-                "worktime",
-              );
+          const updatedTeamWorkTime: TeamDataType[] = [];
 
-              getDocs(teamWorkTimeRef)
-                .then((subcollectionSnapshot) => {
-                  subcollectionSnapshot.forEach((subDoc) => {
-                    const teamWorkTimeData = subDoc.data();
-                    updatedTeamWorkTime.push({
-                      key: doc.id,
-                      name: teamUserData.name || "",
-                      department: teamUserData.department || "",
-                      team: teamUserData.team || "",
-                      starttime: teamWorkTimeData.starttime,
-                      finishtime: teamWorkTimeData.finishtime,
-                    });
-                  });
-                  setIsLoading(false);
-                  setWorkTimeData(updatedTeamWorkTime);
-                })
-                .catch((error) => {
-                  console.error("Error fetching subcollection data", error);
-                });
+          for (const doc of teamDocSnapshot.docs) {
+            const teamUserData = doc.data();
+            const teamUserId = doc.id;
+            const teamWorkTimeRef = collection(
+              db,
+              "Users",
+              teamUserId,
+              "worktime",
+            );
+            console.log(teamUserData);
+            const teamWorkTimeSnapshot = await getDocs(teamWorkTimeRef);
+            teamWorkTimeSnapshot.forEach((subDoc) => {
+              const teamWorkTimeData = subDoc.data();
+              updatedTeamWorkTime.push({
+                tkey: doc.id,
+                tname: teamUserData.name || "",
+                tdepartment: teamUserData.department || "",
+                tteam: teamUserData.team || "",
+                starttime: teamWorkTimeData.starttime || null,
+                finishtime: teamWorkTimeData.finishtime || null,
+              });
             });
-
-            return () => {
-              // Unsubscribe the listener when the component unmounts
-              unsubscribe();
-            };
-          });
+          }
+          setIsLoading(false);
+          setTeamWorkTimeData(updatedTeamWorkTime);
         }
       } catch (error) {
         setIsLoading(false);
-        console.error("Error fetching worktime data", error);
+        console.error("Error fetching Team worktime data", error);
       }
     };
 
@@ -216,12 +206,30 @@ const WorkTimeList: React.FC = () => {
           onChange={(value) => setWorkTimeFilter(value as string)}
         />
         <TableWrapper>
-          <Table
-            columns={columns}
-            dataSource={workTimeData}
-            onChange={onChange}
-            pagination={{ position: ["bottomCenter"] }}
-          />
+          {workTimeFilter === "나의 출퇴근 현황" && (
+            <Table
+              columns={columns}
+              dataSource={myWorkTimeData.map((item, index) => ({
+                ...item,
+                key: `myWorkTime_${item.key || index}`,
+              }))}
+              onChange={onChange}
+              pagination={{ position: ["bottomCenter"] }}
+            />
+          )}
+          {workTimeFilter === "우리팀 출퇴근 현황" && (
+            <Table
+              columns={columns}
+              dataSource={teamWorkTimeData.map((item, index) => ({
+                ...item,
+                key: `teamWorkTime_${item.tkey}_${index}_${Math.random()
+                  .toString(36)
+                  .substr(2, 9)}`,
+              }))}
+              onChange={onChange}
+              pagination={{ position: ["bottomCenter"] }}
+            />
+          )}
           <Space
             direction="vertical"
             style={{

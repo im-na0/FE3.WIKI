@@ -70,6 +70,8 @@ const WorkCalendar = () => {
     return info.originNode;
   };
 
+  locale.lang.monthFormat = "M";
+
   return (
     <CustomCell>
       {!isLoaded ? null : <Calendar locale={locale} cellRender={cellRender} />}
