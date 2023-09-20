@@ -9,8 +9,6 @@ import { db, storage } from "../../libs/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { getDownloadURL, uploadBytesResumable, ref } from "firebase/storage";
 import { FormDataType } from "../../type/form";
-import { useRecoilState } from "recoil";
-import { uploadFileState } from "../../store/member";
 
 const COLLECTION_NAME = "Users";
 
@@ -30,7 +28,6 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
     const name = new Date().getTime() + file!.name;
     const storageRef = ref(storage, `member/${name}`);
     const uploadTask = uploadBytesResumable(storageRef, file as File);
-
     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
     return downloadURL;
   };

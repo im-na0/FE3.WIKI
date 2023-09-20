@@ -8,6 +8,8 @@ import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import TeamTable from "./TeamTable";
+import AddTeamModal from "./AddTeamModal";
 
 const List = styled.div`
   background-color: #fff;
@@ -35,7 +37,7 @@ const ListTable = styled.div`
   width: 100%;
 `;
 
-export default function MemberList() {
+export default function TeamList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
@@ -49,7 +51,7 @@ export default function MemberList() {
     setIsModalOpen(false);
   };
   const DeleteDataParams = {
-    COLLECTION_NAME: "Users",
+    COLLECTION_NAME: "Teams",
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
@@ -67,7 +69,7 @@ export default function MemberList() {
 
   return (
     <>
-      <h2>Employee</h2>
+      <h2>Teams</h2>
       <List>
         <CardHeader className="card-header">
           <ToggleWrap>
@@ -87,13 +89,13 @@ export default function MemberList() {
               Add
             </Button>
             <CustomForm.Modal
-              title="멤버 등록"
+              title="팀 등록"
               width={700}
               footer={null}
               open={isModalOpen}
               onCancel={closeModal}
             >
-              <AddMemberModal onCancel={closeModal} />
+              <AddTeamModal onCancel={closeModal} />
             </CustomForm.Modal>
             <Button
               danger={true}
@@ -104,7 +106,7 @@ export default function MemberList() {
           </ToggleWrap>
         </CardHeader>
         <ListTable>
-          <MemberTable
+          <TeamTable
             setSelectedRowKeys={setSelectedRowKeys}
             searchText={searchText}
             filterValue={filterValue}

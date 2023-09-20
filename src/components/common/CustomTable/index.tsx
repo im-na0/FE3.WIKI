@@ -16,7 +16,6 @@ function CustomTable<TableData extends FormDataType>({
 }: Props<TableData>) {
   return (
     <>
-      {" "}
       <Table
         columns={columns}
         dataSource={data}

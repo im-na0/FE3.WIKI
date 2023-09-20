@@ -21,44 +21,23 @@ interface WorkTimeProps {
   fontSize?: string;
 }
 
-interface DataType {
+type teamDataType = {
   key: string;
   name: string;
   department: string;
   team: string;
+  starttime?: Timestamp;
+  finishtime?: Timestamp;
+};
+
+interface DataType {
+  key?: string;
+  name?: string;
+  department?: string;
+  team?: string;
   starttime: Timestamp;
   finishtime: Timestamp;
 }
-
-const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-`;
-
-const LeftContainer = styled.div`
-  flex: 5;
-`;
-
-const WorkTimeText = styled.span<WorkTimeProps>`
-  font-size: ${(props) => props.fontSize || "1.7rem"};
-  color: ${(props) => props.color || "#3A56A3"};
-`;
-const TableWrapper = styled.div`
-  width: 100%;
-  padding: 1rem;
-`;
-
-const PaginationWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-`;
-
-const RightContainer = styled.div`
-  flex: 5;
-  margin-left: 5px;
-`;
 
 const WorkTimeList: React.FC = () => {
   const [workTimeData, setWorkTimeData] = useState<DataType[]>([]);
@@ -66,7 +45,7 @@ const WorkTimeList: React.FC = () => {
     useState<string>("나의 출퇴근 현황");
 
   const user = auth.currentUser;
-  const userUid = user ? user.uid : "ax2Eyczauq0NbDTfrB2i"; // 유저 Uid 샘플 테스트용
+  const userUid = user ? user.uid : null;
 
   const columns: ColumnsType<DataType> = [
     {
@@ -122,52 +101,66 @@ const WorkTimeList: React.FC = () => {
   useEffect(() => {
     const fetchWorkTime = async () => {
       try {
-        const fetchedWorkTime: DataType[] = [];
-
         if (workTimeFilter === "나의 출퇴근 현황") {
-          const userDocRef = doc(db, `Users/${userUid}`);
-          const userDocSnap = await getDoc(userDocRef);
-          const userData = userDocSnap.data() || {};
+          const myDocRef = doc(db, `Users/${userUid}`);
+          const myDocSnap = await getDoc(myDocRef);
+          const myDocData = myDocSnap.data() || {};
 
-          const userWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
-          const userWorkTimeSnap = await getDocs(userWorkTimeRef);
+          const myWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
+          const myWorkTimeSnap = await getDocs(myWorkTimeRef);
 
-          const unsubscribe = onSnapshot(userWorkTimeRef, (snapshot) => {
-            const updatedUserWorkTime: DataType[] = [];
+          const unsubscribe = onSnapshot(myWorkTimeRef, (snapshot) => {
+            const updatedMyWorkTime: DataType[] = [];
             snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-              const userWorkTimeData = doc.data();
-              updatedUserWorkTime.push({
+              const myWorkTimeData = doc.data();
+              updatedMyWorkTime.push({
                 key: doc.id,
-                name: userData.name || "",
-                department: userData.department || "",
-                team: userData.team || "",
-                starttime: userWorkTimeData.starttime,
-                finishtime: userWorkTimeData.finishtime,
+                name: myDocData.name || "",
+                department: myDocData.department || "",
+                team: myDocData.team || "",
+                starttime: myWorkTimeData.starttime,
+                finishtime: myWorkTimeData.finishtime,
               });
             });
-            setWorkTimeData(updatedUserWorkTime);
+            setWorkTimeData(updatedMyWorkTime);
           });
 
           return () => {
             unsubscribe();
           };
         } else if (workTimeFilter === "우리팀 출퇴근 현황") {
-          const teamWorkTimeRef = collection(db, "Users");
-          const teamWorkTimeSnap = await getDocs(teamWorkTimeRef);
+          const teamDocRef = collection(db, "Users");
+          const teamDocSnap = await getDocs(teamDocRef);
 
-          const unsubscribe = onSnapshot(teamWorkTimeRef, (snapshot) => {
+          const unsubscribe = onSnapshot(teamDocRef, async (snapshot) => {
             const updatedTeamWorkTime: DataType[] = [];
-            snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-              const teamWorkTimeData = doc.data();
-              updatedTeamWorkTime.push({
-                key: doc.id,
-                name: teamWorkTimeData.name || "",
-                department: teamWorkTimeData.department || "",
-                team: teamWorkTimeData.team || "",
-                starttime: teamWorkTimeData.starttime,
-                finishtime: teamWorkTimeData.finishtime,
+            const teamDocData: teamDataType[] = [];
+
+            const teamUserDocs = snapshot.docs;
+
+            for (const teamUserDoc of teamUserDocs) {
+              const teamUserId = teamUserDoc.id;
+              const teamWorkTimeRef = collection(
+                db,
+                "Users",
+                teamUserId,
+                "worktime",
+              );
+              const teamWorkTimeSnap = await getDocs(teamWorkTimeRef);
+
+              teamWorkTimeSnap.forEach((doc) => {
+                const teamUserData = teamUserDoc.data();
+                const teamWorkTimeData = doc.data();
+                updatedTeamWorkTime.push({
+                  key: doc.id,
+                  name: teamUserData.name || "",
+                  department: teamUserData.department || "",
+                  team: teamUserData.team || "",
+                  starttime: teamWorkTimeData.starttime,
+                  finishtime: teamWorkTimeData.finishtime,
+                });
               });
-            });
+            }
             setWorkTimeData(updatedTeamWorkTime);
           });
 
@@ -224,5 +217,35 @@ const WorkTimeList: React.FC = () => {
     </Container>
   );
 };
+
+const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+`;
+
+const LeftContainer = styled.div`
+  flex: 6;
+`;
+
+const WorkTimeText = styled.span<WorkTimeProps>`
+  font-size: ${(props) => props.fontSize || "1.7rem"};
+  color: ${(props) => props.color || "#3A56A3"};
+`;
+const TableWrapper = styled.div`
+  width: 100%;
+  padding: 1rem;
+`;
+
+const PaginationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+`;
+
+const RightContainer = styled.div`
+  flex: 4;
+  margin-left: 5px;
+`;
 
 export default WorkTimeList;

@@ -7,7 +7,7 @@ interface FormItemProps {
   name: string;
   disabled?: boolean;
   rules?: Rule[];
-  value?: string;
+  value?: string | string[];
 }
 
 function CustomInput({
@@ -33,10 +33,16 @@ function CustomSelect({
   disabled,
   defaultValue,
   readOnly,
+  value,
+  children,
 }: FormItemProps & {
   options: Record<string, string>;
   defaultValue?: string;
   readOnly?: boolean;
+  mode?: string;
+  placeholder?: string;
+  onChange?: (selectedUserIds: string[]) => void;
+  children?: ReactNode;
 }) {
   return (
     <Form.Item
@@ -45,7 +51,12 @@ function CustomSelect({
       rules={rules}
       initialValue={defaultValue}
     >
-      <Select disabled={disabled} className={readOnly ? "readOnly" : undefined}>
+      <Select
+        disabled={disabled}
+        className={readOnly ? "readOnly" : undefined}
+        value={value}
+      >
+        {children}
         {Object.entries(options).map(([key, val]) => (
           <Select.Option
             value={Number.isNaN(Number(key)) ? key : Number(key)}

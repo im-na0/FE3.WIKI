@@ -194,3 +194,27 @@ export const userListConverter: FirestoreDataConverter<UserList> = {
     );
   },
 };
+
+// 출퇴근 시간 컨버터를 위한 타입 정의
+export class WorkTimeInfo {
+  constructor(
+    public starttime: Timestamp,
+    public finishtime: Timestamp,
+  ) {}
+}
+
+export const workTimeConverter: FirestoreDataConverter<WorkTimeInfo> = {
+  toFirestore: (docData: WorkTimeInfo): DocumentData => {
+    return {
+      starttime: docData.starttime,
+      finishtime: docData.finishtime,
+    };
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions,
+  ) => {
+    const data = snapshot.data(options);
+    return new WorkTimeInfo(data.starttime, data.finishtime);
+  },
+};

@@ -1,11 +1,11 @@
 import { atom } from "recoil";
 
-export const uploadFileState = atom<File | null>({
-  key: "uploadFileState",
-  default: null,
+export const selectedUserIdsState = atom<string[]>({
+  key: "selectedUserIdsState",
+  default: [],
 });
 
-export const formDataState = atom({
-  key: "formDataState",
-  default: {},
+export const userIdsState = atom<string[]>({
+  key: "userIdsState",
+  default: [],
 });
