@@ -4,7 +4,7 @@ import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
 import Wiki from "../pages/Wiki";
 import Project from "../pages/Project";
-import ProjectList from "../pages/ProjectList";
+// import ProjectList from "../pages/ProjectList";
 import ProjectNew from "../pages/ProjectNew";
 import ProjectDetail from "../pages/ProjectDetail";
 import Timer from "../pages/Timer";
