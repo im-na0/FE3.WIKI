@@ -11,4 +11,6 @@ export interface FormDataType {
   photo?: string;
   finishtime?: Date;
   starttime?: Date;
+  teamLeaderId?: string;
+  teamName?: string;
 }

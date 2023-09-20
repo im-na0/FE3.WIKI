@@ -4,12 +4,13 @@ import React from "react";
 import { styled } from "styled-components";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../hooks/Employee/useDeleteData";
+import { NavigateFunction } from "react-router-dom";
 
 const DeleteDataParams = {
   COLLECTION_NAME: "Teams",
 };
 
-export const columns = (navigate: any) => {
+export const columns = (navigate: NavigateFunction) => {
   const { deleteData } = useDeleteData(DeleteDataParams);
 
   const handleMenuClick = (record: FormDataType, key: string) => {

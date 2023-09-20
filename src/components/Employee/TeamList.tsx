@@ -3,39 +3,11 @@ import { Button } from "antd";
 import styled from "styled-components";
 import MemberFilter from "./MemberFilter";
 import MemberSearch from "./MemberSearch";
-import MemberTable from "./MemberTable";
 import CustomForm from "../common/CustomForm";
-import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
-import TeamTable from "./TeamTable";
 import AddTeamModal from "./AddTeamModal";
-
-const List = styled.div`
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
-  word-wrap: break-word;
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  padding: 1.5rem;
-`;
-
-const ToggleWrap = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-`;
-
-const ListTable = styled.div`
-  width: 100%;
-`;
+import TeamCard from "./TeamCard";
 
 export default function TeamList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -106,7 +78,7 @@ export default function TeamList() {
           </ToggleWrap>
         </CardHeader>
         <ListTable>
-          <TeamTable
+          <TeamCard
             setSelectedRowKeys={setSelectedRowKeys}
             searchText={searchText}
             filterValue={filterValue}
@@ -117,3 +89,29 @@ export default function TeamList() {
     </>
   );
 }
+
+const List = styled.div`
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
+  word-wrap: break-word;
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 1.5rem;
+`;
+
+const ToggleWrap = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+`;
+
+const ListTable = styled.div`
+  width: 100%;
+`;

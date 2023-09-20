@@ -63,7 +63,15 @@ export const teamSelect = [
     name: "department",
     label: "부서",
     options: SELECT_OPTIONS.department,
-    defaultValue: "option",
+    place: "option",
     rules: [required()],
+  },
+];
+
+export const teamTextAreas = [
+  {
+    name: "teamDescription",
+    label: "팀 설명",
+    rules: [required(), max(300)],
   },
 ];

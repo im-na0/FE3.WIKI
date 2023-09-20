@@ -46,10 +46,12 @@ export function useDeleteStorage() {
   return { deleteStorage };
 }
 
+import { updateDoc } from "firebase/firestore";
+
 export function useUpdateData({ COLLECTION_NAME }: UseMemberMutationParams) {
   const updateData = async (id: string, data: FormDataType) => {
     try {
-      await setDoc(doc(db, COLLECTION_NAME, id), {
+      await updateDoc(doc(db, COLLECTION_NAME, id), {
         ...data,
         updatedAt: serverTimestamp(),
       });

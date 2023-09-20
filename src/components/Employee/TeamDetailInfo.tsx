@@ -38,6 +38,7 @@ function TeamDetailInfo() {
     useRecoilState(selectedUserIdsState);
   const [prevUserIds, setPrevUserIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [teamLeaderId, setTeamLeaderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (userData) {
@@ -146,7 +147,10 @@ function TeamDetailInfo() {
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            <TeamForm isEditMode={isEditMode} />
+            <TeamForm
+              isEditMode={isEditMode}
+              setTeamLeaderId={setTeamLeaderId}
+            />
             <EditMemberSelect
               isEditMode={isEditMode}
               onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
