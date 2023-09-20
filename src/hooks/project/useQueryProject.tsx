@@ -1,20 +1,21 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../../libs/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { projectDetailConverter } from "../../libs/firestore";
+import { ProjectDetail, projectDetailConverter } from "../../libs/firestore";
 import { useLocation } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { isLoadingState, projectDetailState } from "../../store/project";
 
-export const useQueryProject = () => {
+export const useQueryProject = (): [
+  projectDetail: ProjectDetail | undefined,
+  isLoaded: boolean,
+] => {
   const location = useLocation();
   const projectId = location.pathname.split("/")[2];
-  const [projectDetail, setProjectDetail] = useRecoilState(projectDetailState);
-  const setIsLoading = useSetRecoilState(isLoadingState);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [projectDetail, setProjectDetail] = useState<ProjectDetail>();
 
   useEffect(() => {
     if (projectId === undefined) return;
-    setIsLoading(true);
+    setIsLoaded(false);
     (async () => {
       try {
         const docRef = doc(db, "Project", projectId).withConverter(
@@ -24,13 +25,16 @@ export const useQueryProject = () => {
         if (docSn.exists()) {
           const data = docSn.data();
           setProjectDetail(data);
-          setIsLoading(false);
         }
       } catch (error) {
-        setIsLoading(false);
         if (error instanceof Error) console.error(error.message);
+      } finally {
+        setIsLoaded(true);
       }
     })();
+    return () => {
+      console.log("unmount");
+    };
   }, [projectId]);
-  return projectDetail;
+  return [projectDetail, isLoaded];
 };
