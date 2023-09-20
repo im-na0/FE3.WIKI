@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../type/form";
-import { Button, message } from "antd";
+import { Button, message, Spin } from "antd";
 import CustomForm from "../common/CustomForm";
 import { EditOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import MemberForm from "./MemberForm";
@@ -12,6 +12,7 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
+import styled from "styled-components";
 
 function MemberDetailInfo() {
   const Form = CustomForm.Form;
@@ -28,6 +29,7 @@ function MemberDetailInfo() {
   const [cardName, setCardName] = useState(userData.name);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
@@ -43,6 +45,7 @@ function MemberDetailInfo() {
 
   const handleUpdate = async () => {
     try {
+      setLoading(true);
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
       const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
@@ -64,6 +67,8 @@ function MemberDetailInfo() {
     } catch (error) {
       console.error("Error updating member:", error);
       message.error("데이터 업데이트 중 오류가 발생했습니다");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,6 +88,11 @@ function MemberDetailInfo() {
 
   return (
     <Form form={form}>
+      {loading ? (
+        <Overlay>
+          <Spin size="large" />
+        </Overlay>
+      ) : null}
       <div className="member-header">
         <div className="member-title">
           <h3>직원 정보</h3>
@@ -135,3 +145,16 @@ function MemberDetailInfo() {
   );
 }
 export default MemberDetailInfo;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
