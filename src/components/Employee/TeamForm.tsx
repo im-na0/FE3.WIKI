@@ -2,14 +2,8 @@ import React from "react";
 import { Divider } from "antd";
 import CustomForm from "../common/CustomForm";
 import { teamInputs, teamSelect } from "../../data/formSource";
-import { useRecoilState } from "recoil";
-import { selectedUserIdsState } from "../../store/member";
-import TeamMemberSelect from "./TeamMemberSelect";
 
 function TeamForm({ isEditMode }: { isEditMode: boolean }) {
-  const [selectedUserIds, setSelectedUserIds] =
-    useRecoilState(selectedUserIdsState);
-
   return (
     <>
       <Divider orientation="left">기본 정보</Divider>
@@ -33,9 +27,6 @@ function TeamForm({ isEditMode }: { isEditMode: boolean }) {
           readOnly={!isEditMode}
         />
       ))}
-      <TeamMemberSelect
-        onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
-      />
     </>
   );
 }

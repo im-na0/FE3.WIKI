@@ -38,10 +38,10 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
       ...data,
       photo: imageUrl,
     });
-    onCancel(); // 모달창 닫기
+    onCancel();
     console.log(previewUrl);
     if (previewUrl) {
-      URL.revokeObjectURL(previewUrl); // FIXME: 리렌더 안돼서 미리보기가 남아있음
+      URL.revokeObjectURL(previewUrl);
     }
     form.resetFields();
   };

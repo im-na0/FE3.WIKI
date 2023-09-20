@@ -4,11 +4,9 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../libs/firebase";
 import { Rule } from "antd/lib/form";
 import CustomForm from "../common/CustomForm";
-import { userIdsState } from "../../store/member";
-import { useRecoilState } from "recoil";
 import { useTeamUserIds } from "../../hooks/Employee/useTeamUserIds";
 
-interface MemberSelectProps {
+interface AddTeamMemberSelectProps {
   onChange: (selectedUserIds: string[]) => void;
   rules?: Rule[];
 }
@@ -18,10 +16,9 @@ interface UserData {
   title: string;
 }
 
-function TeamMemberSelect({ onChange }: MemberSelectProps) {
+function AddTeamMemberSelect({ onChange }: AddTeamMemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
-  const [prevUserIds, setPrevUserIds] = useRecoilState(userIdsState);
   const teamUserIds = useTeamUserIds();
 
   useEffect(() => {
@@ -41,14 +38,6 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
         );
 
         setUsers(filteredUserArray);
-
-        if (prevUserIds && prevUserIds.length > 0) {
-          const selectedKeys = userArray
-            .filter((user) => prevUserIds.includes(user.key))
-            .map((user) => user.key);
-
-          setSelectedUserKeys(selectedKeys);
-        }
       } catch (error) {
         console.error("Error fetching users:", error);
         message.error("데이터를 불러올 수 없습니다!");
@@ -56,7 +45,7 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
     };
 
     fetchUsers();
-  }, [prevUserIds, teamUserIds]);
+  }, [teamUserIds]);
 
   const handleUserChange = (nextSelectedKeys: string[]) => {
     setSelectedUserKeys(nextSelectedKeys);
@@ -81,4 +70,4 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
   );
 }
 
-export default TeamMemberSelect;
+export default AddTeamMemberSelect;

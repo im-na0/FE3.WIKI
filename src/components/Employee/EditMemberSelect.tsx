@@ -4,13 +4,12 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../libs/firebase";
 import { Rule } from "antd/lib/form";
 import CustomForm from "../common/CustomForm";
-import { userIdsState } from "../../store/member";
-import { useRecoilState } from "recoil";
 import { useTeamUserIds } from "../../hooks/Employee/useTeamUserIds";
 
-interface MemberSelectProps {
+interface EditTeamMemberSelectProps {
   onChange: (selectedUserIds: string[]) => void;
   rules?: Rule[];
+  prevUserIds?: string[];
 }
 
 interface UserData {
@@ -18,10 +17,13 @@ interface UserData {
   title: string;
 }
 
-function TeamMemberSelect({ onChange }: MemberSelectProps) {
+function EditTeamMemberSelect({
+  prevUserIds,
+  onChange,
+}: EditTeamMemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
-  const [prevUserIds, setPrevUserIds] = useRecoilState(userIdsState);
+
   const teamUserIds = useTeamUserIds();
 
   useEffect(() => {
@@ -39,6 +41,15 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
         const filteredUserArray = userArray.filter(
           (user) => !teamUserIds.includes(user.key),
         );
+
+        if (prevUserIds && prevUserIds.length > 0) {
+          prevUserIds.forEach((userId) => {
+            const userToAdd = userArray.find((user) => user.key === userId);
+            if (userToAdd) {
+              filteredUserArray.push(userToAdd);
+            }
+          });
+        }
 
         setUsers(filteredUserArray);
 
@@ -81,4 +92,4 @@ function TeamMemberSelect({ onChange }: MemberSelectProps) {
   );
 }
 
-export default TeamMemberSelect;
+export default EditTeamMemberSelect;

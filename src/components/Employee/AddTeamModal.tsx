@@ -8,6 +8,7 @@ import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
 import { selectedUserIdsState } from "../../store/member";
+import TeamMemberSelect from "./TeamMemberSelect";
 
 const COLLECTION_NAME = "Teams";
 
@@ -44,6 +45,9 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
       form={form}
     >
       <TeamForm isEditMode={isEditMode} />
+      <TeamMemberSelect
+        onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
+      />
       <SumbitBtn>
         <Button htmlType="submit" type="primary">
           Add

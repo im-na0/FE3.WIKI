@@ -24,7 +24,7 @@ export default function MemberTable({
     ORDER: "name",
   };
   const data = useFetchData(fetchDataParams);
-  // const initialUserData: FormDataType[] = useFetchData(fetchDataParams);
+
   const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
   const navigate = useNavigate();
 
