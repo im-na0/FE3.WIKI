@@ -15,14 +15,18 @@ const WorkCalendar = () => {
       const date = `${value.month() + 1}-${value.date()}`;
       const start = worktime?.find((time) => {
         const startDate = time?.starttime?.toDate();
-        const dateStr = `${startDate.getMonth() + 1}-${startDate.getDate()}`;
+        const dateStr = startDate
+          ? `${startDate.getMonth() + 1}-${startDate.getDate()}`
+          : "";
         console.log(dateStr, date);
         return dateStr === date;
       });
       const startTime = start?.starttime?.toDate().toTimeString().split(" ")[0];
       const finish = worktime?.find((time) => {
         const endDate = time?.finishtime?.toDate();
-        const dateStr = `${endDate.getMonth() + 1}-${endDate.getDate()}`;
+        const dateStr = endDate
+          ? `${endDate.getMonth() + 1}-${endDate.getDate()}`
+          : "";
         return dateStr === date;
       });
       const finishTime = finish?.finishtime
