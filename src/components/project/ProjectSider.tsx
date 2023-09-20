@@ -28,7 +28,12 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem("전체 프로젝트", "all", <ProjectOutlined />),
+  getItem("프로젝트 상태 별 목록", "projects", <ProjectOutlined />, [
+    getItem("전체 프로젝트", "all"),
+    getItem("예정된 프로젝트", "plus"),
+    getItem("진행중인 프로젝트", "progress"),
+    getItem("완료된 프로젝트", "completed"),
+  ]),
   getItem("내 팀 프로젝트", "myteam", <ProjectOutlined />, [
     getItem("프론트엔드 개발팀", "fe", <UnorderedListOutlined />),
   ]),
@@ -62,6 +67,15 @@ const ProjectSider = () => {
       case "all":
         navigate("/project/all");
         break;
+      case "plus":
+        navigate("/project/all?status=plus");
+        break;
+      case "progress":
+        navigate("/project/all?status=progress");
+        break;
+      case "completed":
+        navigate("/project/all?status=completed");
+        break;
       case "fe":
         navigate("/project");
         break;
@@ -79,7 +93,7 @@ const ProjectSider = () => {
         onClick={onClick}
         style={{ width: 200 }}
         defaultSelectedKeys={[currentPath ?? "fe"]}
-        defaultOpenKeys={["myteam"]}
+        defaultOpenKeys={["myteam", "projects"]}
         mode="inline"
         items={items}
       />

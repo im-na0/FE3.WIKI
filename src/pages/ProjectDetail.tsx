@@ -12,7 +12,6 @@ const { Content, Sider } = Layout;
 const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
   const [projectDetail, isLoaded] = useQueryProject();
 
-  console.log(isLoaded);
   return (
     <Layout>
       <ProjectSider />

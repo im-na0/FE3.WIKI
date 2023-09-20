@@ -1,25 +1,21 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ProjectListItem from "./ProjectListItem";
 import useQueryProjectAllList from "../../hooks/project/useQueryProjectAllList";
+import useQueryParam from "../../hooks/project/useQueryParam";
 
 const ProjectListSider = () => {
+  const status = useQueryParam().get("status");
   const projects = useQueryProjectAllList();
-  const projectArr = [
-    ...projects["plus"],
-    ...projects["progress"],
-    ...projects["completed"],
-  ];
+  const projectArr =
+    status === null
+      ? [...projects["plus"], ...projects["progress"], ...projects["completed"]]
+      : [...projects[status]];
   projectArr.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
-
-  useEffect(() => {
-    console.log("list is rendering");
-    console.log(projectArr);
-  });
 
   return (
     <div className="project__all-list">
       {projectArr?.map((project) => (
-        <ProjectListItem key={project.id} project={project} />
+        <ProjectListItem key={project.id} project={project} status={status} />
       ))}
     </div>
   );

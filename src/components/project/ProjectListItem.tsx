@@ -29,12 +29,20 @@ const ProjectStatus = styled.div<{ $status: string }>`
       : "lightgray"};
 `;
 
-const ProjectListItem = ({ project }: { project: ProjectInfo }) => {
+const ProjectListItem = ({
+  project,
+  status,
+}: {
+  project: ProjectInfo;
+  status: string | null;
+}) => {
   const navigate = useNavigate();
   return (
     <ProjectItem
       onClick={() => {
-        navigate(`/project/${project.id}`);
+        navigate(
+          `/project/${status ? project.id + "?status=" + status : project.id}`,
+        );
       }}
     >
       <div>

@@ -15,7 +15,6 @@ export const useQueryProject = (): [
 
   useEffect(() => {
     if (projectId === undefined) return;
-    setIsLoaded(false);
     (async () => {
       try {
         const docRef = doc(db, "Project", projectId).withConverter(
@@ -33,7 +32,7 @@ export const useQueryProject = (): [
       }
     })();
     return () => {
-      console.log("unmount");
+      setIsLoaded(false);
     };
   }, [projectId]);
   return [projectDetail, isLoaded];
