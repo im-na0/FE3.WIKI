@@ -25,8 +25,10 @@ import {
   currentFileTitle,
   currentItem,
   totalItems,
+  totalTeamItems,
   editFileState,
   editFileSubName,
+  userTeamName,
 } from "../../store/wiki";
 
 // Firebase
@@ -37,6 +39,7 @@ import {
   where,
   getDocs,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 
 // Interface
@@ -62,40 +65,16 @@ const WikiViewer = ({ content }: IContent) => {
   const [currentFile, setCurrentFile] = useRecoilState(currentFileTitle);
   const [editFile, setEditFile] = useRecoilState(editFileState);
   const currentFolder = useRecoilValue(currentFolderTitle);
+  const userTeam = useRecoilValue(userTeamName);
 
   const setItem = useSetRecoilState(currentItem);
   const setItems = useSetRecoilState(totalItems);
+  const setTeamItems = useSetRecoilState(totalTeamItems);
   const setExistSub = useSetRecoilState(editFileSubName);
 
+  const isTeamFile = !!name;
+
   const postEditTitle = async (newData: string) => {
-    const q = query(
-      collection(db, "WikiPage"),
-      where("title", "==", currentFolder),
-    );
-    const querySnapshot = await getDocs(q);
-    const FolderDoc = querySnapshot.docs[0];
-
-    const items = FolderDoc.data().items;
-    const itemIndex = items.findIndex(
-      (item: IItems) => item.fileName === currentFile,
-    );
-
-    if (itemIndex !== -1) {
-      items[itemIndex].fileName = newData;
-
-      const data = {
-        items: items,
-      };
-
-      await updateDoc(FolderDoc.ref, data);
-
-      setItem(items[itemIndex]);
-      setCurrentFile(newData);
-    }
-  };
-
-  // 삭제 권한(position === "Manager")일 경우 부여 => 임시 해제(테스트용)
-  const postDelete = async () => {
     try {
       const q = query(
         collection(db, "WikiPage"),
@@ -110,36 +89,100 @@ const WikiViewer = ({ content }: IContent) => {
       );
 
       if (itemIndex !== -1) {
-        items.splice(itemIndex, 1); // 현재 파일을 배열에서 삭제
+        items[itemIndex].fileName = newData;
 
         const data = {
           items: items,
         };
 
         await updateDoc(FolderDoc.ref, data);
-        setCurrentFile("");
+
+        setItem(items[itemIndex]);
+        setCurrentFile(newData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // 삭제 권한(position === "Manager")일 경우 부여 => 임시 해제(테스트용)
+  const postDelete = async () => {
+    try {
+      if (currentFolder === "FE3 WIKI 가이드") {
+        alert("현재 파일은 위키 가이드 파일이므로 삭제할 수 없습니다.");
+      } else {
+        const q = query(
+          collection(db, "WikiPage"),
+          where("title", "==", currentFolder),
+        );
+        const querySnapshot = await getDocs(q);
+        const FolderDoc = querySnapshot.docs[0];
+
+        const items = FolderDoc.data().items;
+        const itemIndex = items.findIndex(
+          (item: IItems) => item.fileName === currentFile,
+        );
+        if (itemIndex !== -1) {
+          items.splice(itemIndex, 1);
+
+          const data = {
+            items: items,
+          };
+
+          await updateDoc(FolderDoc.ref, data);
+          setCurrentFile("");
+        }
       }
     } catch (error) {
       console.error("파일 삭제 중 오류 발생:", error);
     }
   };
 
-  const refresh = async () => {
-    const q = query(collection(db, "WikiPage"));
+  const refreshTotalFolder = async () => {
+    const q = query(
+      collection(db, "WikiPage"),
+      orderBy("order"),
+      where("teamName", "==", null),
+    );
     const querySnapshot = await getDocs(q);
-    const folderData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
-    setItems(folderData);
+
+    const totalFileData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
+    setItems(totalFileData);
   };
 
-  const onSubmitEdit = (e: FormEvent<HTMLFormElement>) => {
+  const refreshTeamFolder = async () => {
+    const t = query(
+      collection(db, "WikiPage"),
+      where("teamName", "==", userTeam),
+      orderBy("order"),
+    );
+    const teamQuerySnapshot = await getDocs(t);
+
+    const teamFileData = teamQuerySnapshot.docs.map(
+      (doc) => doc.data() as IWiki,
+    );
+    setTeamItems(teamFileData);
+  };
+
+  const onSubmitEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    postEditTitle(editTitle);
-    setEditState(false);
-    refresh();
+    if (isTeamFile) {
+      await postEditTitle(editTitle);
+      setEditState(false);
+      refreshTeamFolder();
+    } else {
+      await postEditTitle(editTitle);
+      setEditState(false);
+      refreshTotalFolder();
+    }
   };
 
   const onClickEdit = () => {
-    setEditState(true);
+    if (currentFolder === "FE3 WIKI 가이드") {
+      alert("현재 파일은 위키 가이드 파일이므로 제목을 수정할 수 없습니다.");
+    } else {
+      setEditState(true);
+    }
   };
 
   const onChangeEdit = (e: ChangeEvent<HTMLInputElement>) => {
@@ -147,8 +190,12 @@ const WikiViewer = ({ content }: IContent) => {
   };
 
   const onClickSubEdit = () => {
-    setEditFile(true);
-    setExistSub(subName);
+    if (currentFolder === "FE3 WIKI 가이드") {
+      alert("현재 파일은 위키 가이드 파일이므로 내용을 수정할 수 없습니다.");
+    } else {
+      setEditFile(true);
+      setExistSub(subName);
+    }
   };
 
   useEffect(() => {
