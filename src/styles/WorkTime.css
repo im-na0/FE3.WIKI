@@ -4,3 +4,8 @@
   overflow-x: hidden;
   overflow-y: hidden;
 }
+
+.ant-spin-text {
+  background-color: rgba(241, 241, 241, 0.7);
+  padding: 0;
+}

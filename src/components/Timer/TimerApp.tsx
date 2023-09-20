@@ -49,7 +49,7 @@ const TimerApp = () => {
 
   const user = auth.currentUser;
   const userUid = user ? user.uid : null;
-  const userNameRef = collection(db, `Users/${userUid}`);
+  const userNameRef = collection(db, `Users`);
   const userDoc = doc(userNameRef);
 
   const [nowTime, setNowTime] = useState<string>(

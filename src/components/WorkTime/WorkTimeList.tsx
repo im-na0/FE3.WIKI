@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Segmented, Table } from "antd";
+import { Segmented, Table, Alert, Space, Spin } from "antd";
 import type { ColumnsType, TableProps } from "antd/es/table";
 import WorkCalendar from "./WorkCalendar";
+import "../../styles/WorkTime.css";
 
 // firebase
 import { db, auth } from "../../libs/firebase";
@@ -43,6 +44,7 @@ const WorkTimeList: React.FC = () => {
   const [workTimeData, setWorkTimeData] = useState<DataType[]>([]);
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const user = auth.currentUser;
   const userUid = user ? user.uid : null;
@@ -101,6 +103,7 @@ const WorkTimeList: React.FC = () => {
   useEffect(() => {
     const fetchWorkTime = async () => {
       try {
+        setIsLoading(true);
         if (workTimeFilter === "나의 출퇴근 현황") {
           const myDocRef = doc(db, `Users/${userUid}`);
           const myDocSnap = await getDoc(myDocRef);
@@ -122,6 +125,7 @@ const WorkTimeList: React.FC = () => {
                 finishtime: myWorkTimeData.finishtime,
               });
             });
+            setIsLoading(false);
             setWorkTimeData(updatedMyWorkTime);
           });
 
@@ -161,6 +165,7 @@ const WorkTimeList: React.FC = () => {
                 });
               });
             }
+            setIsLoading(false);
             setWorkTimeData(updatedTeamWorkTime);
           });
 
@@ -170,6 +175,7 @@ const WorkTimeList: React.FC = () => {
           };
         }
       } catch (error) {
+        setIsLoading(false);
         console.error("Error fetching worktime data", error);
       }
     };
@@ -208,6 +214,25 @@ const WorkTimeList: React.FC = () => {
             onChange={onChange}
             pagination={{ position: ["bottomCenter"] }}
           />
+          <Space
+            direction="vertical"
+            style={{
+              width: "350px",
+              position: "absolute",
+              top: "50%",
+              left: "20%",
+            }}
+          >
+            <Spin
+              size="large"
+              tip="데이터를 불러오는 중입니다. 잠시만 기다려주세요..."
+              spinning={isLoading}
+              className="ant-spin-text"
+              style={{ margin: 0, padding: 0 }}
+            >
+              <div className="content" />
+            </Spin>
+          </Space>
           <PaginationWrapper></PaginationWrapper>
         </TableWrapper>
       </LeftContainer>
@@ -236,7 +261,6 @@ const TableWrapper = styled.div`
   width: 100%;
   padding: 1rem;
 `;
-
 const PaginationWrapper = styled.div`
   display: flex;
   justify-content: center;
