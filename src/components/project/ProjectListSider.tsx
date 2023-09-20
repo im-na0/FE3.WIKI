@@ -76,7 +76,7 @@ const ProjectListSider = () => {
           <Dropdown menu={{ items: userItems, onClick: filterByUser }}>
             <Button size={"small"}>
               <Space>
-                담당자
+                {selectedUser === "" ? "담당자" : selectedUser.substring(0, 3)}
                 <DownOutlined />
               </Space>
             </Button>
@@ -84,7 +84,7 @@ const ProjectListSider = () => {
           <Dropdown menu={{ items: teamItems, onClick: filterByTeam }}>
             <Button size={"small"}>
               <Space>
-                팀명
+                {selectedTeam === "" ? "팀명" : selectedTeam.substring(0, 3)}
                 <DownOutlined />
               </Space>
             </Button>
