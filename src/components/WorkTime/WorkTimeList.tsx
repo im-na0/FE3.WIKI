@@ -16,6 +16,8 @@ import {
   QueryDocumentSnapshot,
   getDoc,
   onSnapshot,
+  where,
+  query,
 } from "firebase/firestore";
 
 interface WorkTimeProps {
@@ -45,6 +47,7 @@ const WorkTimeList: React.FC = () => {
   const [workTimeFilter, setWorkTimeFilter] =
     useState<string>("나의 출퇴근 현황");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [myTeam, setMyTeam] = useState<string>("");
 
   const user = auth.currentUser;
   const userUid = user ? user.uid : null;
@@ -108,6 +111,8 @@ const WorkTimeList: React.FC = () => {
           const myDocRef = doc(db, `Users/${userUid}`);
           const myDocSnap = await getDoc(myDocRef);
           const myDocData = myDocSnap.data() || {};
+          const myTeam = myDocData.team;
+          setMyTeam(myTeam);
 
           const myWorkTimeRef = collection(db, `Users/${userUid}/worktime`);
           const myWorkTimeSnap = await getDocs(myWorkTimeRef);
@@ -116,6 +121,7 @@ const WorkTimeList: React.FC = () => {
             const updatedMyWorkTime: DataType[] = [];
             snapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
               const myWorkTimeData = doc.data();
+              console.log(myWorkTimeData.team);
               updatedMyWorkTime.push({
                 key: doc.id,
                 name: myDocData.name || "",
@@ -134,45 +140,47 @@ const WorkTimeList: React.FC = () => {
           };
         } else if (workTimeFilter === "우리팀 출퇴근 현황") {
           const teamDocRef = collection(db, "Users");
-          const teamDocSnap = await getDocs(teamDocRef);
-
-          const unsubscribe = onSnapshot(teamDocRef, async (snapshot) => {
+          const teamDocQuery = query(teamDocRef, where("team", "==", myTeam));
+          console.log(teamDocQuery);
+          const unsubscribe = onSnapshot(teamDocQuery, async (snapshot) => {
             const updatedTeamWorkTime: DataType[] = [];
-            const teamDocData: teamDataType[] = [];
 
-            const teamUserDocs = snapshot.docs;
-
-            for (const teamUserDoc of teamUserDocs) {
-              const teamUserId = teamUserDoc.id;
+            snapshot.forEach((doc) => {
+              const teamUserData = doc.data();
+              const teamUserId = doc.id;
               const teamWorkTimeRef = collection(
                 db,
                 "Users",
                 teamUserId,
                 "worktime",
               );
-              const teamWorkTimeSnap = await getDocs(teamWorkTimeRef);
 
-              teamWorkTimeSnap.forEach((doc) => {
-                const teamUserData = teamUserDoc.data();
-                const teamWorkTimeData = doc.data();
-                updatedTeamWorkTime.push({
-                  key: doc.id,
-                  name: teamUserData.name || "",
-                  department: teamUserData.department || "",
-                  team: teamUserData.team || "",
-                  starttime: teamWorkTimeData.starttime,
-                  finishtime: teamWorkTimeData.finishtime,
+              getDocs(teamWorkTimeRef)
+                .then((subcollectionSnapshot) => {
+                  subcollectionSnapshot.forEach((subDoc) => {
+                    const teamWorkTimeData = subDoc.data();
+                    updatedTeamWorkTime.push({
+                      key: doc.id,
+                      name: teamUserData.name || "",
+                      department: teamUserData.department || "",
+                      team: teamUserData.team || "",
+                      starttime: teamWorkTimeData.starttime,
+                      finishtime: teamWorkTimeData.finishtime,
+                    });
+                  });
+                  setIsLoading(false);
+                  setWorkTimeData(updatedTeamWorkTime);
+                })
+                .catch((error) => {
+                  console.error("Error fetching subcollection data", error);
                 });
-              });
-            }
-            setIsLoading(false);
-            setWorkTimeData(updatedTeamWorkTime);
-          });
+            });
 
-          return () => {
-            // Unsubscribe the listener when the component unmounts
-            unsubscribe();
-          };
+            return () => {
+              // Unsubscribe the listener when the component unmounts
+              unsubscribe();
+            };
+          });
         }
       } catch (error) {
         setIsLoading(false);
@@ -181,7 +189,7 @@ const WorkTimeList: React.FC = () => {
     };
 
     fetchWorkTime();
-  }, [workTimeFilter, userUid]);
+  }, [workTimeFilter, userUid, myTeam]);
 
   const onChange: TableProps<DataType>["onChange"] = (
     pagination,

@@ -14,6 +14,8 @@ import {
   addDoc,
   collection,
   doc,
+  DocumentData,
+  DocumentReference,
   getDoc,
   getDocs,
   serverTimestamp,
@@ -21,8 +23,10 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import { Link } from "react-router-dom";
-import WorkTime from "../../pages/WorkTime";
+
+interface UserData {
+  name: string;
+}
 
 // 타이머 스타일링
 interface TimerProps {
@@ -49,8 +53,8 @@ const TimerApp = () => {
 
   const user = auth.currentUser;
   const userUid = user ? user.uid : null;
-  const userNameRef = collection(db, `Users`);
-  const userDoc = doc(userNameRef);
+  const userNameRef = userUid ? collection(db, "Users") : null;
+  const userDoc = userNameRef ? doc(db, `Users/${userUid}`) : null;
 
   const [nowTime, setNowTime] = useState<string>(
     new Date().toLocaleTimeString(),
@@ -70,15 +74,22 @@ const TimerApp = () => {
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const userDocSnap = await getDoc(userDoc);
-        const userName = userDocSnap.data()?.name || "";
-        setUserName(userName);
-        console.log("Fetched userName:", userName);
+        if (userDoc) {
+          const userDocSnap = await getDoc(
+            userDoc as DocumentReference<UserData>,
+          );
+          const userData = userDocSnap.data() as UserData | undefined;
+          const userName = userData ? userData.name || null : "";
+          setUserName(userName);
+          console.log("Fetched userName:", userName);
+        }
       } catch (error) {
         console.error("Error fetching userName:", error);
       }
     };
-    fetchUserName();
+    if (userDoc) {
+      fetchUserName();
+    }
   }, [userDoc]);
 
   // 현재 시간을 출력해주는 일반 타이머
@@ -120,6 +131,7 @@ const TimerApp = () => {
 
   const recordStartWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (!userUid) return alert("로그인부터 먼저 진행해주세요!");
     const startWorkTime = serverTimestamp() as Timestamp; // 현재 시간을 출근 시간으로 기록
     const workTimeSubCollectionRef = collection(
       db,
@@ -179,7 +191,7 @@ const TimerApp = () => {
 
   return (
     <form>
-      {userName ? `환영합니다. ${userName} 님!` : "환영합니다."}
+      {userUid ? `환영합니다. ${userName} 님!` : "환영합니다."}
       <TimerAlign>
         <div>
           <div>
@@ -202,23 +214,11 @@ const TimerApp = () => {
           alignItems: "center",
         }}
       >
-        <Button
+        <CustomButton
           type="primary"
-          shape="default"
           size="large"
           onClick={recordStartWork}
           disabled={startWorkBtnClicked}
-          style={{
-            width: "130px",
-            height: "60px",
-            backgroundColor: startWorkBtnClicked ? "gray" : "#3956A3",
-            color: startWorkBtnClicked ? "#5F5F5F" : "white",
-            fontSize: startWorkBtnClicked ? "0.9rem" : "1.5rem",
-            whiteSpace: "pre-wrap",
-            textOverflow: "ellipsis",
-            textAlign: "center",
-            transition: "none",
-          }}
         >
           {!startWorkBtnClicked ? (
             <>
@@ -233,25 +233,13 @@ const TimerApp = () => {
               {clickedStartBtnText}
             </>
           )}
-        </Button>
+        </CustomButton>
         <span>&nbsp;|&nbsp;</span>
-        <Button
-          type="primary"
-          shape="default"
+        <CustomButton
+          type="default"
           size="large"
           onClick={recordFinishWork}
           disabled={finishWorkBtnClicked}
-          style={{
-            width: "130px",
-            height: "60px",
-            backgroundColor: finishWorkBtnClicked ? "gray" : "#728AC9",
-            color: finishWorkBtnClicked ? "#5F5F5F" : "white",
-            fontSize: finishWorkBtnClicked ? "0.9rem" : "1.5rem",
-            whiteSpace: "pre-wrap",
-            textOverflow: "ellipsis",
-            textAlign: "center",
-            transition: "none",
-          }}
         >
           {!finishWorkBtnClicked ? (
             <>
@@ -266,7 +254,7 @@ const TimerApp = () => {
               {clickedFinishBtnText}
             </>
           )}
-        </Button>
+        </CustomButton>
       </div>
       {startWorkBtnClicked && !finishWorkBtnClicked && (
         <TimerText fontSize="1.2rem" style={{ lineHeight: 2, fontWeight: 400 }}>
@@ -287,5 +275,27 @@ const TimerApp = () => {
     </form>
   );
 };
+
+const CustomButton = styled(Button)`
+  && {
+    width: 130px;
+    height: 60px;
+    font-size: ${(props) => (props.disabled ? "0.9rem" : "1.5rem")};
+    white-space: pre-wrap;
+    text-overflow: ellipsis;
+    text-align: center;
+    transition: none;
+  }
+
+  &&.ant-btn-primary {
+    background-color: ${(props) => (props.disabled ? "gray" : "#3956A3")};
+    color: ${(props) => (props.disabled ? "#5F5F5F" : "white")};
+  }
+
+  &&.ant-btn-default {
+    background-color: ${(props) => (props.disabled ? "gray" : "#E1E1E1")};
+    color: ${(props) => (props.disabled ? "#5F5F5F" : "white")};
+  }
+`;
 
 export default TimerApp;

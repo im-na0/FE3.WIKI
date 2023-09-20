@@ -117,11 +117,15 @@ const MainHeader = () => {
           style={{ paddingRight: "1.3rem", paddingTop: "0.8rem" }}
         >
           <Timer />
-          <div style={{ textAlign: "center", marginTop: "0.3rem" }}>
-            <Link to="/WorkTime" onClick={closeTimerModal}>
-              출퇴근 기록 페이지
-            </Link>
-          </div>
+          {isSignIn ? (
+            <div style={{ textAlign: "center", marginTop: "0.3rem" }}>
+              <Link to="/WorkTime" onClick={closeTimerModal}>
+                출퇴근 기록 페이지
+              </Link>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </Modal>
     </Header>
