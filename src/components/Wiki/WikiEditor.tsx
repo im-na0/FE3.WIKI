@@ -53,7 +53,7 @@ const WikiEditor = () => {
     const FolderDoc = querySnapshot.docs[0];
     const items = FolderDoc.data().items;
     const itemIndex = items.findIndex(
-      (item: IItem) => item.name === currentFile,
+      (item: IItem) => item.fileName === currentFile,
     );
 
     if (itemIndex !== -1) {
@@ -124,7 +124,7 @@ const WikiEditor = () => {
         ref={editorRef}
         initialValue={existSub ? existSub : INIT}
         previewStyle="vertical"
-        height="600px"
+        height="800px"
         initialEditType="markdown"
         useCommandShortcut={false}
         hooks={{ addImageBlobHook: onUploadImage }}
@@ -143,4 +143,5 @@ const StyledTop = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: -20px;
 `;
