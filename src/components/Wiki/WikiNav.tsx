@@ -2,6 +2,7 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 // Components
 import WikiSelect from "./WikiSelect";
+import WikiTeamNav from "./WikiTeamNav";
 
 // Style
 import styled from "styled-components";
@@ -11,6 +12,7 @@ import {
   FolderAddOutlined,
   TeamOutlined,
   LockOutlined,
+  UnlockOutlined,
 } from "@ant-design/icons";
 import { Input } from "antd";
 
@@ -40,7 +42,7 @@ import {
 } from "firebase/firestore";
 
 // api
-import { addFile, addFolder } from "../../hooks/Wiki/api";
+import { addFile, addAllFolder } from "../../hooks/Wiki/api";
 
 // Interface
 import { IWiki } from "../../store/wiki";
@@ -75,21 +77,17 @@ const WikiNav = () => {
   const [folderState, setFolderState] = useRecoilState(editFolderState);
   const setCurrentTarget = useSetRecoilState(currentFolderTitle);
   const deleteState = useRecoilValue(deleteFolderState);
-
-  useEffect(() => {
-    refreshFolders();
-  }, []);
-
-  useEffect(() => {
-    refreshFolders();
-  }, [currentTargetFile, deleteState]);
+  const [teamName, setTeamName] = useState<string | null>(null);
 
   const refreshFolders = async () => {
-    const q = query(collection(db, "WikiPage"), orderBy("order"));
+    const q = query(
+      collection(db, "WikiPage"),
+      orderBy("order"),
+      where("teamName", "==", null),
+    );
     const querySnapshot = await getDocs(q);
     const folderData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
     setItems(folderData);
-    console.log(items);
   };
 
   const changeFolderName = async (
@@ -116,7 +114,7 @@ const WikiNav = () => {
 
   const onSubmitFolder = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addFolder(newFolder, refreshFolders);
+    addAllFolder(newFolder, refreshFolders);
     setInputState(false);
     setNewFolder("");
   };
@@ -197,6 +195,33 @@ const WikiNav = () => {
 
     await Promise.all(batch);
   };
+
+  // 유저 검증 및 팀 확인
+  const userUid = localStorage.getItem("uid");
+
+  const validTeamUser = async () => {
+    const q = query(
+      collection(db, "Teams"),
+      where("userId", "array-contains", userUid),
+    );
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const teamName = querySnapshot.docs[0].data().teamName;
+      setTeamName(teamName);
+    }
+  };
+
+  useEffect(() => {
+    refreshFolders();
+    validTeamUser();
+  }, []);
+
+  useEffect(() => {
+    refreshFolders();
+    validTeamUser();
+  }, [currentTargetFile, deleteState, userUid]);
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="folders">
@@ -245,7 +270,7 @@ const WikiNav = () => {
                     index={index}
                   >
                     {(provided) => (
-                      <ItemContainer key={item.title + index}>
+                      <div key={item.title + index}>
                         <li
                           ref={provided.innerRef}
                           {...provided.draggableProps}
@@ -304,17 +329,28 @@ const WikiNav = () => {
                               ))}
                           </StyledFile>
                         </li>
-                      </ItemContainer>
+                      </div>
                     )}
                   </Draggable>
                 ))}
                 {provided.placeholder}
               </StyledUl>
             </StyledContainer>
-            <FolderWrapper>
-              <LockOutlined />
-              <StyledFolderTitle>팀</StyledFolderTitle>
-            </FolderWrapper>
+            <StyledTeamContainer>
+              <FolderWrapper>
+                {userUid ? <UnlockOutlined /> : <LockOutlined />}
+                <StyledFolderTitle>
+                  <span>팀 &nbsp;&nbsp;</span>
+                  {userUid ? (
+                    <span>{teamName}</span>
+                  ) : (
+                    <span>로그인을 해주세요</span>
+                  )}
+                </StyledFolderTitle>
+              </FolderWrapper>
+              <FolderAddOutlined style={{ color: "white", fontSize: "15px" }} />
+            </StyledTeamContainer>
+            {teamName !== null && <WikiTeamNav teamName={teamName} />}
           </Container>
         )}
       </Droppable>
@@ -436,6 +472,7 @@ const StyledItem = styled.li`
   padding-bottom: 5px;
   padding-left: 4px;
   margin-bottom: 8.5px;
+  margin-top: 3px;
   font-size: 13.8px;
   &:hover {
     color: blue;
@@ -457,4 +494,10 @@ const FileForm = styled.form`
     font-size: 14px;
   }
 `;
-const ItemContainer = styled.div``;
+
+const StyledTeamContainer = styled.div`
+  margin-right: 30px;
+  width: 280px;
+  background-color: rgba(0, 0, 0, 0.01);
+  border-right: 0.1px solid rgba(0, 0, 0, 0.1);
+`;
