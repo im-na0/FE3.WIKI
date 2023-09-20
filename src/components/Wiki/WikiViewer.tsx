@@ -15,8 +15,8 @@ import "@toast-ui/editor/dist/toastui-editor-viewer.css";
 
 // Style
 import styled from "styled-components";
-import { Button, Space, Input } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Button, Space, Input, Avatar } from "antd";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
 
 // Recoil
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -49,14 +49,14 @@ interface IContent {
 }
 
 const WikiViewer = ({ content }: IContent) => {
-  const { name, subName, date } = content;
+  const { fileName, subName, date, name, position, department } = content;
 
   const prevSubNameRef = useRef<string | null>(null);
   const prevNameRef = useRef<string | null>(null);
 
   const [renderKey, setRenderKey] = useState(0);
   const [editState, setEditState] = useState<boolean>(false);
-  const [editTitle, setEditTitle] = useState<string>(name);
+  const [editTitle, setEditTitle] = useState<string>(fileName);
   const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   const [currentFile, setCurrentFile] = useRecoilState(currentFileTitle);
@@ -77,11 +77,11 @@ const WikiViewer = ({ content }: IContent) => {
 
     const items = FolderDoc.data().items;
     const itemIndex = items.findIndex(
-      (item: IItems) => item.name === currentFile,
+      (item: IItems) => item.fileName === currentFile,
     );
 
     if (itemIndex !== -1) {
-      items[itemIndex].name = newData;
+      items[itemIndex].fileName = newData;
 
       const data = {
         items: items,
@@ -94,6 +94,7 @@ const WikiViewer = ({ content }: IContent) => {
     }
   };
 
+  // 삭제 권한(position === "Manager")일 경우 부여 => 임시 해제(테스트용)
   const postDelete = async () => {
     try {
       const q = query(
@@ -105,7 +106,7 @@ const WikiViewer = ({ content }: IContent) => {
 
       const items = FolderDoc.data().items;
       const itemIndex = items.findIndex(
-        (item: IItems) => item.name === currentFile,
+        (item: IItems) => item.fileName === currentFile,
       );
 
       if (itemIndex !== -1) {
@@ -155,11 +156,11 @@ const WikiViewer = ({ content }: IContent) => {
       prevSubNameRef.current = subName;
       setRenderKey((prev) => prev + 1);
     }
-    if (prevNameRef.current !== name) {
-      prevNameRef.current = name;
+    if (prevNameRef.current !== fileName) {
+      prevNameRef.current = fileName;
       setRenderKey((prev) => prev + 1);
     }
-  }, [subName, name]);
+  }, [subName, fileName]);
 
   useEffect(() => {
     console.log("editFile 현재: ", editFile);
@@ -175,6 +176,11 @@ const WikiViewer = ({ content }: IContent) => {
 
       const formatDate = `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
       setFormattedDate(formatDate);
+
+      if (name) {
+        const formatUserDate = `${month}월 ${day}일`;
+        setFormattedDate(formatUserDate);
+      }
     }
   }, [date]);
 
@@ -186,7 +192,7 @@ const WikiViewer = ({ content }: IContent) => {
             <div>
               {!editState ? (
                 <>
-                  <h1>{name}</h1>
+                  <h1>{fileName}</h1>
                   <EditOutlined
                     style={{
                       marginTop: "12px",
@@ -197,7 +203,7 @@ const WikiViewer = ({ content }: IContent) => {
                 </>
               ) : (
                 <form onSubmit={onSubmitEdit}>
-                  <Input placeholder={name} onChange={onChangeEdit} />
+                  <Input placeholder={fileName} onChange={onChangeEdit} />
                 </form>
               )}
             </div>
@@ -206,7 +212,24 @@ const WikiViewer = ({ content }: IContent) => {
               <Button onClick={postDelete}>삭제</Button>
             </Space>
           </StyledDiv>
-          <StyledDate>최종 수정일 : {formattedDate}</StyledDate>
+          {name ? (
+            <UserContainer>
+              <Space wrap size={16} style={{ marginRight: "14px" }}>
+                <Avatar size={38} icon={<UserOutlined />} />
+              </Space>
+              <div>
+                <div style={{ fontWeight: "600" }}>{name}</div>
+                <StyledSpan>
+                  <span>{department} - </span>
+                  <span>{position} • </span>
+                  <span>{formattedDate}</span>
+                </StyledSpan>
+              </div>
+            </UserContainer>
+          ) : (
+            <StyledDate>최종 수정일 : {formattedDate}</StyledDate>
+          )}
+
           <StyledViewer>
             <Viewer key={renderKey} initialValue={subName} />
           </StyledViewer>
@@ -222,6 +245,7 @@ export default WikiViewer;
 
 const Container = styled.div`
   width: 95%;
+  margin-top: -20px;
 `;
 const StyledDiv = styled.div`
   display: flex;
@@ -240,10 +264,21 @@ const StyledDiv = styled.div`
 `;
 const StyledViewer = styled.div`
   font-size: 1rem !important;
+  margin-top: 30px;
 `;
 const StyledDate = styled.div`
   opacity: 0.5;
   font-size: 0.75rem;
   margin-top: -10px;
   margin-bottom: 30px;
+`;
+const UserContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const StyledSpan = styled.div`
+  margin-top: 3px;
+  span {
+    font-size: 12px;
+  }
 `;
