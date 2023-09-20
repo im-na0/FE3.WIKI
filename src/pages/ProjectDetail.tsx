@@ -2,12 +2,17 @@ import React from "react";
 import "../styles/Project.css";
 import ProjectSider from "../components/project/ProjectSider";
 import { Layout } from "antd";
+import ProjectDetailInfo from "../components/project/ProjectDetailInfo";
 import ProjectListSider from "../components/project/ProjectListSider";
+import { useQueryProject } from "../hooks/project/useQueryProject";
 import ProjectDetailDefault from "../components/project/ProjectDetailDefault";
 
 const { Content, Sider } = Layout;
 
-const ProjectList = () => {
+const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
+  const [projectDetail, isLoaded] = useQueryProject();
+
+  console.log(isLoaded);
   return (
     <Layout>
       <ProjectSider />
@@ -23,11 +28,15 @@ const ProjectList = () => {
             padding: "10px",
           }}
         >
-          <ProjectDetailDefault />
+          {isDefault ? (
+            <ProjectDetailDefault />
+          ) : isLoaded ? (
+            <ProjectDetailInfo projectDetail={projectDetail} />
+          ) : null}
         </Content>
       </Layout>
     </Layout>
   );
 };
 
-export default ProjectList;
+export default ProjectDetail;
