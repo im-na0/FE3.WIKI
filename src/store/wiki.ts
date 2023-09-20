@@ -3,9 +3,12 @@ import { atom } from "recoil";
 import { Timestamp } from "firebase/firestore";
 
 export interface IWikiItem {
-  name: string;
+  fileName: string;
   subName: string;
   date: Timestamp;
+  name: null | string;
+  department: null | string;
+  position: null | string;
 }
 
 export interface IWiki {
@@ -29,13 +32,13 @@ export const currentFileTitle = atom<string>({
 
 // 전역 Item 속성 관리
 export interface IItems {
-  name: string;
+  fileName: string;
   subName: string;
 }
 
 export const currentItem = atom<IItems>({
   key: "curItemState",
-  default: { name: "", subName: "" },
+  default: { fileName: "", subName: "" },
 });
 
 // 전체 Item
@@ -46,7 +49,16 @@ export const totalItems = atom<IWiki[]>({
       title: "",
       order: 0,
       teamName: null,
-      items: [{ name: "", subName: "", date: Timestamp.fromDate(new Date()) }],
+      items: [
+        {
+          fileName: "",
+          subName: "",
+          date: Timestamp.fromDate(new Date()),
+          name: null,
+          department: null,
+          position: null,
+        },
+      ],
     },
   ],
 });
@@ -59,7 +71,16 @@ export const totalTeamItems = atom<IWiki[]>({
       title: "",
       order: 0,
       teamName: "",
-      items: [{ name: "", subName: "", date: Timestamp.fromDate(new Date()) }],
+      items: [
+        {
+          fileName: "",
+          subName: "",
+          date: Timestamp.fromDate(new Date()),
+          name: "",
+          department: "",
+          position: "",
+        },
+      ],
     },
   ],
 });
