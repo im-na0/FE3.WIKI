@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
 import {
   ProjectDetail,
   TeamList,
@@ -11,14 +10,14 @@ import {
 import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
 import { db } from "../../libs/firebase";
 
-const useQueryProjectEdit = (): [
+const useQueryProjectEdit = (
+  projectId?: string,
+): [
   teams: TeamList[] | undefined,
   users: UserList[] | undefined,
   projectDetail: ProjectDetail | undefined,
   isLoaded: boolean,
 ] => {
-  const { pathname } = useLocation();
-  const projectId = pathname.split("/")[2];
   const [teams, setTeams] = useState<TeamList[]>();
   const [users, setUsers] = useState<UserList[]>();
   const [projectDetail, setProjectDetail] = useState<ProjectDetail>();
@@ -42,7 +41,9 @@ const useQueryProjectEdit = (): [
     });
     return data;
   };
-  const projectQuery = async (): Promise<ProjectDetail | undefined> => {
+  const projectQuery = async (
+    projectId: string,
+  ): Promise<ProjectDetail | undefined> => {
     const docRef = doc(db, "Project", projectId).withConverter(
       projectDetailConverter,
     );
@@ -63,7 +64,7 @@ const useQueryProjectEdit = (): [
         setTeams(team);
         setUsers(user);
         if (projectId) {
-          const project = await projectQuery();
+          const project = await projectQuery(projectId);
           setProjectDetail(project);
         }
       })();

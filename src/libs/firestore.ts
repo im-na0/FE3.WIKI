@@ -14,6 +14,7 @@ export class ProjectInfo {
     public order: number,
     public assignees: string[],
     public duration: string[],
+    public teams: string[],
     public createdAt: Timestamp,
   ) {}
   toString() {
@@ -45,6 +46,7 @@ export const projectConverter: FirestoreDataConverter<ProjectInfo> = {
       order: docData.order,
       assignees: docData.assignees,
       duration: docData.duration,
+      teams: docData.teams,
       createdAt: docData.createdAt,
     };
   },
@@ -61,6 +63,7 @@ export const projectConverter: FirestoreDataConverter<ProjectInfo> = {
       data.order,
       data.assignees,
       data.duration,
+      data.teams,
       data.createdAt,
     );
   },
