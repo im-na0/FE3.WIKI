@@ -48,9 +48,9 @@ const TimerApp = () => {
   });
 
   const user = auth.currentUser;
-  const userUid = user ? user.uid : "ax2Eyczauq0NbDTfrB2i"; // 유저 Uid 샘플 테스트용
-  const userNameRef = collection(db, "Users");
-  const userDoc = doc(userNameRef, userUid);
+  const userUid = user ? user.uid : null;
+  const userNameRef = collection(db, `Users/${userUid}`);
+  const userDoc = doc(userNameRef);
 
   const [nowTime, setNowTime] = useState<string>(
     new Date().toLocaleTimeString(),
