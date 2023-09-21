@@ -1,27 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import styled from "styled-components";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useRecoilState, useRecoilValueLoadable } from "recoil";
+import {
+  userState,
+  userAccessState,
+  fetchUserAccess,
+} from "../../store/member";
 import MemberFilter from "./MemberFilter";
 import MemberSearch from "./MemberSearch";
 import MemberTable from "./MemberTable";
 import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 export default function MemberList() {
+  const [user, setUser] = useRecoilState(userState);
+  const [userAccess, setUserAccess] = useRecoilState(userAccessState);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [sortValue, setSortValue] = useState("");
+  const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  const userAccessLoadable = useRecoilValueLoadable(fetchUserAccess);
+  useEffect(() => {
+    if (userAccessLoadable.state === "hasValue") {
+      setUserAccess(userAccessLoadable.contents);
+    }
+  }, [userAccessLoadable.state, setUserAccess, userAccessLoadable.contents]);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const userId = firebaseUser.uid;
+        const db = getFirestore();
+        const userRef = doc(db, "Users", userId);
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          setUser(docSnap.data());
+        }
+      } else {
+        setUser(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   type selectedRowKeys = {
     id: string;
@@ -32,8 +60,6 @@ export default function MemberList() {
     COLLECTION_NAME: "Users",
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
-
   const handleDelete = async () => {
     try {
       for (const data of selectedRowKeys) {
@@ -43,6 +69,14 @@ export default function MemberList() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -58,14 +92,16 @@ export default function MemberList() {
             <MemberSearch onSearch={setSearchText} />
           </ToggleWrap>
           <ToggleWrap>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={openModal}
-              size="large"
-            >
-              Add
-            </Button>
+            {userAccess === "admin" && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openModal}
+                size="large"
+              >
+                Add
+              </Button>
+            )}
             <CustomForm.Modal
               title="멤버 등록"
               width={700}
