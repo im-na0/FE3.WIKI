@@ -52,7 +52,8 @@ interface IContent {
 }
 
 const WikiViewer = ({ content }: IContent) => {
-  const { fileName, subName, date, name, position, department } = content;
+  const { fileName, subName, date, name, position, department, photo } =
+    content;
 
   const prevSubNameRef = useRef<string | null>(null);
   const prevNameRef = useRef<string | null>(null);
@@ -261,9 +262,15 @@ const WikiViewer = ({ content }: IContent) => {
           </StyledDiv>
           {name ? (
             <UserContainer>
-              <Space wrap size={16} style={{ marginRight: "14px" }}>
-                <Avatar size={38} icon={<UserOutlined />} />
-              </Space>
+              {photo ? (
+                <Space wrap size={16} style={{ marginRight: "14px" }}>
+                  <Avatar size={38} src={photo} style={{ opacity: "1" }} />
+                </Space>
+              ) : (
+                <Space wrap size={16} style={{ marginRight: "14px" }}>
+                  <Avatar size={38} icon={<UserOutlined />} />
+                </Space>
+              )}
               <div>
                 <div style={{ fontWeight: "600" }}>{name}</div>
                 <StyledSpan>

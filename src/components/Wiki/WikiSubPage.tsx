@@ -35,6 +35,7 @@ export interface IItem {
   name?: string;
   position?: string;
   department?: string;
+  photo?: string;
 }
 
 const SubPage = () => {

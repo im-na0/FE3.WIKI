@@ -133,6 +133,7 @@ const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
         teamInfos.name,
         teamInfos.department,
         teamInfos.position,
+        teamInfos.photo,
         refreshFolders,
       );
     setFileState(false);
@@ -206,8 +207,7 @@ const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
   };
 
   useEffect(() => {
-    console.log(teamName);
-    console.log(teamInfos.department, teamInfos.name, teamInfos.position);
+    console.log(teamName, "위키 활성화!");
     refreshFolders();
   }, []);
 

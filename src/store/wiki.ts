@@ -9,6 +9,7 @@ export interface IWikiItem {
   name: null | string;
   department: null | string;
   position: null | string;
+  photo: null | string;
 }
 
 export interface IWiki {
@@ -57,6 +58,7 @@ export const totalItems = atom<IWiki[]>({
           name: null,
           department: null,
           position: null,
+          photo: null,
         },
       ],
     },
@@ -79,6 +81,7 @@ export const totalTeamItems = atom<IWiki[]>({
           name: "",
           department: "",
           position: "",
+          photo: "",
         },
       ],
     },
