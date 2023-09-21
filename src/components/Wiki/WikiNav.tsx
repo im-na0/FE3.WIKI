@@ -6,6 +6,7 @@ import WikiTeamNav from "./WikiTeamNav";
 
 // Style
 import styled from "styled-components";
+
 import {
   FolderOutlined,
   FileOutlined,
@@ -59,10 +60,6 @@ export interface NewFile {
   department: null;
   position: null;
   photo: null;
-}
-
-interface isOpenProps {
-  isopen: "true" | "false";
 }
 
 export interface ITeamProps {
@@ -348,8 +345,8 @@ const WikiNav = () => {
                             </div>
                           </StyledTitle>
                           <StyledFile
-                            isopen={
-                              item.title === currentFolder ? "true" : "false"
+                            className={
+                              item.title === currentFolder ? "open" : "closed"
                             }
                           >
                             {fileState && (
@@ -501,24 +498,29 @@ const StyledSpan = styled.span`
   line-height: 10px;
 `;
 
-const StyledFile = styled.ul<isOpenProps>`
+const StyledFile = styled.ul`
   list-style: none;
   cursor: pointer;
   margin-top: 3px;
   color: rgba(0, 0, 0, 0.85);
-  max-height: ${(props) => (props.isopen === "true" ? "500px" : "0")};
+  &.open {
+    max-height: 500px;
+    div {
+      opacity: 1;
+    }
+  }
+  &.closed {
+    max-height: 0;
+    opacity: 0;
+  }
   overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
-
   div {
-    opacity: ${(props) => (props.isopen === "true" ? "1" : "0")};
     transition: opacity 0.3s;
   }
 `;
-
-StyledFile.shouldForwardProp = (prop) => prop !== "$isopen";
 
 const StyledItem = styled.li`
   width: 85%;

@@ -263,7 +263,11 @@ const WikiViewer = ({ content }: IContent) => {
           {name ? (
             <UserContainer>
               {photo ? (
-                <Space wrap size={16} style={{ marginRight: "14px" }}>
+                <Space
+                  wrap
+                  size={16}
+                  style={{ marginRight: "14px", marginTop: "2px" }}
+                >
                   <Avatar size={38} src={photo} style={{ opacity: "1" }} />
                 </Space>
               ) : (
