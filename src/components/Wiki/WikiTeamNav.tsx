@@ -39,19 +39,22 @@ import {
 
 // Interface
 import { IWiki } from "../../store/wiki";
+import { ITeamProps } from "./WikiNav";
+
 // React-Beautiful-Dnd
 import { DropResult } from "react-beautiful-dnd";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 // api
-import { addFile, addTeamFolder } from "../../hooks/Wiki/api";
+import { addTeamFile, addTeamFolder } from "../../hooks/Wiki/api";
 
 interface ITeamList {
   teamName: string;
+  teamInfos: ITeamProps;
 }
 
-interface NewFile {
-  name: string;
+export interface TeamNewFile {
+  fileName: string;
   subName: string;
 }
 
@@ -59,12 +62,12 @@ interface isOpenProps {
   isopen: boolean;
 }
 
-const WikiTeamNav = ({ teamName }: ITeamList) => {
+const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
   const [inputState, setInputState] = useState<boolean>(false);
   const [folderName, setFolderName] = useState<string>("");
   const [newFolder, setNewFolder] = useState<string>("");
-  const [newFile, setNewFile] = useState<NewFile>({
-    name: "",
+  const [newFile, setNewFile] = useState<TeamNewFile>({
+    fileName: "",
     subName: "",
   });
   const [isWikiSelectOpen, setIsWikiSelectOpen] = useRecoilState(SelectState);
@@ -123,12 +126,20 @@ const WikiTeamNav = ({ teamName }: ITeamList) => {
 
   const onSubmitFile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (currentFolder) addFile(currentFolder, newFile, refreshFolders);
+    if (currentFolder)
+      addTeamFile(
+        currentFolder,
+        newFile,
+        teamInfos.name,
+        teamInfos.department,
+        teamInfos.position,
+        refreshFolders,
+      );
     setFileState(false);
   };
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewFile({ ...newFile, name: e.target.value });
+    setNewFile({ ...newFile, fileName: e.target.value });
   };
 
   const handleFolderClick = (current: string) => {
@@ -195,6 +206,8 @@ const WikiTeamNav = ({ teamName }: ITeamList) => {
   };
 
   useEffect(() => {
+    console.log(teamName);
+    console.log(teamInfos.department, teamInfos.name, teamInfos.position);
     refreshFolders();
   }, []);
 
@@ -293,12 +306,12 @@ const WikiTeamNav = ({ teamName }: ITeamList) => {
                           {item.items &&
                             item.items.map((v, fileIndex: number) => (
                               <StyledItem
-                                key={v.name + fileIndex}
-                                onClick={() => handleFileClick(v.name)}
+                                key={v.fileName + fileIndex}
+                                onClick={() => handleFileClick(v.fileName)}
                               >
                                 <div>
                                   <FileOutlined />
-                                  <StyledSpan>{v.name}</StyledSpan>
+                                  <StyledSpan>{v.fileName}</StyledSpan>
                                 </div>
                               </StyledItem>
                             ))}

@@ -15,8 +15,8 @@ import "@toast-ui/editor/dist/toastui-editor-viewer.css";
 
 // Style
 import styled from "styled-components";
-import { Button, Space, Input } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Button, Space, Input, Avatar } from "antd";
+import { EditOutlined, UserOutlined } from "@ant-design/icons";
 
 // Recoil
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -25,8 +25,10 @@ import {
   currentFileTitle,
   currentItem,
   totalItems,
+  totalTeamItems,
   editFileState,
   editFileSubName,
+  userTeamName,
 } from "../../store/wiki";
 
 // Firebase
@@ -37,6 +39,7 @@ import {
   where,
   getDocs,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 
 // Interface
@@ -49,52 +52,29 @@ interface IContent {
 }
 
 const WikiViewer = ({ content }: IContent) => {
-  const { name, subName, date } = content;
+  const { fileName, subName, date, name, position, department } = content;
 
   const prevSubNameRef = useRef<string | null>(null);
   const prevNameRef = useRef<string | null>(null);
 
   const [renderKey, setRenderKey] = useState(0);
   const [editState, setEditState] = useState<boolean>(false);
-  const [editTitle, setEditTitle] = useState<string>(name);
+  const [editTitle, setEditTitle] = useState<string>(fileName);
   const [formattedDate, setFormattedDate] = useState<string | null>(null);
 
   const [currentFile, setCurrentFile] = useRecoilState(currentFileTitle);
   const [editFile, setEditFile] = useRecoilState(editFileState);
   const currentFolder = useRecoilValue(currentFolderTitle);
+  const userTeam = useRecoilValue(userTeamName);
 
   const setItem = useSetRecoilState(currentItem);
   const setItems = useSetRecoilState(totalItems);
+  const setTeamItems = useSetRecoilState(totalTeamItems);
   const setExistSub = useSetRecoilState(editFileSubName);
 
+  const isTeamFile = !!name;
+
   const postEditTitle = async (newData: string) => {
-    const q = query(
-      collection(db, "WikiPage"),
-      where("title", "==", currentFolder),
-    );
-    const querySnapshot = await getDocs(q);
-    const FolderDoc = querySnapshot.docs[0];
-
-    const items = FolderDoc.data().items;
-    const itemIndex = items.findIndex(
-      (item: IItems) => item.name === currentFile,
-    );
-
-    if (itemIndex !== -1) {
-      items[itemIndex].name = newData;
-
-      const data = {
-        items: items,
-      };
-
-      await updateDoc(FolderDoc.ref, data);
-
-      setItem(items[itemIndex]);
-      setCurrentFile(newData);
-    }
-  };
-
-  const postDelete = async () => {
     try {
       const q = query(
         collection(db, "WikiPage"),
@@ -105,40 +85,104 @@ const WikiViewer = ({ content }: IContent) => {
 
       const items = FolderDoc.data().items;
       const itemIndex = items.findIndex(
-        (item: IItems) => item.name === currentFile,
+        (item: IItems) => item.fileName === currentFile,
       );
 
       if (itemIndex !== -1) {
-        items.splice(itemIndex, 1); // 현재 파일을 배열에서 삭제
+        items[itemIndex].fileName = newData;
 
         const data = {
           items: items,
         };
 
         await updateDoc(FolderDoc.ref, data);
-        setCurrentFile("");
+
+        setItem(items[itemIndex]);
+        setCurrentFile(newData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // 삭제 권한(position === "Manager")일 경우 부여 => 임시 해제(테스트용)
+  const postDelete = async () => {
+    try {
+      if (currentFolder === "FE3 WIKI 가이드") {
+        alert("현재 파일은 위키 가이드 파일이므로 삭제할 수 없습니다.");
+      } else {
+        const q = query(
+          collection(db, "WikiPage"),
+          where("title", "==", currentFolder),
+        );
+        const querySnapshot = await getDocs(q);
+        const FolderDoc = querySnapshot.docs[0];
+
+        const items = FolderDoc.data().items;
+        const itemIndex = items.findIndex(
+          (item: IItems) => item.fileName === currentFile,
+        );
+        if (itemIndex !== -1) {
+          items.splice(itemIndex, 1);
+
+          const data = {
+            items: items,
+          };
+
+          await updateDoc(FolderDoc.ref, data);
+          setCurrentFile("");
+        }
       }
     } catch (error) {
       console.error("파일 삭제 중 오류 발생:", error);
     }
   };
 
-  const refresh = async () => {
-    const q = query(collection(db, "WikiPage"));
+  const refreshTotalFolder = async () => {
+    const q = query(
+      collection(db, "WikiPage"),
+      orderBy("order"),
+      where("teamName", "==", null),
+    );
     const querySnapshot = await getDocs(q);
-    const folderData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
-    setItems(folderData);
+
+    const totalFileData = querySnapshot.docs.map((doc) => doc.data() as IWiki);
+    setItems(totalFileData);
   };
 
-  const onSubmitEdit = (e: FormEvent<HTMLFormElement>) => {
+  const refreshTeamFolder = async () => {
+    const t = query(
+      collection(db, "WikiPage"),
+      where("teamName", "==", userTeam),
+      orderBy("order"),
+    );
+    const teamQuerySnapshot = await getDocs(t);
+
+    const teamFileData = teamQuerySnapshot.docs.map(
+      (doc) => doc.data() as IWiki,
+    );
+    setTeamItems(teamFileData);
+  };
+
+  const onSubmitEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    postEditTitle(editTitle);
-    setEditState(false);
-    refresh();
+    if (isTeamFile) {
+      await postEditTitle(editTitle);
+      setEditState(false);
+      refreshTeamFolder();
+    } else {
+      await postEditTitle(editTitle);
+      setEditState(false);
+      refreshTotalFolder();
+    }
   };
 
   const onClickEdit = () => {
-    setEditState(true);
+    if (currentFolder === "FE3 WIKI 가이드") {
+      alert("현재 파일은 위키 가이드 파일이므로 제목을 수정할 수 없습니다.");
+    } else {
+      setEditState(true);
+    }
   };
 
   const onChangeEdit = (e: ChangeEvent<HTMLInputElement>) => {
@@ -146,8 +190,12 @@ const WikiViewer = ({ content }: IContent) => {
   };
 
   const onClickSubEdit = () => {
-    setEditFile(true);
-    setExistSub(subName);
+    if (currentFolder === "FE3 WIKI 가이드") {
+      alert("현재 파일은 위키 가이드 파일이므로 내용을 수정할 수 없습니다.");
+    } else {
+      setEditFile(true);
+      setExistSub(subName);
+    }
   };
 
   useEffect(() => {
@@ -155,11 +203,11 @@ const WikiViewer = ({ content }: IContent) => {
       prevSubNameRef.current = subName;
       setRenderKey((prev) => prev + 1);
     }
-    if (prevNameRef.current !== name) {
-      prevNameRef.current = name;
+    if (prevNameRef.current !== fileName) {
+      prevNameRef.current = fileName;
       setRenderKey((prev) => prev + 1);
     }
-  }, [subName, name]);
+  }, [subName, fileName]);
 
   useEffect(() => {
     console.log("editFile 현재: ", editFile);
@@ -175,6 +223,11 @@ const WikiViewer = ({ content }: IContent) => {
 
       const formatDate = `${year}년 ${month}월 ${day}일 ${hours}시 ${minutes}분`;
       setFormattedDate(formatDate);
+
+      if (name) {
+        const formatUserDate = `${month}월 ${day}일`;
+        setFormattedDate(formatUserDate);
+      }
     }
   }, [date]);
 
@@ -186,7 +239,7 @@ const WikiViewer = ({ content }: IContent) => {
             <div>
               {!editState ? (
                 <>
-                  <h1>{name}</h1>
+                  <h1>{fileName}</h1>
                   <EditOutlined
                     style={{
                       marginTop: "12px",
@@ -197,7 +250,7 @@ const WikiViewer = ({ content }: IContent) => {
                 </>
               ) : (
                 <form onSubmit={onSubmitEdit}>
-                  <Input placeholder={name} onChange={onChangeEdit} />
+                  <Input placeholder={fileName} onChange={onChangeEdit} />
                 </form>
               )}
             </div>
@@ -206,7 +259,24 @@ const WikiViewer = ({ content }: IContent) => {
               <Button onClick={postDelete}>삭제</Button>
             </Space>
           </StyledDiv>
-          <StyledDate>최종 수정일 : {formattedDate}</StyledDate>
+          {name ? (
+            <UserContainer>
+              <Space wrap size={16} style={{ marginRight: "14px" }}>
+                <Avatar size={38} icon={<UserOutlined />} />
+              </Space>
+              <div>
+                <div style={{ fontWeight: "600" }}>{name}</div>
+                <StyledSpan>
+                  <span>{department} - </span>
+                  <span>{position} • </span>
+                  <span>{formattedDate}</span>
+                </StyledSpan>
+              </div>
+            </UserContainer>
+          ) : (
+            <StyledDate>최종 수정일 : {formattedDate}</StyledDate>
+          )}
+
           <StyledViewer>
             <Viewer key={renderKey} initialValue={subName} />
           </StyledViewer>
@@ -222,6 +292,7 @@ export default WikiViewer;
 
 const Container = styled.div`
   width: 95%;
+  margin-top: -20px;
 `;
 const StyledDiv = styled.div`
   display: flex;
@@ -240,10 +311,21 @@ const StyledDiv = styled.div`
 `;
 const StyledViewer = styled.div`
   font-size: 1rem !important;
+  margin-top: 30px;
 `;
 const StyledDate = styled.div`
   opacity: 0.5;
   font-size: 0.75rem;
   margin-top: -10px;
   margin-bottom: 30px;
+`;
+const UserContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const StyledSpan = styled.div`
+  margin-top: 3px;
+  span {
+    font-size: 12px;
+  }
 `;

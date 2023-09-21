@@ -18,7 +18,7 @@ const MainWidget = () => {
           {isLoaded ? (
             <Row gutter={[32, 16]}>
               <Col flex={1}>
-                <MainWikiWidget wikis={wikis} />
+                <MainWikiWidget />
               </Col>
               <Col flex={1}>
                 <MainProjectWidget projects={projects} />

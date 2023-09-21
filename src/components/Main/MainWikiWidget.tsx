@@ -1,8 +1,12 @@
-import React from "react";
-import { WikiList } from "../../libs/firestore";
+import React, { useEffect, useState } from "react";
+import { db } from "../../libs/firebase";
+import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
 import styled from "styled-components";
 import { theme } from "antd";
 import { Link } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { currentFileTitle, currentFolderTitle } from "../../store/wiki";
+import { IWikiItem } from "../../store/wiki";
 
 export const BorderTitle = styled.h4<{ $colorPrimary: string }>`
   border-left: 3px solid ${(props) => props.$colorPrimary};
@@ -25,27 +29,61 @@ export const WidgetItem = styled.div`
   .list-date {
     color: #999;
   }
+};
 `;
 
-const MainWikiWidget = ({ wikis }: { wikis?: WikiList }) => {
+const MainWikiWidget = () => {
   const {
     token: { colorPrimary },
   } = theme.useToken();
-  wikis?.items?.sort((a, b) => b.date.toMillis() - a.date.toMillis());
+
+  const [fileNames, setFileNames] = useState<string[]>([]);
+  const setCurrentFolderTitle = useSetRecoilState(currentFolderTitle);
+  const setCurrentFileTitle = useSetRecoilState(currentFileTitle);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "WikiPage"),
+      orderBy("order"),
+      where("title", "==", "FE3 WIKI 가이드"),
+    );
+
+    const fetchWikiData = async () => {
+      try {
+        const querySnapshot = await getDocs(q);
+        const fileNames: string[] = [];
+        querySnapshot.forEach((doc) => {
+          const items: IWikiItem[] = doc.data().items;
+          console.log(items);
+          items.forEach((item) => {
+            fileNames.push(item.fileName);
+          });
+        });
+        setFileNames(fileNames);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchWikiData();
+  }, []);
+
+  const handleFileClick = (fileName: string) => {
+    setCurrentFolderTitle("FE3 WIKI 가이드");
+    setCurrentFileTitle(fileName);
+  };
 
   return (
     <div>
-      <BorderTitle $colorPrimary={colorPrimary}>최근 위키 페이지</BorderTitle>
+      <BorderTitle $colorPrimary={colorPrimary}>위키 가이드</BorderTitle>
       <div>
-        {wikis?.items.map((item) => (
-          <WidgetItem key={item.date.toMillis()}>
+        {fileNames.map((fileName, index) => (
+          <WidgetItem key={index}>
             <p>
-              <Link to={`/wiki`}>{item.name}</Link>
+              <Link to={`/wiki`} onClick={() => handleFileClick(fileName)}>
+                {fileName}
+              </Link>
             </p>
-            <div className="list-date">
-              <span>{item.date.toDate().getMonth() + 1}</span>.
-              <span>{item.date.toDate().getUTCDate()}</span>
-            </div>
           </WidgetItem>
         ))}
       </div>

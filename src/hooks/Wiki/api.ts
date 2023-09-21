@@ -10,10 +10,8 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-interface IState {
-  name: string;
-  subName: string;
-}
+import { NewFile } from "../../components/Wiki/WikiNav";
+import { TeamNewFile } from "../../components/Wiki/WikiTeamNav";
 
 type RefreshFunction = () => void;
 
@@ -41,6 +39,7 @@ export const addAllFolder = async (
         title: folderName,
         items: [],
         order: order,
+        teamName: null,
       };
 
       await addDoc(collection(db, "WikiPage"), folderData);
@@ -112,7 +111,7 @@ export const changeFolderName = async (
 // 새로운 파일 생성
 export const addFile = async (
   currentFileName: string,
-  state: IState,
+  state: NewFile,
   refreshFc: RefreshFunction,
 ): Promise<void> => {
   try {
@@ -125,9 +124,56 @@ export const addFile = async (
     const exist = folderDoc.data().items;
     const date = new Date();
     const newFileData = {
-      name: state.name,
+      fileName: state.fileName,
       subName: state.subName,
       date: date,
+      name: null,
+      department: null,
+      position: null,
+    };
+
+    const order = exist.length;
+
+    exist.push({
+      ...newFileData,
+      order: order,
+    });
+
+    await updateDoc(folderDoc.ref, {
+      items: exist,
+    });
+
+    refreshFc();
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+// 팀 파일 생성
+export const addTeamFile = async (
+  currentFileName: string,
+  state: TeamNewFile,
+  name: null | string,
+  department: null | string,
+  position: null | string,
+  refreshFc: RefreshFunction,
+): Promise<void> => {
+  try {
+    const q = query(
+      collection(db, "WikiPage"),
+      where("title", "==", currentFileName),
+    );
+    const querySnapshot = await getDocs(q);
+    const folderDoc = querySnapshot.docs[0];
+    const exist = folderDoc.data().items;
+    const date = new Date();
+    const newFileData = {
+      fileName: state.fileName,
+      subName: state.subName,
+      date: date,
+      name: name,
+      department: department,
+      position: position,
     };
 
     const order = exist.length;
@@ -153,15 +199,19 @@ export const deleteFolder = async (
   state: (value: boolean) => void,
 ) => {
   try {
-    const q = query(
-      collection(db, "WikiPage"),
-      where("title", "==", folderName),
-    );
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const folderDoc = querySnapshot.docs[0];
-      await deleteDoc(folderDoc.ref);
-      state(false);
+    if (folderName === "FE3 WIKI 가이드") {
+      alert("현재 폴더는 가이드 폴더이므로 삭제할 수 없습니다.");
+    } else {
+      const q = query(
+        collection(db, "WikiPage"),
+        where("title", "==", folderName),
+      );
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const folderDoc = querySnapshot.docs[0];
+        await deleteDoc(folderDoc.ref);
+        state(false);
+      }
     }
   } catch (e) {
     console.error(e);
