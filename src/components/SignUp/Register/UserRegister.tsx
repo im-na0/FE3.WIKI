@@ -209,6 +209,19 @@ export default function UserRegister() {
       alert("업로드 실패");
     }
   };
+  useEffect(() => {
+    const userDataStr = localStorage.getItem("userData");
+    if (userDataStr) {
+      const userData = JSON.parse(userDataStr);
+      setInput((prevInput) => ({
+        ...prevInput,
+        ...userData.newUser,
+      }));
+      setSelectedPart(userData.newUser.department);
+      setSelectedTeam(userData.newUser.team);
+      setSelectedPosition(userData.newUser.position);
+    }
+  }, []);
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -225,6 +238,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="사용하실 이름을 입력해주세요"
               onChange={handleInputChange}
+              value={input.name}
             />
           </UserNameCategory>
           <UserEmailCategory>
@@ -234,6 +248,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="이메일을 입력해주세요"
               onChange={handleInputChange}
+              value={input.email}
             />
           </UserEmailCategory>
           <UserPhoneCategory>
@@ -243,6 +258,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="휴대폰 번호를 입력해주세요"
               onChange={handleInputChange}
+              value={input.phone}
             />
           </UserPhoneCategory>
           <UserDepartmentCategory>
@@ -263,6 +279,7 @@ export default function UserRegister() {
                   ],
               }))}
               onChange={handleSelectedPart}
+              value={selectedPart}
             />
           </UserDepartmentCategory>
           <UserTeamCategory>
@@ -285,6 +302,7 @@ export default function UserRegister() {
                 label: team.teamName,
               }))}
               onChange={handleSelectedTeam}
+              value={selectedTeam}
             />
           </UserTeamCategory>
           <UserPositionCategory>
@@ -310,6 +328,7 @@ export default function UserRegister() {
                   ],
               }))}
               onChange={handleSelectedPosition}
+              value={selectedPosition}
             />
           </UserPositionCategory>
           <UserImageCategory>
