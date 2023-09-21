@@ -1,10 +1,8 @@
 import React from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ProjectDroppable from "./ProjectDroppable";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { isLoadingState, projectListState } from "../../store/project";
-import useQueryProjectAllList from "../../hooks/project/useQueryProjectAllList";
 import { updateOrder } from "../../hooks/project/updateOrder";
+import useQueryProjectTeam from "../../hooks/project/useQueryProjectTeam";
 
 export interface ProjectInfo {
   id: string;
@@ -16,17 +14,15 @@ export interface ProjectInfo {
 }
 
 const ProjectDragDrop = () => {
-  const projects = useQueryProjectAllList();
-  const setProjects = useSetRecoilState(projectListState);
-  const isLoading = useRecoilValue(isLoadingState);
+  const [teamProj, setTeamProj, isLoaded] = useQueryProjectTeam();
 
   const onDragEnd = ({ destination, source }: DropResult) => {
-    if (!destination) return;
+    if (!destination || teamProj === undefined) return;
     if (destination?.droppableId === source.droppableId) {
       // 같은 보드 내에서 이동
       const diff: ProjectInfo[] = [];
-      const origProj = [...projects[source.droppableId]];
-      const projCopy = [...projects[source.droppableId]];
+      const origProj = [...teamProj[source.droppableId]];
+      const projCopy = [...teamProj[source.droppableId]];
       const movedItem = projCopy.splice(source.index, 1);
       projCopy.splice(destination.index, 0, movedItem[0]);
 
@@ -49,24 +45,24 @@ const ProjectDragDrop = () => {
         }
       });
 
-      setProjects((allProjects) => {
+      setTeamProj((allProjects) => {
         return {
           ...allProjects,
           [source.droppableId]: newProjArr,
         };
       });
       // 실제 firebase에 적용하기
-      const deletePromise = diff.map((item) =>
+      const updatePromises = diff.map((item) =>
         updateOrder(item.id, item.order),
       );
-      Promise.all(deletePromise);
+      Promise.all(updatePromises);
     } else {
       // 다른 보드로 이동
       const sourceDiff: ProjectInfo[] = [];
       // 드래그한 요소가 원래 속해있던 배열
-      const sourceBoard = [...projects[source.droppableId]];
+      const sourceBoard = [...teamProj[source.droppableId]];
       // 드래그한 요소가 놓인 배열
-      const targetBoard = [...projects[destination.droppableId]];
+      const targetBoard = [...teamProj[destination.droppableId]];
       // 이동한 아이템을 잘라냅니다.
       const movedItem = sourceBoard.splice(source.index, 1);
       targetBoard.splice(destination.index, 0, movedItem[0]);
@@ -92,7 +88,7 @@ const ProjectDragDrop = () => {
 
       console.log(sourceDiff);
 
-      setProjects((allProjects) => {
+      setTeamProj((allProjects) => {
         return {
           ...allProjects,
           [source.droppableId]: sourceBoard,
@@ -110,24 +106,26 @@ const ProjectDragDrop = () => {
         );
       })();
       // 순서 바뀌는 요소는 모두 order값을 변경
-      const deletePromise = sourceDiff.map((item) =>
+      const updatePromises = sourceDiff.map((item) =>
         updateOrder(item.id, item.order, true, destination.droppableId),
       );
-      Promise.all(deletePromise);
+      Promise.all(updatePromises);
     }
   };
+
   return (
     <>
-      {isLoading ? null : (
+      {!isLoaded ? null : (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="drag-drop-wrap">
-            {Object.keys(projects).map((key) => (
-              <ProjectDroppable
-                key={key}
-                id={key}
-                projectList={projects[key]}
-              />
-            ))}
+            {teamProj !== undefined &&
+              Object.keys(teamProj).map((key) => (
+                <ProjectDroppable
+                  key={key}
+                  id={key}
+                  projectList={teamProj[key]}
+                />
+              ))}
           </div>
         </DragDropContext>
       )}
