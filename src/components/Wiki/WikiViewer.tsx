@@ -335,6 +335,7 @@ const StyledDiv = styled.div`
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
+    margin-bottom: 20px;
   }
 `;
 const StyledViewer = styled.div`
