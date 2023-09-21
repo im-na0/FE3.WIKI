@@ -48,6 +48,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 // api
 import { addTeamFile, addTeamFolder } from "../../hooks/Wiki/api";
+import swal from "sweetalert";
 
 interface ITeamList {
   teamName: string;
@@ -125,17 +126,22 @@ const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
 
   const onSubmitFile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (currentFolder)
-      addTeamFile(
-        currentFolder,
-        newFile,
-        teamInfos.name,
-        teamInfos.department,
-        teamInfos.position,
-        teamInfos.photo,
-        refreshFolders,
-      );
-    setFileState(false);
+    if (newFile.fileName !== "") {
+      if (currentFolder)
+        addTeamFile(
+          currentFolder,
+          newFile,
+          teamInfos.name,
+          teamInfos.department,
+          teamInfos.position,
+          teamInfos.photo,
+          refreshFolders,
+        );
+      setFileState(false);
+    } else {
+      swal("Fail", "파일의 이름을 입력해주세요", "error");
+      setFileState(false);
+    }
   };
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
@@ -218,13 +224,19 @@ const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
   }, []);
 
   useEffect(() => {
-    console.log(teamName, "위키 활성화!");
     refreshFolders();
   }, []);
 
   useEffect(() => {
     refreshFolders();
   }, [currentTargetFile, deleteState, teamName]);
+
+  useEffect(() => {
+    if (fileState === true) {
+      setNewFile({ ...newFile, fileName: "" });
+      console.log("working: ", newFile);
+    }
+  }, [fileState]);
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>

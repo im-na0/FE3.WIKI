@@ -59,6 +59,7 @@ import { IWiki } from "../../store/wiki";
 // React-Beautiful-Dnd
 import { DropResult } from "react-beautiful-dnd";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import swal from "sweetalert";
 
 export interface NewFile {
   fileName: string;
@@ -155,8 +156,13 @@ const WikiNav = () => {
 
   const onSubmitFile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (currentFolder) addFile(currentFolder, newFile, refreshFolders);
-    setFileState(false);
+    if (newFile.fileName !== "") {
+      if (currentFolder) addFile(currentFolder, newFile, refreshFolders);
+      setFileState(false);
+    } else {
+      swal("Fail", "파일의 이름을 입력해주세요", "error");
+      setFileState(false);
+    }
   };
 
   const onChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
@@ -262,6 +268,13 @@ const WikiNav = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (fileState === true) {
+      setNewFile({ ...newFile, fileName: "" });
+      console.log("working: ", newFile);
+    }
+  }, [fileState]);
 
   useEffect(() => {
     setNavHeight(navRef.current?.offsetHeight);
