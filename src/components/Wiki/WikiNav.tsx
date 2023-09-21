@@ -1,4 +1,10 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 
 // Components
 import WikiSelect from "./WikiSelect";
@@ -70,6 +76,11 @@ export interface ITeamProps {
 }
 
 const WikiNav = () => {
+  // 모바일에서 메뉴 펼치고 접기를 위한 코드
+  const navRef = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState<number>();
+  const [isOpen, setIsOpen] = useState(true);
+
   const [newFolder, setNewFolder] = useState<string>("");
   const [folderName, setFolderName] = useState<string>("");
   const [newFile, setNewFile] = useState<NewFile>({
@@ -252,6 +263,17 @@ const WikiNav = () => {
       console.log(error);
     }
   };
+  useEffect(() => {
+    setNavHeight(navRef.current?.offsetHeight);
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsOpen(false);
+      }
+      console.log(isOpen);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     validTeamUser();
@@ -267,7 +289,11 @@ const WikiNav = () => {
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="folders">
         {(provided) => (
-          <Container>
+          <Container
+            ref={navRef}
+            $isOpen={isOpen}
+            $navHeight={navHeight ?? 530}
+          >
             <StyledContainer>
               <FolderWrapper>
                 <TeamOutlined />
@@ -406,9 +432,10 @@ const WikiNav = () => {
 
 export default WikiNav;
 
-const Container = styled.div`
+const Container = styled.div<{ $isOpen: boolean; $navHeight: number }>`
   display: flex;
   flex-direction: column;
+  height: ${(props) => (props.$isOpen ? props.$navHeight : 32)};
 `;
 
 const StyledContainer = styled.div`
@@ -419,6 +446,9 @@ const StyledContainer = styled.div`
   width: 280px;
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const FolderWrapper = styled.div`
@@ -478,6 +508,7 @@ const StyledTitle = styled.div`
       background-color: rgba(0, 0, 0, 0.03);
       transition: background-color 0.3s;
     }
+  }
 `;
 
 const StyledForm = styled.div`
@@ -557,4 +588,7 @@ const StyledTeamContainer = styled.div`
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 15px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
