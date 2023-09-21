@@ -34,9 +34,10 @@ function MemberSelectTeam({ readOnly, form }: MemberSelectTeamProps) {
   const { required } = CustomForm.useValidate();
   return (
     <Spin spinning={loading}>
-      <Form.Item label="팀" name="team">
+      <Form.Item label="팀" name="team" rules={[required]}>
         <Select
           loading={loading}
+          className={readOnly ? "readOnly" : undefined}
           showSearch
           placeholder="Select"
           onChange={(selectedValue) => {

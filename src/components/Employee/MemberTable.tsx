@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Spin, Table } from "antd";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import { Table, Skeleton } from "antd";
 import { FormDataType } from "../../type/form";
 import { columns } from "../../data/tableColumns";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
@@ -28,7 +27,7 @@ export default function MemberTable({
     COLLECTION_NAME: "Users",
     ORDER: "name",
   };
-  const data = useFetchData(fetchDataParams);
+  const { data, loading } = useFetchData(fetchDataParams);
 
   const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
 
@@ -71,33 +70,54 @@ export default function MemberTable({
     setFilteredData(dataWithKeys);
   }, [data, filterValue, sortValue, searchText]);
 
+  const skeletonData = Array(8)
+    .fill({})
+    .map((_, index) => ({ key: `skeleton-${index}` }));
+
+  const displayData = loading ? skeletonData : filteredData;
+
+  type RenderArgs = {
+    text: string;
+    record: FormDataType;
+    index: number;
+  };
+  const skeletonColumns = columns(navigate).map((col) => ({
+    ...col,
+    render: (text: string, record: FormDataType) => {
+      if (loading) return <Skeleton active paragraph={false} />;
+      return col.render ? col.render(record) : text;
+    },
+  }));
+
   return (
     <>
-      {filteredData && (
-        <Table
-          dataSource={filteredData}
-          columns={columns(navigate)}
-          pagination={{
-            defaultPageSize: 8,
-            showSizeChanger: true,
-          }}
-          rowSelection={{
-            onChange: (
-              selectedKeys: React.Key[],
-              selectedRows: FormDataType[],
-            ) => {
-              const selectedIds = selectedRows
-                .filter((row) => row.id)
-                .map((row) => ({
-                  id: row.id!,
-                  teamId: row.teamId,
-                }));
-              console.log(selectedIds);
-              setSelectedRowKeys(selectedIds);
-            },
-          }}
-        />
-      )}
+      <Table
+        dataSource={displayData}
+        columns={skeletonColumns}
+        pagination={{
+          defaultPageSize: 8,
+          showSizeChanger: true,
+        }}
+        rowSelection={
+          loading
+            ? undefined
+            : {
+                onChange: (
+                  selectedKeys: React.Key[],
+                  selectedRows: FormDataType[],
+                ) => {
+                  const selectedIds = selectedRows
+                    .filter((row) => row.id)
+                    .map((row) => ({
+                      id: row.id!,
+                      teamId: row.teamId,
+                    }));
+                  console.log(selectedIds);
+                  setSelectedRowKeys(selectedIds);
+                },
+              }
+        }
+      />
     </>
   );
 }
