@@ -365,7 +365,6 @@ const HideDiv = styled.div<{ $hideFolder: boolean }>`
   opacity: ${(props) => (props.$hideFolder ? "0" : "1")};
   max-height: ${(props) => (props.$hideFolder ? "0" : "auto")};
   visibility: ${(props) => (props.$hideFolder ? "hidden" : "visible")};
-  overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
