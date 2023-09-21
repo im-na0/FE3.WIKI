@@ -81,8 +81,6 @@ export const useMutationNewProject = ({
     const day1 = dayjs(values.duration[0]).format(dateFormat);
     const day2 = dayjs(values.duration[1]).format(dateFormat);
 
-    console.log(markdown);
-
     const projectId = location.pathname.split("/")[2];
     if (projectId) {
       await updateDoc(doc(db, "Project", projectId), {

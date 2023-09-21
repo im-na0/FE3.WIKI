@@ -22,7 +22,7 @@ const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
         <Content
           className="project__content-area"
           style={{
-            minHeight: "calc(100vh - 64px)",
+            minHeight: "calc(100vh - 112px)",
             backgroundColor: "#f5f5f5",
             padding: "10px",
           }}
@@ -32,12 +32,17 @@ const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
           ) : isLoaded ? (
             <ProjectDetailInfo projectDetail={projectDetail} />
           ) : (
-            <div className="project-container">
-              <div className="project__top-title">
-                <h3>프로젝트 상세 정보</h3>
+            <>
+              <div style={{ marginBottom: "10px" }}>
+                <Skeleton.Input active size="small" />
               </div>
-              <Skeleton title={true} />
-            </div>
+              <div className="project-container">
+                <div className="project__top-title">
+                  <h3>프로젝트 상세 정보</h3>
+                </div>
+                <Skeleton title={true} />
+              </div>
+            </>
           )}
         </Content>
       </Layout>

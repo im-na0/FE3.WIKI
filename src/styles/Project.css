@@ -34,6 +34,8 @@
 }
 .project__all-list{
     border: 1px solid #dfdfdf;
+    max-height: calc(100vh - 128px);
+    overflow: auto;
 }
 .project__content-area .project-container{
     padding-top:24px;
