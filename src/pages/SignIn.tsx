@@ -1,8 +1,8 @@
-import { GoogleOutlined, MailOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import React from "react";
+import { MailOutlined } from "@ant-design/icons";
 import { styled } from "styled-components";
 import SignInEmailModal from "../components/Signin/SignInEmail";
-import { Modal } from "antd";
+import { Col, Divider, Modal, Row } from "antd";
 import SignInGoogle from "../components/Signin/SignInGoogle";
 import { Link } from "react-router-dom";
 import { MainTitle } from "../components/SignUp/Title";
@@ -19,25 +19,35 @@ const SignIn = () => {
     >
       <Container>
         <SignInContainer>
-          <Logo src="/fe3-wiki-logo.png" alt="logo"></Logo>
-          <LoginBtnContainer>
-            <MainTitle>
-              Wiki에 오신 것을 환영합니다!
-              <br />
-              시작하시기 전에 로그인을 해주세요!
-            </MainTitle>
-            <SignInGoogle />
-            <span>OR</span>
-            <EmailLogin onClick={showModal}>
-              <IconContainer>
-                <MailOutlined />
-              </IconContainer>
-              <span>직접 이메일 입력</span>
-            </EmailLogin>
-          </LoginBtnContainer>
-          <MoveSingUp to="/signup">
-            <span>아직 계정이 없으신가요?</span> 회원가입하기
-          </MoveSingUp>
+          <Row gutter={[0, 0]}>
+            <Col span={12}>
+              <SignInLeftImg $img={"/secure_login.svg"} />
+            </Col>
+            <Col span={12}>
+              <SignInRight>
+                <Logo src="/fe3-wiki-logo.png" alt="logo"></Logo>
+                <LoginBtnContainer>
+                  <Divider>로그인</Divider>
+                  <MainTitle>
+                    Wiki에 오신 것을 환영합니다!
+                    <br />
+                    시작하시기 전에 로그인을 해주세요!
+                  </MainTitle>
+                  <SignInGoogle />
+                  <Divider plain>OR</Divider>
+                  <EmailLogin onClick={showModal}>
+                    <IconContainer>
+                      <MailOutlined />
+                    </IconContainer>
+                    <span>직접 이메일 입력</span>
+                  </EmailLogin>
+                </LoginBtnContainer>
+                <MoveSingUp to="/signup">
+                  <span>아직 계정이 없으신가요?</span> 회원가입하기
+                </MoveSingUp>
+              </SignInRight>
+            </Col>
+          </Row>
         </SignInContainer>
         <Modal open={isEmailModalOpen} onCancel={handleCancel} onOk={handleOk}>
           <SignInEmailModal />
@@ -49,34 +59,47 @@ const SignIn = () => {
 
 export default SignIn;
 
-const Container = styled.div`
+export const Container = styled.div`
   margin: 0;
   padding: 0;
-  width: 100vw;
-`;
-const SignInContainer = styled.div`
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  border: 1px solid black;
+  align-items: center;
+  height: 100vh;
+  background-color: #f7f7f7;
+`;
+export const SignInContainer = styled.div`
+  width: 100%;
+  max-width: 900px;
   border-radius: 20px;
-  width: 50vw;
-  margin: 100px auto;
+  box-shadow: 3px 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  padding: 10px;
+  background-color: #fff;
+`;
+export const SignInLeftImg = styled.div<{ $img: string }>`
+  width: 100%;
+  height: 100%;
+  background: #dbdaf3 url(${process.env.PUBLIC_URL}${(props) => props.$img}) 50%
+    50% /60% no-repeat;
+  border-radius: 10px;
+  object {
+    max-width: 100%;
+  }
+`;
+export const SignInRight = styled.div`
+  padding: 50px 30px;
   text-align: center;
 `;
-const Logo = styled.img`
-  width: 150px;
-  height: 50px;
-  margin: 60px auto 0;
-  text-align: center;
+export const Logo = styled.img`
+  width: 120px;
 `;
-const LoginBtnContainer = styled.div`
-  margin-top: 50px;
+export const LoginBtnContainer = styled.div`
   display: flex;
   flex-direction: column;
-  text-align: center;
+  align-items: center;
 `;
-const GoogleLogin = styled.button`
+export const GoogleLogin = styled.button`
   border: none;
   border-radius: 10px;
   width: 330px;
@@ -84,20 +107,21 @@ const GoogleLogin = styled.button`
   text-align: center;
   display: flex;
   align-items: center;
-  background-color: #6c63ff;
-  color: #fff;
+  border: 1px solid #6c63ff;
+  color: #6c63ff;
   font-weight: bold;
   padding-left: 5px;
-  margin: 30px auto;
   cursor: pointer;
+  transition: background-color 0.3s;
   &:hover {
-    background-color: grey;
+    color: #6c63ff;
+    background-color: #ddd;
   }
   span {
     padding-left: 35px;
   }
 `;
-const EmailLogin = styled(GoogleLogin)`
+export const EmailLogin = styled(GoogleLogin)`
   margin-bottom: 20px;
 `;
 
@@ -106,7 +130,6 @@ const IconContainer = styled.div`
 `;
 const MoveSingUp = styled(Link)`
   text-align: center;
-  margin-bottom: 20px;
   font-size: 12px;
   font-weight: bold;
   text-decoration: none;

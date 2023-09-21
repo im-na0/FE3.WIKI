@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <AuthStateChanged />
-      <Router />;
+      <Router />
     </>
   );
 }

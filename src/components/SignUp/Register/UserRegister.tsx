@@ -86,19 +86,49 @@ export default function UserRegister() {
   const [input, setInput] = useRecoilState(userInfo);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "department") {
-      setSelectedPart(value);
+
+    switch (name) {
+      case "phone":
+        setInput((prevInput) => {
+          const phone = value
+            .replace(/[^0-9]/g, "")
+            .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+          return {
+            ...prevInput,
+            phone,
+          };
+        });
+        break;
+      case "department":
+        setSelectedPart(value);
+        break;
+      case "team":
+        setSelectedTeam(value);
+        break;
+      case "position":
+        setSelectedPosition(value);
+        break;
+      default:
+        setInput((prevInput) => ({
+          ...prevInput,
+          [name]: value,
+        }));
+        break;
     }
-    if (name === "team") {
-      setSelectedTeam(value);
-    }
-    if (name === "position") {
-      setSelectedPosition(value);
-    }
-    setInput((prevInput) => ({
-      ...prevInput,
-      [name]: value,
-    }));
+
+    // if (name === "department") {
+    //   setSelectedPart(value);
+    // }
+    // if (name === "team") {
+    //   setSelectedTeam(value);
+    // }
+    // if (name === "position") {
+    //   setSelectedPosition(value);
+    // }
+    // setInput((prevInput) => ({
+    //   ...prevInput,
+    //   [name]: value,
+    // }));
   };
 
   // upload 컴포넌트 props 값 => 이미지 업로드
