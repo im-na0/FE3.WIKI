@@ -6,11 +6,8 @@ const WikiDefaultPage = () => {
     <WikiDetailHolder>
       <div>
         <object data={process.env.PUBLIC_URL + "/wiki.svg"}></object>
-        <p>왼쪽의 위키 폴더 목록을 클릭하면 상세정보가 이곳에 보여집니다.</p>
-        <p>
-          전체 위키의 FE3 WIKI 가이드를 참고하면 위키 페이지를 더욱 활용도 있게
-          사용할 수 있습니다.
-        </p>
+        <p>위키 목록을 클릭하면 파일이 이곳에 보여집니다.</p>
+        <p>전체 위키의 FE3 WIKI 가이드를 참고하세요.</p>
       </div>
     </WikiDetailHolder>
   );
@@ -31,7 +28,7 @@ const WikiDetailHolder = styled.div`
   }
   p {
     display: block;
-    margin-left: 140px;
-    text-align: start;
+    text-align: center;
+    opacity: 0.4;
   }
 `;
