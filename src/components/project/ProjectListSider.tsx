@@ -69,11 +69,25 @@ const ProjectListSider = () => {
     projectArr = selectedProj;
   }
 
+  const dropDownStyle = {
+    height: "200px",
+    overflow: "scroll",
+    boxShadow: "0 0 10px rgba(0,0,0,.2)",
+    borderRadius: "5px",
+  };
+
   return (
     <>
       {isLoaded ? (
         <div className="project__filter">
-          <Dropdown menu={{ items: userItems, onClick: filterByUser }}>
+          <Dropdown
+            menu={{ items: userItems, onClick: filterByUser }}
+            dropdownRender={(menu) => (
+              <div style={dropDownStyle}>
+                {React.cloneElement(menu as React.ReactElement)}
+              </div>
+            )}
+          >
             <Button size={"small"}>
               <Space>
                 {selectedUser === "" ? "담당자" : selectedUser.substring(0, 3)}
