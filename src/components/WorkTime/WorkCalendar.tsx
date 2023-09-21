@@ -39,17 +39,18 @@ const WorkCalendar = () => {
         .toTimeString()
         .split(" ")[0];
 
+      const contentArray = [];
+
       if (start !== undefined) {
-        return [
-          { type: "success", content: startTime ? "출근: " + startTime : "" },
-          {
-            type: "error",
-            content: finishTime ? "퇴근: " + finishTime : "",
-          },
-        ];
-      } else {
-        return null; // 출력할 내용이 없을 시 null 값을 반환
+        contentArray.push({
+          type: "success",
+          content: startTime ? "출근: " + startTime : "",
+        });
       }
+      if (finishTime) {
+        contentArray.push({ type: "error", content: "퇴근: " + finishTime });
+      }
+      return contentArray.length > 0 ? contentArray : null; // 출력할 내용이 없을 시 null 값을 반환
     }
 
     if (isLeaveLoaded) {

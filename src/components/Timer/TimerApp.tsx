@@ -356,18 +356,22 @@ const TimerApp = () => {
           오늘도 수고하셨습니다!👍
         </TimerText>
       )}
-      {(startWorkBtnClicked || finishWorkBtnClicked) && // 출근 버튼을 누른 상태에서는 기본적으로 passedTime이 출력되어 일반 타이머 역할을 하고, 이후 퇴근 버튼을 누르면 타이머가 멈추고 현재까지 경과한 시간이 출력됨. 만약 페이지가 새로고침 된 경우(아래와 같이 passedTime !== null && passedTime !== undefined 조건을 통해) timeDiffFromCookie 쿠키값이 기본적으로 보일 수 있게 함
-      passedTime !== 0 &&
-      passedTime !== null &&
-      passedTime !== undefined ? (
+      {(startWorkBtnClicked || finishWorkBtnClicked) && (
         <div>
-          오늘 총 근무시간은 {formatTotalWorkTime(passedTime)}입니다.
-          <br />
-        </div>
-      ) : (
-        <div>
-          오늘 총 근무시간은 {formatTotalWorkTime(timeDiffFromCookie)}입니다.
-          <br />
+          {passedTime !== null &&
+          passedTime !== undefined &&
+          passedTime !== 0 ? (
+            <>
+              오늘 총 근무시간은 {formatTotalWorkTime(passedTime)}입니다.
+              <br />
+            </>
+          ) : (
+            <>
+              오늘 총 근무시간은 {formatTotalWorkTime(timeDiffFromCookie)}
+              입니다.
+              <br />
+            </>
+          )}
         </div>
       )}
     </form>
