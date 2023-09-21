@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import SubLayout from "../layouts/SubLayout";
 import Main from "../pages/Main";
 import Wiki from "../pages/Wiki";
 import Project from "../pages/Project";
-// import ProjectList from "../pages/ProjectList";
 import ProjectNew from "../pages/ProjectNew";
 import ProjectDetail from "../pages/ProjectDetail";
 import Timer from "../pages/Timer";
@@ -16,11 +15,7 @@ import StartRegister from "../components/SignUp/Register/StartRegister";
 import UserRegister from "../components/SignUp/Register/UserRegister";
 import EndRegister from "../components/SignUp/Register/EndRegister";
 import ProjectEdit from "../pages/ProjectEdit";
-import { setPersistence, browserSessionPersistence } from "@firebase/auth";
-import { auth } from "../libs/firebase";
 import EmployeeDetail from "../pages/EmployeeDetail";
-import { browserLocalPersistence } from "firebase/auth";
-import AuthStateChanged from "../components/Signin/AuthStateChanged";
 
 const Router = () => {
   return (
