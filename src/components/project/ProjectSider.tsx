@@ -2,9 +2,14 @@ import React from "react";
 import { Layout, Menu, theme } from "antd";
 import type { MenuProps } from "antd";
 import {
+  AlignLeftOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
   EditOutlined,
+  PlusCircleOutlined,
   ProjectOutlined,
   UnorderedListOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -28,14 +33,14 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem("프로젝트 상태 별 목록", "projects", <ProjectOutlined />, [
-    getItem("전체 프로젝트", "all"),
-    getItem("예정된 프로젝트", "plus"),
-    getItem("진행중인 프로젝트", "progress"),
-    getItem("완료된 프로젝트", "completed"),
+  getItem("프로젝트 상태", "projects", <AlignLeftOutlined />, [
+    getItem("전체 프로젝트", "all", <UnorderedListOutlined />),
+    getItem("예정된 프로젝트", "plus", <PlusCircleOutlined />),
+    getItem("진행중인 프로젝트", "progress", <ClockCircleOutlined />),
+    getItem("완료된 프로젝트", "completed", <CheckCircleOutlined />),
   ]),
-  getItem("내 팀 프로젝트", "myteam", <ProjectOutlined />, [
-    getItem("프론트엔드 개발팀", "fe", <UnorderedListOutlined />),
+  getItem("팀 프로젝트", "team", <ProjectOutlined />, [
+    getItem("내 팀 프로젝트", "myProject", <UserOutlined />),
   ]),
 ];
 
@@ -76,7 +81,7 @@ const ProjectSider = () => {
       case "completed":
         navigate("/project/all?status=completed");
         break;
-      case "fe":
+      case "myProject":
         navigate("/project");
         break;
     }
@@ -92,8 +97,8 @@ const ProjectSider = () => {
       <Menu
         onClick={onClick}
         style={{ width: 200 }}
-        defaultSelectedKeys={[currentPath ?? "fe"]}
-        defaultOpenKeys={["myteam", "projects"]}
+        defaultSelectedKeys={[currentPath ?? "myProject"]}
+        defaultOpenKeys={["team", "projects"]}
         mode="inline"
         items={items}
       />

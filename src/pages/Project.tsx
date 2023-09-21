@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Project.css";
 import ProjectSider from "../components/project/ProjectSider";
 import { Layout } from "antd";
 import ProjectDragDrop from "../components/project/ProjectDragDrop";
 
 const Project = () => {
+  const [teamName, setTeamName] = useState<string>();
+  const userData = localStorage.getItem("userData");
+  useEffect(() => {
+    if (userData) {
+      const { newUser } = JSON.parse(userData);
+      setTeamName(newUser.team);
+    }
+  }, [userData]);
+
   return (
     <Layout>
       <ProjectSider />
@@ -12,7 +21,7 @@ const Project = () => {
         <div className="project__top-title">
           <h3>프로젝트</h3>
         </div>
-        <h2>프론트엔드 개발팀 Project</h2>
+        <h2>{teamName ? teamName + " 프로젝트" : "로그인 먼저 해주세요"}</h2>
         <ProjectDragDrop />
       </div>
     </Layout>
