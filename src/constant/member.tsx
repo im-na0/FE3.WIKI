@@ -26,4 +26,5 @@ export const TABLE_TITLE: Record<string, string> = {
   phone: "번호",
   team: "팀",
   access: "권한",
+  teamId: "팀id",
 };

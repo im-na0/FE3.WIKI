@@ -9,32 +9,6 @@ import AddMemberModal from "./AddMemberModal";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 
-const List = styled.div`
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
-  word-wrap: break-word;
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  padding: 1.5rem;
-`;
-
-const ToggleWrap = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
-`;
-
-const ListTable = styled.div`
-  width: 100%;
-`;
-
 export default function MemberList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -48,16 +22,22 @@ export default function MemberList() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  type selectedRowKeys = {
+    id: string;
+    teamId?: string;
+  };
+
   const DeleteDataParams = {
     COLLECTION_NAME: "Users",
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
 
   const handleDelete = async () => {
     try {
-      for (const id of selectedRowKeys) {
-        await deleteData(id);
+      for (const data of selectedRowKeys) {
+        await deleteData(data.id, data.teamId);
       }
       setSelectedRowKeys([]);
     } catch (err) {
@@ -115,3 +95,29 @@ export default function MemberList() {
     </>
   );
 }
+
+const List = styled.div`
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
+  word-wrap: break-word;
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 1.5rem;
+`;
+
+const ToggleWrap = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+`;
+
+const ListTable = styled.div`
+  width: 100%;
+`;

@@ -12,7 +12,7 @@ export interface FormDataType {
   finishtime?: Date;
   starttime?: Date;
   teamLeaderId?: string;
-  teamName?: string;
+  teamId?: string;
 }
 
 export interface TeamType {
