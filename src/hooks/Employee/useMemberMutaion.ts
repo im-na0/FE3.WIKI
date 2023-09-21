@@ -134,6 +134,7 @@ export const useUploadData = (COLLECTION_NAME: string) => {
     }
 
     try {
+      console.log("uploadStore 시작");
       await runTransaction(db, async (transaction) => {
         // 먼저 읽기 작업을 수행
         let teamDocRef;
@@ -153,7 +154,7 @@ export const useUploadData = (COLLECTION_NAME: string) => {
           userId: arrayUnion(userUid),
         });
       });
-
+      console.log("uploadStore 종료");
       message.success("데이터가 업로드되었습니다.");
     } catch (error) {
       console.error(error);
