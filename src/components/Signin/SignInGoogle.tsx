@@ -58,7 +58,6 @@ const GoogleLogin = styled.button`
   color: #fff;
   font-weight: bold;
   padding-left: 5px;
-  margin: 30px auto;
   cursor: pointer;
   &:hover {
     background-color: grey;

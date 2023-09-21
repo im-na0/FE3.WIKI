@@ -1,11 +1,11 @@
-import React from "react";
 import { styled } from "styled-components";
 
 export const MainTitle = styled.p`
   font-size: 20px;
   font-weight: 500;
   text-align: start;
-  margin: 0 auto;
+  margin: 20px 0 40px;
+  text-align: center;
 `;
 
 export const StartTitle = styled.p`
