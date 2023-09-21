@@ -12,6 +12,7 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
+import { useUpdateTeamForMember } from "../../hooks/Employee/useUpdateTeamForMember";
 import styled from "styled-components";
 
 function MemberDetailInfo() {
@@ -54,8 +55,6 @@ function MemberDetailInfo() {
       fieldsValue.team = teamName;
       fieldsValue.teamId = teamId;
 
-      console.log(fieldsValue);
-
       if (file) {
         const downloadURL = await uploadStorage(file);
         fieldsValue.photo = downloadURL || fieldsValue.photo!;
@@ -63,9 +62,14 @@ function MemberDetailInfo() {
       } else {
         fieldsValue.photo = previewUrl || fieldsValue.photo;
       }
-
+      const currentTeamId = userData.teamId;
       if (memberId) {
         await updateData(memberId, fieldsValue);
+      }
+      const { updateTeamForMember } = useUpdateTeamForMember();
+
+      if (memberId && fieldsValue.teamId && currentTeamId) {
+        await updateTeamForMember(memberId, currentTeamId, fieldsValue.teamId);
       }
 
       handleProfileCard();

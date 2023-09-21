@@ -33,7 +33,7 @@ export default function MemberList() {
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
   const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
-  console.log(selectedRowKeys);
+
   const handleDelete = async () => {
     try {
       for (const data of selectedRowKeys) {

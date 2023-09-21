@@ -12,6 +12,8 @@ export function useDeleteData({ COLLECTION_NAME }: DeleteDataParams) {
       await runTransaction(db, async (transaction) => {
         const userDocRef = doc(db, COLLECTION_NAME, id);
 
+        console.log(teamId);
+
         if (teamId) {
           const teamDocRef = doc(db, "Teams", teamId);
           const teamDoc = await transaction.get(teamDocRef);

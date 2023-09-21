@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { message } from "antd";
-import { FormDataType, TeamType } from "../../type/form";
+import { FormDataType } from "../../type/form";
 import {
   getDownloadURL,
   uploadBytesResumable,
@@ -11,9 +11,11 @@ import {
   collection,
   doc,
   getDocs,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { db, storage, auth } from "../../libs/firebase";
 
@@ -125,16 +127,36 @@ export const useUploadData = (COLLECTION_NAME: string) => {
     });
   };
 
-  const uploadStore = async (data: any, mergeOption = true) => {
+  const uploadStore = async (data: FormDataType, teamId?: string) => {
     if (!userDocRef) {
-      message.error("로그인이 필요합니다.");
+      message.error("로그인이 필요합니다!");
       return;
     }
 
     try {
-      await setDoc(userDocRef, data, { merge: mergeOption });
+      await runTransaction(db, async (transaction) => {
+        // 먼저 읽기 작업을 수행
+        let teamDocRef;
+        if (teamId) {
+          teamDocRef = doc(db, "Teams", teamId);
+          const teamSnap = await transaction.get(teamDocRef);
+          if (!teamSnap.exists()) {
+            throw new Error("Team does not exist!");
+          }
+        } else {
+          teamDocRef = doc(db, "Teams", userUid!);
+        }
+
+        // 읽기 작업이 완료된 후 쓰기 작업을 수행
+        transaction.set(userDocRef, data);
+        transaction.update(teamDocRef, {
+          userId: arrayUnion(userUid),
+        });
+      });
+
       message.success("데이터가 업로드되었습니다.");
-    } catch (storeError) {
+    } catch (error) {
+      console.error(error);
       message.error("데이터 업로드 중 오류가 발생했습니다.");
     }
   };

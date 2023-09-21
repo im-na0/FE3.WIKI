@@ -17,11 +17,12 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const { uploadStorage, uploadStore, uploading, downloadURL } =
     useUploadData(COLLECTION_NAME);
 
-  const handleAdd = async (data: FormDataType) => {
+  const handleAdd = async (data: FormDataType, teamId: string) => {
     if (file) {
       await uploadStorage(file);
+      console.log(teamId);
       if (downloadURL) {
-        await uploadStore({ ...data, photo: downloadURL });
+        await uploadStore({ ...data, photo: downloadURL }, teamId);
         onCancel();
         if (previewUrl) {
           URL.revokeObjectURL(previewUrl);
@@ -35,11 +36,12 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
     <>
       {uploading && <FullScreenSpin spinning={uploading}></FullScreenSpin>}
       <Form
+        form={form}
         onFinish={(data) => {
           const [teamName, teamId] = data.team.split("|");
-          handleAdd({ ...data, team: teamName, teamId: teamId });
+          console.log(data, teamName, teamId);
+          handleAdd({ ...data, team: teamName, teamId: teamId }, teamId);
         }}
-        form={form}
       >
         <MemberProfile
           isEditMode={isEditMode}
