@@ -57,7 +57,6 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
         }}
         form={form}
       >
-        {" "}
         <MemberProfile
           isEditMode={isEditMode}
           previewUrl={previewUrl}

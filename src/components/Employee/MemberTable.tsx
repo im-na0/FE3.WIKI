@@ -71,7 +71,6 @@ export default function MemberTable({
         <Table
           dataSource={filteredData}
           columns={columns(navigate)}
-          scroll={{ x: "max-content" }}
           pagination={{
             defaultPageSize: 8,
             showSizeChanger: true,

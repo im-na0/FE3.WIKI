@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Spin } from "antd";
+import { FormInstance, Spin } from "antd";
 import CustomForm from "../common/CustomForm";
 import { userFetchTeamsData } from "../../hooks/Employee/useMemberMutaion";
-import { FormDataType } from "../../type/form";
 
 interface UserData {
   key: string;
@@ -11,9 +10,10 @@ interface UserData {
 
 interface MemberSelectTeamProps {
   readOnly: boolean;
+  form: FormInstance;
 }
 
-function MemberSelectTeam({ readOnly }: MemberSelectTeamProps) {
+function MemberSelectTeam({ readOnly, form }: MemberSelectTeamProps) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<UserData[] | undefined>(undefined);
   const fetchDataParams = {
@@ -29,8 +29,6 @@ function MemberSelectTeam({ readOnly }: MemberSelectTeamProps) {
     fetchTeams();
   }, []);
 
-  console.log(data);
-
   const { required } = CustomForm.useValidate();
   return (
     <Spin spinning={loading}>
@@ -41,6 +39,12 @@ function MemberSelectTeam({ readOnly }: MemberSelectTeamProps) {
         item={data}
         name="team"
         readOnly={readOnly}
+        onChange={(combinedValue) => {
+          if (combinedValue) {
+            const [title, key] = combinedValue.split("|");
+            form.setFieldsValue({ team: combinedValue });
+          }
+        }}
       />
     </Spin>
   );

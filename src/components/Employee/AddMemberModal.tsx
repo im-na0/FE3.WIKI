@@ -1,16 +1,11 @@
 import React, { useState } from "react";
-import { Button, Form } from "antd";
+import { Button, Form, Spin } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";
 import { useUploadData } from "../../hooks/Employee/useMemberMutaion";
 import { FormDataType } from "../../type/form";
-
-const SumbitBtn = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
 
 export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const [form] = Form.useForm();
@@ -37,25 +32,43 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   };
 
   return (
-    <Form
-      onFinish={(data) => {
-        handleAdd(data);
-      }}
-      form={form}
-    >
-      <MemberProfile
-        isEditMode={isEditMode}
-        previewUrl={previewUrl}
-        setPreviewUrl={setPreviewUrl}
-        file={file}
-        setFile={setFile}
-      />
-      <MemberForm isEditMode={isEditMode} />
-      <SumbitBtn>
-        <Button icon={<UserAddOutlined />} htmlType="submit" type="primary">
-          Add
-        </Button>
-      </SumbitBtn>
-    </Form>
+    <>
+      {uploading && <FullScreenSpin spinning={uploading}></FullScreenSpin>}
+      <Form
+        onFinish={(data) => {
+          const [teamName, teamId] = data.team.split("|");
+
+          handleAdd({ ...data, team: teamName, teamId: teamId });
+        }}
+        form={form}
+      >
+        <MemberProfile
+          isEditMode={isEditMode}
+          previewUrl={previewUrl}
+          setPreviewUrl={setPreviewUrl}
+          file={file}
+          setFile={setFile}
+        />
+        <MemberForm isEditMode={isEditMode} form={form} />
+        <SumbitBtn>
+          <Button icon={<UserAddOutlined />} htmlType="submit" type="primary">
+            Add
+          </Button>
+        </SumbitBtn>
+      </Form>{" "}
+    </>
   );
 }
+
+const FullScreenSpin = styled(Spin)`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+`;
+
+const SumbitBtn = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
