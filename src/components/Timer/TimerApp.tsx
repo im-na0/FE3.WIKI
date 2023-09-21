@@ -14,7 +14,6 @@ import {
   addDoc,
   collection,
   doc,
-  DocumentData,
   DocumentReference,
   getDoc,
   getDocs,
@@ -28,20 +27,9 @@ interface UserData {
   name: string;
 }
 
-// 타이머 스타일링
 interface TimerProps {
   fontSize?: string;
 }
-const TimerText = styled.div<TimerProps>`
-  font-size: ${(props) => props.fontSize || "1.5rem"};
-`;
-
-const TimerAlign = styled.div`
-  style={
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "right",
-  alignItems: "center"}`;
 
 const TimerApp = () => {
   const nowDate = new Date().toLocaleDateString("ko-KR", {
@@ -56,21 +44,6 @@ const TimerApp = () => {
   const userNameRef = userUid ? collection(db, "Users") : null;
   const userDoc = userNameRef ? doc(db, `Users/${userUid}`) : null;
 
-  const [nowTime, setNowTime] = useState<string>(
-    new Date().toLocaleTimeString(),
-  ); // 현재 시간 표시
-  const [userName, setUserName] = useState<string | null>(""); // 현재 로그인한 유저의 이름을 관리
-  const [startWorkTime, setStartWorkTime] = useState<string | null>(null); // 출근 시간 기록
-  const [finishWorkTime, setFinishWorkTime] = useState<string | null>(null); // 퇴근 시간 기록
-  const [startWorkBtnClicked, setStartWorkBtnClicked] =
-    useState<boolean>(false); // 출근 버튼 클릭 가능 상태로 시작
-  const [finishWorkBtnClicked, setFinishWorkBtnClicked] =
-    useState<boolean>(false); // 퇴근 버튼 클릭 가능 상태로 시작
-  const [clickedStartBtnText, setClickedStartBtnText] = useState<string>(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
-  const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
-  const [workTimeDocId, setWorkTimeDocId] = useState<string | null>(""); // starttime 기록시 자동으로 생성된 문서 ID 저장
-  const [totalWorkTime, setTotalWorkTime] = useState<number>(0); // 출근 시간과 퇴근 시간을 대조하여 총 근무 시간을 계산
-
   useEffect(() => {
     const fetchUserName = async () => {
       try {
@@ -82,15 +55,98 @@ const TimerApp = () => {
           const userName = userData ? userData.name || null : "";
           setUserName(userName);
           console.log("Fetched userName:", userName);
+
+          // 쿠키를 사용하여 출퇴근 버튼 상태 불러오기
+          const startWorkBtnCookieUserUid = `startWorkBtnClicked${userUid}`;
+          const startWorkBtnStateFromCookie = getCookie(
+            startWorkBtnCookieUserUid,
+          );
+          const finishWorkBtnCookieUserUid = `finishWorkBtnClicked${userUid}`;
+          const finishWorkBtnStateFromCookie = getCookie(
+            finishWorkBtnCookieUserUid,
+          );
+
+          if (
+            startWorkBtnStateFromCookie !== "" &&
+            finishWorkBtnStateFromCookie !== ""
+          ) {
+            setStartWorkBtnClicked(startWorkBtnStateFromCookie === "true");
+            setFinishWorkBtnClicked(finishWorkBtnStateFromCookie === "true");
+          }
         }
       } catch (error) {
-        console.error("Error fetching userName:", error);
+        console.error("Error fetching userName or button states:", error);
       }
     };
+
     if (userDoc) {
       fetchUserName();
     }
-  }, [userDoc]);
+  }, [userDoc, userUid]);
+
+  const [nowTime, setNowTime] = useState<string>(
+    new Date().toLocaleTimeString(),
+  ); // 현재 시간 표시
+  const [userName, setUserName] = useState<string | null>(""); // 현재 로그인한 유저의 이름을 관리
+  const [startWorkTime, setStartWorkTime] = useState<Timestamp | null>(); // 출근 시간 기록
+  const [finishWorkTime, setFinishWorkTime] = useState<Timestamp | null>(); // 퇴근 시간 기록
+  const [startWorkBtnClicked, setStartWorkBtnClicked] =
+    useState<boolean>(false); // 출근 버튼 클릭 가능 상태로 시작
+  const [finishWorkBtnClicked, setFinishWorkBtnClicked] =
+    useState<boolean>(false); // 퇴근 버튼 클릭 가능 상태로 시작
+  const [clickedStartBtnText, setClickedStartBtnText] = useState<string>(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
+  const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
+  const [workTimeDocId, setWorkTimeDocId] = useState<string | null>(""); // starttime 기록시 자동으로 생성된 문서 ID 저장
+  const [passedTime, setPassedTime] = useState<number | null>(0); // 출근 버튼을 클릭한 순간부터 퇴근 버튼을 클릭할 때까지의 타이머 역할
+  const [timeDiff, setTimeDiff] = useState<number | null>(0); // 출근 시간과 퇴근 시간을 대조하여 총 근무 시간을 계산 (Timestamp 형태가 숫자로 변환되어 있음)
+
+  function setCookie(name: string, value: string, days: number) {
+    const date = new Date();
+    const endOfDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      23, // 23시간
+      59, // 59분
+      59, // 59초
+      999, // 999밀리세컨드 (오늘 지나기 전까지)
+    );
+    const expires = "expires=" + endOfDay.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  }
+
+  function getCookie(name: string) {
+    const cookieName = name + "=";
+    const cookies = document.cookie.split("; ");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      if (cookie.indexOf(cookieName) === 0) {
+        return cookie.substring(cookieName.length, cookie.length);
+      }
+    }
+    return "";
+  }
+
+  const updateButtonStatesAndCookies = (
+    startBtnClicked: boolean,
+    finishBtnClicked: boolean,
+    userUid: string | null,
+  ) => {
+    setStartWorkBtnClicked(startBtnClicked);
+    setFinishWorkBtnClicked(finishBtnClicked);
+    setClickedStartBtnText(startBtnClicked ? nowTime : "");
+    setClickedFinishBtnText(finishBtnClicked ? nowTime : "");
+
+    // 쿠키에 버튼 상태 저장
+    if (userUid !== null) {
+      setCookie(`startWorkBtnClicked${userUid}`, startBtnClicked.toString(), 1); //오늘 23시 59분 59초까지만 쿠키가 저장되도록 함
+      setCookie(
+        `finishWorkBtnClicked${userUid}`,
+        finishBtnClicked.toString(),
+        1,
+      ); //오늘 23시 59분 59초까지만 쿠키가 저장되도록 함
+    }
+  };
 
   // 현재 시간을 출력해주는 일반 타이머
   const UpdateTime = () => {
@@ -107,17 +163,19 @@ const TimerApp = () => {
   }, []);
 
   // 출근 시간을 기준으로 총 근무 시간을 출력해주는 타이머
-  const updateTotalWorkTime = () => {
-    if (startWorkBtnClicked && !finishWorkBtnClicked) {
-      setTotalWorkTime((prevTotalWorkTime) => prevTotalWorkTime + 1);
-    }
-  };
-
   useEffect(() => {
-    const totalWorkTimeInterval = setInterval(updateTotalWorkTime, 1000);
+    let interval: NodeJS.Timeout | null = null;
+
+    if (startWorkBtnClicked && !finishWorkBtnClicked) {
+      interval = setInterval(() => {
+        setPassedTime((prevPassedTime) => (prevPassedTime ?? 0) + 1);
+      }, 1000);
+    }
 
     return () => {
-      clearInterval(totalWorkTimeInterval);
+      if (interval) {
+        clearInterval(interval);
+      }
     };
   }, [startWorkBtnClicked, finishWorkBtnClicked]);
 
@@ -150,10 +208,12 @@ const TimerApp = () => {
     const docRef = await addDoc(workTimeSubCollectionRef, {
       starttime: startWorkTime,
     });
-    console.log(docRef.id);
     setWorkTimeDocId(docRef.id); // 자동으로 생성된 문서 ID 저장
-    setStartWorkBtnClicked(true); // 출근 시간 기록 후 버튼 비활성화
+    updateButtonStatesAndCookies(true, finishWorkBtnClicked, userUid); // 출근 시간 기록 후 버튼 비활성화
+    setStartWorkTime(startWorkTime);
     setClickedStartBtnText(nowTime);
+    const storedStartTime = nowTime; // 출근 시간 쿠키 저장용
+    setCookie(`startWorkTime${userUid}`, storedStartTime.toString(), 1);
   };
 
   const recordFinishWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -163,11 +223,9 @@ const TimerApp = () => {
     if (!startWorkBtnClicked) {
       return alert("출근한 상태일 때만 퇴근 기록이 가능합니다!");
     }
-
+    console.log(workTimeDocId);
     if (workTimeDocId) {
-      const finishWorkTime = serverTimestamp() as Timestamp;
-      setFinishWorkBtnClicked(true); // 퇴근 시간 기록 후 버튼 비활성화
-      setClickedFinishBtnText(nowTime);
+      const finishWorkTime = serverTimestamp();
 
       // 출근 시간이 저장된 동일 문서 ID를 참조
       const workTimeDocRef = doc(
@@ -180,6 +238,31 @@ const TimerApp = () => {
         await updateDoc(workTimeDocRef, {
           finishtime: finishWorkTime,
         });
+        console.log(workTimeDocId);
+        const workTimeDocSnapshot = await getDoc(workTimeDocRef);
+        const workTimeData = workTimeDocSnapshot.data();
+        const actualStartWorkTime = workTimeData?.starttime;
+        const actualFinishWorkTime = workTimeData?.finishtime;
+        console.log(actualStartWorkTime.seconds);
+        console.log(actualStartWorkTime.nanoseconds);
+
+        // 총 근무시간 산출
+        if (actualFinishWorkTime && actualStartWorkTime) {
+          const startTimeMillis = actualStartWorkTime.toDate().getTime();
+          const finishTimeMillis = actualFinishWorkTime.toDate().getTime();
+          const timeDiff = (finishTimeMillis - startTimeMillis) / 1000; // 밀리세컨드를 초 단위로 변환
+          setTimeDiff(timeDiff);
+
+          updateButtonStatesAndCookies(startWorkBtnClicked, true, userUid); // 퇴근 시간 기록 후 버튼 비활성화
+          setClickedFinishBtnText(nowTime);
+          const storedFinishTime = nowTime; // 퇴근 시간 쿠키 저장용
+          setCookie(`finishWorkTime${userUid}`, storedFinishTime.toString(), 1);
+          if (timeDiff !== null && timeDiff !== undefined) {
+            setCookie(`totalWorkTime${userUid}`, timeDiff.toString(), 1);
+          } else {
+            console.error("timeDiff is null or undefined");
+          }
+        }
         console.log("퇴근 처리가 정상적으로 완료되었습니다!");
       } catch (error) {
         console.error("퇴근 처리에 실패했습니다", error);
@@ -188,6 +271,13 @@ const TimerApp = () => {
       console.error("worktimeDocId is null");
     }
   };
+
+  const startWorkTimeCookie = `startWorkTime${userUid}`;
+  const startWorkTimeFromCookie = getCookie(startWorkTimeCookie);
+  const finishWorkTimeCookie = `finishWorkTime${userUid}`;
+  const finishWorkTimeFromCookie = getCookie(finishWorkTimeCookie);
+  const timeDiffCookie = `totalWorkTime${userUid}`;
+  const timeDiffFromCookie = Math.floor(Number(getCookie(timeDiffCookie)));
 
   return (
     <form>
@@ -230,7 +320,7 @@ const TimerApp = () => {
               <CheckOutlined />
               &nbsp;출근!
               <br />
-              {clickedStartBtnText}
+              {startWorkTimeFromCookie}
             </>
           )}
         </CustomButton>
@@ -251,7 +341,7 @@ const TimerApp = () => {
               <PoweroffOutlined />
               &nbsp;퇴근!
               <br />
-              {clickedFinishBtnText}
+              {finishWorkTimeFromCookie}
             </>
           )}
         </CustomButton>
@@ -266,9 +356,17 @@ const TimerApp = () => {
           오늘도 수고하셨습니다!👍
         </TimerText>
       )}
-      {(startWorkBtnClicked || finishWorkBtnClicked) && (
+      {(startWorkBtnClicked || finishWorkBtnClicked) && // 출근 버튼을 누른 상태에서는 기본적으로 passedTime이 출력되어 일반 타이머 역할을 하고, 이후 퇴근 버튼을 누르면 타이머가 멈추고 현재까지 경과한 시간이 출력됨. 만약 페이지가 새로고침 된 경우(아래와 같이 passedTime !== null && passedTime !== undefined 조건을 통해) timeDiffFromCookie 쿠키값이 기본적으로 보일 수 있게 함
+      passedTime !== 0 &&
+      passedTime !== null &&
+      passedTime !== undefined ? (
         <div>
-          오늘 총 근무시간은 {formatTotalWorkTime(totalWorkTime)}입니다.
+          오늘 총 근무시간은 {formatTotalWorkTime(passedTime)}입니다.
+          <br />
+        </div>
+      ) : (
+        <div>
+          오늘 총 근무시간은 {formatTotalWorkTime(timeDiffFromCookie)}입니다.
           <br />
         </div>
       )}
@@ -297,5 +395,16 @@ const CustomButton = styled(Button)`
     color: ${(props) => (props.disabled ? "#5F5F5F" : "white")};
   }
 `;
+
+const TimerText = styled.div<TimerProps>`
+  font-size: ${(props) => props.fontSize || "1.5rem"};
+`;
+
+const TimerAlign = styled.div`
+  style={
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "right",
+  alignItems: "center"}`;
 
 export default TimerApp;
