@@ -130,6 +130,7 @@ export const addFile = async (
       name: null,
       department: null,
       position: null,
+      photo: null,
     };
 
     const order = exist.length;
@@ -156,6 +157,7 @@ export const addTeamFile = async (
   name: null | string,
   department: null | string,
   position: null | string,
+  photo: null | string,
   refreshFc: RefreshFunction,
 ): Promise<void> => {
   try {
@@ -174,6 +176,7 @@ export const addTeamFile = async (
       name: name,
       department: department,
       position: position,
+      photo: photo,
     };
 
     const order = exist.length;

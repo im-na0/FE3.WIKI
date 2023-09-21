@@ -58,6 +58,7 @@ export interface NewFile {
   name: null;
   department: null;
   position: null;
+  photo: null;
 }
 
 interface isOpenProps {
@@ -68,6 +69,7 @@ export interface ITeamProps {
   name: string | null;
   department: string | null;
   position: string | null;
+  photo: string | null;
 }
 
 const WikiNav = () => {
@@ -79,6 +81,7 @@ const WikiNav = () => {
     name: null,
     department: null,
     position: null,
+    photo: null,
   });
   const [inputState, setInputState] = useState<boolean>(false);
   const [isWikiSelectOpen, setIsWikiSelectOpen] = useRecoilState(SelectState);
@@ -94,6 +97,9 @@ const WikiNav = () => {
   const [teamName, setTeamName] = useState<string | null>("");
   const [teamInfo, setTeamInfo] = useState<ITeamProps | null>(null);
   const setUserTeam = useSetRecoilState(userTeamName);
+
+  const [userUid, setUserUid] = useState<string | null>(null);
+  const [authState, setAuthState] = useState<boolean>(false);
 
   const refreshFolders = async () => {
     const q = query(
@@ -214,31 +220,46 @@ const WikiNav = () => {
   };
 
   // 유저 검증 및 팀 확인
-  // const userUid = localStorage.getItem("uid");
-  const userUid = "ILDsVGrPboZCnYsqZdw9Z3x3QD53";
-
   const validTeamUser = async () => {
-    const q = query(
-      collection(db, "Teams"),
-      where("userId", "array-contains", userUid),
-    );
-    const querySnapshot = await getDocs(q);
+    try {
+      const userDataString = localStorage.getItem("userData");
+      const isAuthStateString = localStorage.getItem("recoil-persist");
 
-    if (!querySnapshot.empty) {
-      const teamName = querySnapshot.docs[0].data().teamName;
-      if (teamName) {
-        setTeamName(teamName);
-        setUserTeam(teamName);
-        setTeamInfo({ name: "김범수", department: "BE", position: "Senior" });
-        console.log(teamInfo, teamName);
+      if (userDataString && isAuthStateString) {
+        const userData = await JSON.parse(userDataString);
+        const isAuthState = await JSON.parse(isAuthStateString);
+        setUserUid(userData.userUid);
+        setAuthState(isAuthState.authstate);
+
+        const q = query(
+          collection(db, "Teams"),
+          where("userId", "array-contains", userUid),
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const teamName = querySnapshot.docs[0].data().teamName;
+          if (teamName) {
+            setTeamName(teamName);
+            setUserTeam(teamName);
+            setTeamInfo({
+              name: userData.newUser.name,
+              department: userData.newUser.department,
+              position: userData.newUser.position,
+              photo: userData.newUser.photo,
+            });
+          }
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    refreshFolders();
     validTeamUser();
-  }, []);
+    refreshFolders();
+  }, [userUid, authState]);
 
   useEffect(() => {
     refreshFolders();
