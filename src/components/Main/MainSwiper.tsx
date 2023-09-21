@@ -9,6 +9,39 @@ import "swiper/css/pagination";
 import { MAIN_SLIDES, slideInfos } from "../../constant/main";
 import styled from "styled-components";
 
+const MainSwiper = () => {
+  return (
+    <section style={{ margin: "0 -24px" }}>
+      <Swiper
+        loop={true}
+        loopedSlides={1}
+        className="main-swiper"
+        modules={[Navigation]}
+        navigation
+        slidesPerView={"auto"}
+        centeredSlides={true}
+      >
+        {MAIN_SLIDES.map((slide) => (
+          <SwiperSlide key={slide.key}>
+            <MainSwiperItem $slide={slide}>
+              <div className="slide-wrap">
+                <div className="slide-desc">
+                  <h3 className="text-block">{slide.subText}</h3>
+                  <h2>{slide.title}</h2>
+                  <p>{slide.description}</p>
+                </div>
+                <div className="slide-bg"></div>
+              </div>
+            </MainSwiperItem>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    </section>
+  );
+};
+
+export default MainSwiper;
+
 const MainSwiperItem = styled.div<{ $slide: slideInfos }>`
   padding: 0 8px;
   .slide-wrap {
@@ -57,36 +90,3 @@ const MainSwiperItem = styled.div<{ $slide: slideInfos }>`
     }
   }
 `;
-
-const MainSwiper = () => {
-  return (
-    <section style={{ margin: "0 -24px" }}>
-      <Swiper
-        loop={true}
-        loopedSlides={1}
-        className="main-swiper"
-        modules={[Navigation]}
-        navigation
-        slidesPerView={"auto"}
-        centeredSlides={true}
-      >
-        {MAIN_SLIDES.map((slide) => (
-          <SwiperSlide key={slide.key}>
-            <MainSwiperItem $slide={slide}>
-              <div className="slide-wrap">
-                <div className="slide-desc">
-                  <h3 className="text-block">{slide.subText}</h3>
-                  <h2>{slide.title}</h2>
-                  <p>{slide.description}</p>
-                </div>
-                <div className="slide-bg"></div>
-              </div>
-            </MainSwiperItem>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </section>
-  );
-};
-
-export default MainSwiper;

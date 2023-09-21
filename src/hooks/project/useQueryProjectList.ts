@@ -4,27 +4,33 @@ import { db } from "../../libs/firebase";
 import { projectConverter, ProjectInfo } from "../../libs/firestore";
 import { projectListType } from "../../store/project";
 
-const useQueryProjectTeam = (): [
+const useQueryProjectList = (
+  teamName?: string,
+): [
   teamProj: projectListType | undefined,
   setTeamProj: React.Dispatch<
     React.SetStateAction<projectListType | undefined>
   >,
   isLoaded: boolean,
 ] => {
-  const userData = localStorage.getItem("userData");
   const [teamProj, setTeamProj] = useState<projectListType>();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const teamProjQuery = async (teamName: string) => {
+  const teamProjQuery = async (teamName?: string) => {
     let data: projectListType = {};
     const projectPlus: ProjectInfo[] = [];
     const projectProgress: ProjectInfo[] = [];
     const projectCompleted: ProjectInfo[] = [];
-    const q = query(
-      collection(db, "Project").withConverter(projectConverter),
-      where("teams", "array-contains", teamName),
-      orderBy("order", "desc"),
-    );
+    const q = teamName
+      ? query(
+          collection(db, "Project").withConverter(projectConverter),
+          where("teams", "array-contains", teamName),
+          orderBy("order", "desc"),
+        )
+      : query(
+          collection(db, "Project").withConverter(projectConverter),
+          orderBy("order", "desc"),
+        );
     const sn = await getDocs(q);
     sn.forEach((project) => {
       const data = project.data();
@@ -49,17 +55,10 @@ const useQueryProjectTeam = (): [
   };
 
   useEffect(() => {
-    // 유저 정보가 없으면 불러오지 않습니다.
-    if (userData === null) return;
-
-    const {
-      newUser: { team },
-    } = JSON.parse(userData);
-
     try {
-      // 리턴값이 없고 state만 변경하여 void로 처리했습니다.
       (async () => {
-        const data = await teamProjQuery(team);
+        // 유저 정보가 있으면 소속팀 프로젝트 불러오기
+        const data = await teamProjQuery(teamName);
         setTeamProj(data);
       })();
     } catch (error) {
@@ -72,4 +71,4 @@ const useQueryProjectTeam = (): [
   return [teamProj, setTeamProj, isLoaded];
 };
 
-export default useQueryProjectTeam;
+export default useQueryProjectList;

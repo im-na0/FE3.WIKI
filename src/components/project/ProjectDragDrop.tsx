@@ -2,7 +2,7 @@ import React from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import ProjectDroppable from "./ProjectDroppable";
 import { updateOrder } from "../../hooks/project/updateOrder";
-import useQueryProjectTeam from "../../hooks/project/useQueryProjectTeam";
+import useQueryProjectList from "../../hooks/project/useQueryProjectList";
 
 export interface ProjectInfo {
   id: string;
@@ -13,8 +13,8 @@ export interface ProjectInfo {
   duration: string[];
 }
 
-const ProjectDragDrop = () => {
-  const [teamProj, setTeamProj, isLoaded] = useQueryProjectTeam();
+const ProjectDragDrop = ({ teamName }: { teamName?: string }) => {
+  const [teamProj, setTeamProj, isLoaded] = useQueryProjectList(teamName);
 
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination || teamProj === undefined) return;

@@ -22,7 +22,7 @@ const Project = () => {
           <h3>프로젝트</h3>
         </div>
         <h2>{teamName ? teamName + " 프로젝트" : "로그인 먼저 해주세요"}</h2>
-        <ProjectDragDrop />
+        {teamName ? <ProjectDragDrop teamName={teamName} /> : null}
       </div>
     </Layout>
   );
