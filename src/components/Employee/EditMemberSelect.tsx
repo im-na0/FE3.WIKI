@@ -7,6 +7,7 @@ import CustomForm from "../common/CustomForm";
 import { useTeamUserIds } from "../../hooks/Employee/useTeamUserIds";
 
 interface EditTeamMemberSelectProps {
+  isEditMode: boolean;
   onChange: (selectedUserIds: string[]) => void;
   rules?: Rule[];
   prevUserIds?: string[];
@@ -18,6 +19,7 @@ interface UserData {
 }
 
 function EditTeamMemberSelect({
+  isEditMode,
   prevUserIds,
   onChange,
 }: EditTeamMemberSelectProps) {
@@ -86,6 +88,7 @@ function EditTeamMemberSelect({
           render={(item) => item.title}
           showSearch
           listStyle={{ width: "100%" }}
+          disabled={!isEditMode}
         />
       </Form.Item>
     </>

@@ -83,6 +83,13 @@
     padding: 3rem;
 }
 
+.member-btn-area > button {
+    margin-right: 10px;
+}
+.member-btn-area > button:last-child {
+    margin: 0;
+}
+
 /* custom antd style */
 .ant-input[readonly]{
     border: 0;
