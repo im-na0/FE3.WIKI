@@ -1,5 +1,5 @@
 export interface FormDataType {
-  [key: string]: any;
+  [key: string]: any; // FIXME: 인덱스 시그니처 지우깅
   id?: string;
   name?: string;
   email?: string;
@@ -11,4 +11,17 @@ export interface FormDataType {
   photo?: string;
   finishtime?: Date;
   starttime?: Date;
+  teamLeaderId?: string;
+  teamName?: string;
+}
+
+export interface TeamType {
+  id?: string;
+  teamName?: string;
+  leader?: string;
+  desc?: string;
+  photo?: string;
+  userId?: string;
+  updatedAt?: Date;
+  createdAt?: Date;
 }

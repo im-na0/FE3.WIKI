@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import MemberDetailInfo from "../components/Employee/MemberDetailInfo";
-import TeamDetailInfo from "../components/Employee/TeamDetailInfo"; // TeamDetailInfo 컴포넌트 추가
+import TeamDetailInfo from "../components/Employee/Team/TeamDetailInfo"; // TeamDetailInfo 컴포넌트 추가
 import MemberSider from "../components/Employee/MemberSider";
 import { Layout } from "antd";
 import "../styles/Employee.css";

@@ -48,7 +48,7 @@ export function useFetchData({
         },
       );
     } else {
-      // collection 단위
+      // collection 단위 FIXME: 테이블만 가능
       let q = query(collection(db, COLLECTION_NAME));
       if (ORDER) {
         q = query(q, orderBy(ORDER));

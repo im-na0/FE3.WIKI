@@ -137,7 +137,7 @@ function MemberDetailInfo() {
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            <MemberForm isEditMode={isEditMode} />
+            <MemberForm isEditMode={isEditMode} form={form} />
           </div>
         </div>
       </div>

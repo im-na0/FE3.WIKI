@@ -14,6 +14,7 @@ export const SELECT_OPTIONS = {
     admin: "Admin",
     member: "Member",
   },
+  team: {},
 };
 
 export const TABLE_TITLE: Record<string, string> = {

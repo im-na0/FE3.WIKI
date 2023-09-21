@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useFetchData } from "../../hooks/Employee/useFetchData";
-import { FormDataType } from "../../type/form";
+import { useFetchData } from "../../../hooks/Employee/useFetchData";
+import { FormDataType } from "../../../type/form";
 import { Button, message, Spin } from "antd";
-import CustomForm from "../common/CustomForm";
+import CustomForm from "../../common/CustomForm";
 import { EditOutlined, UnorderedListOutlined } from "@ant-design/icons";
-import MemberProfile from "./MemberProfile";
+import MemberProfile from "../MemberProfile";
 import {
   useUpdateData,
   useUploadStorage,
   useDeleteStorage,
-} from "../../hooks/Employee/useMemberMutaion";
+} from "../../../hooks/Employee/useMemberMutaion";
 import TeamForm from "./TeamForm";
 import { useRecoilState } from "recoil";
-import { selectedUserIdsState, userIdsState } from "../../store/member";
+import { selectedUserIdsState, userIdsState } from "../../../store/member";
 import EditMemberSelect from "./EditMemberSelect";
 import styled from "styled-components";
 
@@ -74,6 +74,7 @@ function TeamDetailInfo() {
       }
 
       handleProfileCard();
+      navigate(-1);
     } catch (error) {
       console.error("Error updating member:", error);
       message.error("데이터 업데이트 중 오류가 발생했습니다");

@@ -1,9 +1,18 @@
 import React from "react";
 import { Divider } from "antd";
-import CustomForm from "../common/CustomForm";
-import { teamInputs, teamSelect } from "../../data/formSource";
+import CustomForm from "../../common/CustomForm";
+import TeamLeaderSelect from "./TeamLeaderSelect";
+import {
+  teamInputs,
+  teamSelect,
+  teamTextAreas,
+} from "../../../data/formSource";
 
-function TeamForm({ isEditMode }: { isEditMode: boolean }) {
+interface TeamFormProps {
+  isEditMode: boolean;
+}
+
+function TeamForm({ isEditMode }: TeamFormProps) {
   return (
     <>
       <Divider orientation="left">기본 정보</Divider>
@@ -21,9 +30,19 @@ function TeamForm({ isEditMode }: { isEditMode: boolean }) {
           key={select.name}
           label={select.label}
           name={select.name}
-          defaultValue={select.defaultValue}
+          placeholder={select.place}
           options={select.options}
           rules={select.rules}
+          readOnly={!isEditMode}
+        />
+      ))}
+      <TeamLeaderSelect readOnly={!isEditMode} />
+      {teamTextAreas.map((textArea) => (
+        <CustomForm.TextArea
+          key={textArea.name}
+          label={textArea.label}
+          name={textArea.name}
+          rules={textArea.rules}
           readOnly={!isEditMode}
         />
       ))}

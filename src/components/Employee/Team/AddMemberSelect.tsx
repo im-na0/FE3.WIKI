@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Transfer, Form, message } from "antd";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../libs/firebase";
+import { db } from "../../../libs/firebase";
 import { Rule } from "antd/lib/form";
-import CustomForm from "../common/CustomForm";
-import { useTeamUserIds } from "../../hooks/Employee/useTeamUserIds";
+import CustomForm from "../../common/CustomForm";
+import { useTeamUserIds } from "../../../hooks/Employee/useTeamUserIds";
 
-interface EditTeamMemberSelectProps {
-  isEditMode: boolean;
+interface AddTeamMemberSelectProps {
   onChange: (selectedUserIds: string[]) => void;
   rules?: Rule[];
-  prevUserIds?: string[];
 }
 
 interface UserData {
@@ -18,14 +16,9 @@ interface UserData {
   title: string;
 }
 
-function EditTeamMemberSelect({
-  isEditMode,
-  prevUserIds,
-  onChange,
-}: EditTeamMemberSelectProps) {
+function AddTeamMemberSelect({ onChange }: AddTeamMemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
-
   const teamUserIds = useTeamUserIds();
 
   useEffect(() => {
@@ -44,24 +37,7 @@ function EditTeamMemberSelect({
           (user) => !teamUserIds.includes(user.key),
         );
 
-        if (prevUserIds && prevUserIds.length > 0) {
-          prevUserIds.forEach((userId) => {
-            const userToAdd = userArray.find((user) => user.key === userId);
-            if (userToAdd) {
-              filteredUserArray.push(userToAdd);
-            }
-          });
-        }
-
         setUsers(filteredUserArray);
-
-        if (prevUserIds && prevUserIds.length > 0) {
-          const selectedKeys = userArray
-            .filter((user) => prevUserIds.includes(user.key))
-            .map((user) => user.key);
-
-          setSelectedUserKeys(selectedKeys);
-        }
       } catch (error) {
         console.error("Error fetching users:", error);
         message.error("데이터를 불러올 수 없습니다!");
@@ -69,7 +45,7 @@ function EditTeamMemberSelect({
     };
 
     fetchUsers();
-  }, [prevUserIds, teamUserIds]);
+  }, [teamUserIds]);
 
   const handleUserChange = (nextSelectedKeys: string[]) => {
     setSelectedUserKeys(nextSelectedKeys);
@@ -88,11 +64,10 @@ function EditTeamMemberSelect({
           render={(item) => item.title}
           showSearch
           listStyle={{ width: "100%" }}
-          disabled={!isEditMode}
         />
       </Form.Item>
     </>
   );
 }
 
-export default EditTeamMemberSelect;
+export default AddTeamMemberSelect;
