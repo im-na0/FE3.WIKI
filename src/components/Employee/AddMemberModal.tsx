@@ -46,8 +46,7 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
       <Form
         form={form}
         onFinish={(data) => {
-          const [teamName, teamId] = data.team.split("|");
-          handleAdd({ ...data, team: teamName, teamId: teamId }, teamId);
+          handleAdd(data, data.teamId);
         }}
       >
         <MemberProfile

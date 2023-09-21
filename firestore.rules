@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+  match /users/{userId} {
+    allow read: if true; // 모든 사용자가 읽기를 허용합니다.
+    allow write: if request.auth.uid == userId; // 해당 데이터의 주인(즉, userId와 일치하는 사용자)만 쓰기를 허용합니다.
+  }
+
+  match /otherData/{docId} {
+        allow read: if request.auth.uid != null; // 로그인한 모든 사용자는 읽을 수 있음
+        allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.access == 'admin'; // admin 권한이 있는 사용자만 쓸 수 있음
+      }
+
+  }
+
+    // This rule allows anyone with your Firestore database reference to view, edit,
+    // and delete all data in your Firestore database. It is useful for getting
+    // started, but it is configured to expire after 30 days because it
+    // leaves your app open to attackers. At that time, all client
+    // requests to your Firestore database will be denied.
+    //
+    // Make sure to write security rules for your app before that time, or else
+    // all client requests to your Firestore database will be denied until you Update
+    // your rules
+    match /{document=**} {
+      allow read, write: if request.time < timestamp.date(2023, 10, 10);
+    }
+  }
+}

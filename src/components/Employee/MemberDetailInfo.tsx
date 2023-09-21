@@ -44,16 +44,12 @@ function MemberDetailInfo() {
     }
   }, [userData]);
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (fieldsValue: FormDataType) => {
     try {
       setLoading(true);
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
       const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
-      const fieldsValue = form.getFieldsValue();
-      const [teamName, teamId] = fieldsValue.team.split("|");
-      fieldsValue.team = teamName;
-      fieldsValue.teamId = teamId;
 
       if (file) {
         const downloadURL = await uploadStorage(file);
@@ -101,7 +97,8 @@ function MemberDetailInfo() {
       onFinish={() => {
         toggleEditMode();
         if (isEditMode) {
-          handleUpdate();
+          const fieldsValue = form.getFieldsValue();
+          handleUpdate(fieldsValue);
         }
       }}
     >
