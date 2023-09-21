@@ -123,7 +123,7 @@ const WikiEditor = () => {
       <ToastUIEditor
         ref={editorRef}
         initialValue={existSub ? existSub : INIT}
-        previewStyle="vertical"
+        previewStyle={window.innerWidth < 768 ? "tab" : "vertical"}
         height="800px"
         initialEditType="markdown"
         useCommandShortcut={false}
