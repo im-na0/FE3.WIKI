@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 
 // Style
 import styled from "styled-components";
+
 import { EllipsisOutlined } from "@ant-design/icons";
 
 // Recoil
@@ -16,10 +17,6 @@ import {
 
 // api
 import { deleteFolder } from "../../hooks/Wiki/api";
-
-interface CustomSelectMenuProps {
-  visible: boolean;
-}
 
 interface IProps {
   title: string;
@@ -68,7 +65,10 @@ const WikiSelect = ({ title }: IProps) => {
   return (
     <Container>
       <EllipsisOutlined onClick={handleButtonClick} />
-      <CustomSelectMenu ref={menuRef} visible={isMenuVisible}>
+      <CustomSelectMenu
+        ref={menuRef}
+        className={isMenuVisible ? "open" : "closed"}
+      >
         <CustomSelectItem
           onClick={() => {
             handleItemClick();
@@ -120,8 +120,13 @@ const Container = styled.div`
   position: relative;
 `;
 
-const CustomSelectMenu = styled.ul<CustomSelectMenuProps>`
-  display: ${(props) => (props.visible ? "block" : "none")};
+const CustomSelectMenu = styled.ul`
+  &.open {
+    display: block;
+  }
+  &.closed {
+    display: none;
+  }
   position: absolute;
   top: 100%;
   left: 0;

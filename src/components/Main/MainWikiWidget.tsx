@@ -54,7 +54,6 @@ const MainWikiWidget = () => {
         const fileNames: string[] = [];
         querySnapshot.forEach((doc) => {
           const items: IWikiItem[] = doc.data().items;
-          console.log(items);
           items.forEach((item) => {
             fileNames.push(item.fileName);
           });

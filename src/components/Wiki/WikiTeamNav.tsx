@@ -5,6 +5,7 @@ import WikiSelect from "./WikiSelect";
 
 // Style
 import styled from "styled-components";
+
 import {
   FolderOutlined,
   FileOutlined,
@@ -56,10 +57,6 @@ interface ITeamList {
 export interface TeamNewFile {
   fileName: string;
   subName: string;
-}
-
-interface isOpenProps {
-  isopen: boolean;
 }
 
 const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
@@ -291,7 +288,11 @@ const WikiTeamNav = ({ teamName, teamInfos }: ITeamList) => {
                             <WikiSelect title={item.title} />
                           </div>
                         </StyledTitle>
-                        <StyledFile isopen={item.title === currentFolder}>
+                        <StyledFile
+                          className={
+                            item.title === currentFolder ? "open" : "closed"
+                          }
+                        >
                           {fileState && (
                             <FormContainer>
                               <FileOutlined style={{ fontSize: "14px" }} />
@@ -401,18 +402,26 @@ const StyledSpan = styled.span`
   line-height: 10px;
 `;
 
-const StyledFile = styled.ul<isOpenProps>`
+const StyledFile = styled.ul`
   list-style: none;
   cursor: pointer;
   margin-top: 3px;
   color: rgba(0, 0, 0, 0.85);
-  max-height: ${(props) => (props.isopen ? "500px" : "0")};
+  &.open {
+    max-height: 500px;
+    div {
+      opacity: 1;
+    }
+  }
+  &.closed {
+    max-height: 0;
+    opacity: 0;
+  }
   overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
   div {
-    opacity: ${(props) => (props.isopen ? "1" : "0")};
     transition: opacity 0.3s;
   }
 `;
