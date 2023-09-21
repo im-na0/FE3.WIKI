@@ -22,7 +22,7 @@ const ProjectDetail = ({ isDefault }: { isDefault: boolean }) => {
         <Content
           className="project__content-area"
           style={{
-            minHeight: "calc(100vh - 64px)",
+            minHeight: "calc(100vh - 112px)",
             backgroundColor: "#f5f5f5",
             padding: "10px",
           }}
