@@ -154,6 +154,8 @@ const WikiNav = () => {
     setNewFolder(e.target.value);
   };
 
+  // console.log(1)
+
   const onSubmitFile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newFile.fileName !== "") {
