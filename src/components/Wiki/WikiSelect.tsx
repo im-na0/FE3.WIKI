@@ -144,6 +144,9 @@ const CustomSelectMenu = styled.ul`
   padding: 0;
   margin: 0;
   margin-left: 8px;
+  @media (max-width: 768px) {
+    left: -110px;
+  }
 `;
 
 const CustomSelectItem = styled.li`
