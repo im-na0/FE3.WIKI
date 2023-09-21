@@ -319,6 +319,10 @@ const StyledDiv = styled.div`
     margin-top: 10px;
     margin-bottom: 20px;
   }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 const StyledViewer = styled.div`
   font-size: 1rem !important;
@@ -329,6 +333,9 @@ const StyledDate = styled.div`
   font-size: 0.75rem;
   margin-top: -10px;
   margin-bottom: 30px;
+  @media (max-width: 768px) {
+    margin-top: 10px;
+  }
 `;
 const UserContainer = styled.div`
   display: flex;

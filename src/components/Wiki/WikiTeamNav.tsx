@@ -1,5 +1,4 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-
 // Components
 import WikiSelect from "./WikiSelect";
 
@@ -342,6 +341,9 @@ const StyledContainer = styled.div`
   width: 280px;
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const StyledDiv = styled.div`
@@ -382,6 +384,7 @@ const StyledTitle = styled.div`
       background-color: rgba(0, 0, 0, 0.03);
       transition: background-color 0.3s;
     }
+  }
 `;
 
 const StyledForm = styled.div`

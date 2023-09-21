@@ -21,6 +21,9 @@ export default Wiki;
 const StyledContainer = styled.div`
   margin: 0;
   padding: 0;
-  width: 100vw;
+  width: 100%;
   display: flex;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
