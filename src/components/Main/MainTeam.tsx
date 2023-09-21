@@ -4,60 +4,6 @@ import styled from "styled-components";
 import { AnimatePresence, motion } from "framer-motion";
 import { TEAM3 } from "../../constant/main";
 
-export const MainSect = styled.section`
-  padding: 60px 0;
-  position: relative;
-`;
-
-export const MainWrapper = styled.div`
-  display: flex;
-  gap: 16px;
-  .team-member {
-    flex: 1;
-    background-color: #fff;
-    .profile-img-wrap {
-      height: 240px;
-      img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-  }
-`;
-
-const MainTeamModalWrapper = styled.div`
-  position: absolute;
-  left: 50%;
-  top: 90px;
-  width: 100%;
-  max-width: 600px;
-  z-index: 2;
-  transform: translateX(-50%);
-  .team-member {
-    box-shadow: 3px 5px 20px 8px rgba(0, 0, 0, 0.15);
-    border-radius: 16px;
-    padding: 10px;
-    height: calc(100% - 20px);
-    background-color: #fff;
-    display: flex;
-  }
-  .profile-img-wrap {
-    overflow: hidden;
-    border-radius: 8px;
-    width: 280px;
-    height: 280px;
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
-  .team-member-desc {
-    padding-left: 20px;
-  }
-`;
-
 const MainTeam = () => {
   const [selectedId, setSelectedId] = useState<string | null>();
   const [member, setMember] = useState(TEAM3[0]);
@@ -117,3 +63,57 @@ const MainTeam = () => {
 };
 
 export default MainTeam;
+
+export const MainSect = styled.section`
+  padding: 60px 0;
+  position: relative;
+`;
+
+export const MainWrapper = styled.div`
+  display: flex;
+  gap: 16px;
+  .team-member {
+    flex: 1;
+    background-color: #fff;
+    .profile-img-wrap {
+      height: 240px;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+  }
+`;
+
+const MainTeamModalWrapper = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 90px;
+  width: 100%;
+  max-width: 600px;
+  z-index: 2;
+  transform: translateX(-50%);
+  .team-member {
+    box-shadow: 3px 5px 20px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    padding: 10px;
+    height: calc(100% - 20px);
+    background-color: #fff;
+    display: flex;
+  }
+  .profile-img-wrap {
+    overflow: hidden;
+    border-radius: 8px;
+    width: 280px;
+    height: 280px;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+  .team-member-desc {
+    padding-left: 20px;
+  }
+`;

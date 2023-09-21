@@ -6,7 +6,7 @@ import MainWikiWidget from "./MainWikiWidget";
 import MainProjectWidget from "./MainProjectWidget";
 
 const MainWidget = () => {
-  const [wikis, projects, isLoaded] = useQueryWidget();
+  const [, projects, isLoaded] = useQueryWidget();
   return (
     <MainSect>
       <Row justify={"center"}>

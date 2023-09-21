@@ -8,30 +8,6 @@ import { useSetRecoilState } from "recoil";
 import { currentFileTitle, currentFolderTitle } from "../../store/wiki";
 import { IWikiItem } from "../../store/wiki";
 
-export const BorderTitle = styled.h4<{ $colorPrimary: string }>`
-  border-left: 3px solid ${(props) => props.$colorPrimary};
-  padding: 6px 1rem;
-`;
-
-export const WidgetItem = styled.div`
-  padding: 0.5rem 0;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #dfdfdf;
-  a {
-    display: block;
-    color: inherit;
-  }
-  p {
-    margin: 0;
-    flex: 1;
-  }
-  .list-date {
-    color: #999;
-  }
-};
-`;
-
 const MainWikiWidget = () => {
   const {
     token: { colorPrimary },
@@ -91,3 +67,26 @@ const MainWikiWidget = () => {
 };
 
 export default MainWikiWidget;
+
+export const BorderTitle = styled.h4<{ $colorPrimary: string }>`
+  border-left: 3px solid ${(props) => props.$colorPrimary};
+  padding: 6px 1rem;
+`;
+
+export const WidgetItem = styled.div`
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #dfdfdf;
+  a {
+    display: block;
+    color: inherit;
+  }
+  p {
+    margin: 0;
+    flex: 1;
+  }
+  .list-date {
+    color: #999;
+  }
+`;

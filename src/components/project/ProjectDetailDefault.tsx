@@ -1,21 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 
-const ProjectDetailHolder = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  object {
-    display: block;
-    max-width: 320px;
-    margin: 0 auto;
-  }
-  p {
-    text-align: center;
-  }
-`;
-
 const ProjectDetailDefault = () => {
   return (
     <ProjectDetailHolder>
@@ -31,3 +16,18 @@ const ProjectDetailDefault = () => {
 };
 
 export default ProjectDetailDefault;
+
+const ProjectDetailHolder = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  object {
+    display: block;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  p {
+    text-align: center;
+  }
+`;
