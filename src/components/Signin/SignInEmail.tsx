@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import swal from "sweetalert";
 import { Button, Modal, Checkbox, Form, Input } from "antd";
 import { styled } from "styled-components";
 import { auth, db } from "../../libs/firebase";
@@ -58,8 +59,8 @@ const SignInEmailModal = () => {
         moveStartRegister();
       }
     } catch (error) {
-      alert("회원가입부터 진행해주세요");
       console.error("로그인 실패:", error);
+      swal("Fail", "회원가입부터 진행해주세요!", "error");
     }
   };
   return (

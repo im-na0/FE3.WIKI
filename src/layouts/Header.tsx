@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import swal from "sweetalert";
 import "../styles/Header.css";
 import { Layout, theme, Modal } from "antd";
 import { Link } from "react-router-dom";
@@ -56,14 +57,14 @@ const MainHeader = () => {
       setIsSignIn(false);
       localStorage.removeItem("userData");
       auth.signOut();
-      alert("로그아웃 되었습니다!");
+      swal("Success", "로그아웃 되었습니다!", "success");
     }
   };
   return (
     <Header style={{ background: colorBgContainer }}>
       <div className="header-wrap">
         <h1 className="header-logo fe3-wiki-logo">
-          <Link to="/">Logo</Link>
+          <a href="/">Logo</a>
         </h1>
         <div className="header-nav">
           <nav>

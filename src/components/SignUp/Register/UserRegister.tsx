@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { styled } from "styled-components";
-import { Button, Input, Select, Upload, message } from "antd";
+import { Button, Input, Select, Upload } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
+import swal from "sweetalert";
 import { MainTitle } from "../Title";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../../../hooks/SignIn/Navigation";
@@ -115,18 +116,16 @@ export default function UserRegister() {
             `images/${userUid}/${uploadFile.name}`,
           );
           const snapshot = await uploadBytes(storageRef, uploadFile);
-          console.log("업로드 완료", snapshot);
-          alert("사진 업로드 완료");
+          swal("사진 업로드 완료");
           const downloadURL: string | undefined =
             await getDownloadURL(storageRef);
-          console.log("URL : ", downloadURL);
           setInput((prevInput) => ({
             ...prevInput,
             photo: downloadURL,
           }));
         } else {
           console.error("로그아웃 상태");
-          alert("로그인 부터 해주세요");
+          swal("Fail", "로그인부터 해주세요!", "error");
         }
       } catch (error) {
         console.error("업로드 오류: ", error);
@@ -198,15 +197,15 @@ export default function UserRegister() {
           userUid: userUid,
         };
         localStorage.setItem("userData", JSON.stringify(userData));
-        alert("업로드 성공");
+        swal("Success", "업로드 성공", "success");
         moveEndRegister();
       } else {
         console.error("로그아웃 상태");
-        alert("로그아웃 상태입니다");
+        swal("Warning", "로그아웃 상태입니다!", "warning");
       }
     } catch (error) {
       console.error("Error: ", error);
-      alert("업로드 실패");
+      swal("Error", "업로드 실패", "error");
     }
   };
   // 내 정보 수정시 기존 유저 정보 보이게 하기

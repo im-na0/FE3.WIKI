@@ -17,6 +17,7 @@ import "@toast-ui/editor/dist/toastui-editor-viewer.css";
 import styled from "styled-components";
 import { Button, Space, Input, Avatar } from "antd";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
+import swal from "sweetalert";
 
 // Recoil
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
@@ -110,7 +111,11 @@ const WikiViewer = ({ content }: IContent) => {
   const postDelete = async () => {
     try {
       if (currentFolder === "FE3 WIKI 가이드") {
-        alert("현재 파일은 위키 가이드 파일이므로 삭제할 수 없습니다.");
+        swal(
+          "Fail",
+          "현재 파일은 위키 가이드 파일이므로 삭제할 수 없습니다",
+          "error",
+        );
       } else {
         const q = query(
           collection(db, "WikiPage"),
@@ -180,7 +185,11 @@ const WikiViewer = ({ content }: IContent) => {
 
   const onClickEdit = () => {
     if (currentFolder === "FE3 WIKI 가이드") {
-      alert("현재 파일은 위키 가이드 파일이므로 제목을 수정할 수 없습니다.");
+      swal(
+        "Fail",
+        "현재 파일은 위키 가이드 파일이므로 제목을 수정할 수 없습니다.",
+        "error",
+      );
     } else {
       setEditState(true);
     }
@@ -192,7 +201,11 @@ const WikiViewer = ({ content }: IContent) => {
 
   const onClickSubEdit = () => {
     if (currentFolder === "FE3 WIKI 가이드") {
-      alert("현재 파일은 위키 가이드 파일이므로 내용을 수정할 수 없습니다.");
+      swal(
+        "Fail",
+        "현재 파일은 위키 가이드 파일이므로 내용을 수정할 수 없습니다.",
+        "error",
+      );
     } else {
       setEditFile(true);
       setExistSub(subName);

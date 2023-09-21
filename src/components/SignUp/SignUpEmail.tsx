@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Modal, Checkbox, Form, Input } from "antd";
 import { styled } from "styled-components";
+import swal from "sweetalert";
 import { auth } from "../../libs/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -56,8 +57,8 @@ const SignUpEmailModal = () => {
         password,
       );
       const user = userCredential.user;
-      console.log("로그인 성공:", user);
-      alert("회원가입 완료되었습니다!");
+      console.log("회원가입 성공:", user);
+      swal("회원가입 성공", "회원가입 완료되었습니다!", "success");
       moveStartRegister();
     } catch (error) {
       console.error("로그인 실패:", error);
