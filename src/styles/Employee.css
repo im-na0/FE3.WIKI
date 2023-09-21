@@ -114,3 +114,19 @@
 .ant-select.readOnly > .ant-select-arrow {
     display: none;
 }
+
+
+/* Card List*/
+.ant-card .ant-card-body {
+padding: 2rem 2rem 1.2rem;
+ 
+}
+
+.ant-card .ant-card-actions {
+
+}
+
+.ant-card .ant-card-actions>li {
+    margin: 0;
+    padding: 0.4rem;
+}
