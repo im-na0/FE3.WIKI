@@ -1,7 +1,8 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { modalState } from "../../store/sign";
 const useModal = () => {
-  const [isEmailModalOpen, setEmailModalOpen] = useState(false);
+  const [isEmailModalOpen, setEmailModalOpen] = useRecoilState(modalState);
   const navigate = useNavigate();
   const showModal = () => {
     setEmailModalOpen(true);

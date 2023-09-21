@@ -1,12 +1,7 @@
-import React, { useState } from "react";
-import { Button, Modal, Checkbox, Form, Input } from "antd";
+import React from "react";
+import { Button, Form, Input } from "antd";
 import { styled } from "styled-components";
-import { auth, db } from "../../libs/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigation } from "../../hooks/SignIn/Navigation";
-import { getDoc, doc } from "firebase/firestore";
-import { useRecoilState } from "recoil";
-import { emailState, passwordState } from "../../store/sign";
+import { useSign } from "../../hooks/SignIn/useSign";
 
 interface FieldType {
   userEmail?: string;
@@ -22,46 +17,7 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 const SignInEmailModal = () => {
-  const { moveStartRegister, moveMain } = useNavigation();
-  const [email, setEmail] = useRecoilState(emailState);
-  const [password, setPassword] = useRecoilState(passwordState);
-  // 이메일, 비밀번호 입력
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-  // 이메일 로그인 기능
-  const handleSignIn = async () => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
-      const userUid = user.uid;
-      const userDocRef = doc(db, "Users", userUid);
-      const userDocSnapShot = await getDoc(userDocRef);
-      if (userDocSnapShot.exists()) {
-        const userInfo = userDocSnapShot.data();
-        const userData = {
-          newUser: userInfo,
-          userUid: userUid,
-        };
-        localStorage.setItem("userData", JSON.stringify(userData)); // 로컬스토리지로 보내기
-        moveMain();
-      } else {
-        console.log("정보 입력 단계 시작");
-        moveStartRegister();
-      }
-    } catch (error) {
-      alert("회원가입부터 진행해주세요");
-      console.error("로그인 실패:", error);
-    }
-  };
+  const { handleEmailChange, handlePasswordChange, handleSignIn } = useSign();
   return (
     <Container>
       <ModalContainer>
@@ -102,11 +58,7 @@ const SignInEmailModal = () => {
             wrapperCol={{ offset: 8, span: 16 }}
           ></Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit" onClick={handleSignIn}>
-              제출
-            </Button>
-          </Form.Item>
+          <Form.Item wrapperCol={{ offset: 8, span: 16 }}></Form.Item>
         </Form>
       </ModalContainer>
     </Container>

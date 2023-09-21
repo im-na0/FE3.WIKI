@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { styled } from "styled-components";
+import swal from "sweetalert";
 import { Button } from "antd";
 import {
   ClockCircleOutlined,
@@ -42,7 +43,6 @@ const TimerAlign = styled.div`
   flexDirection: "column",
   justifyContent: "right",
   alignItems: "center"}`;
-
 const TimerApp = () => {
   const nowDate = new Date().toLocaleDateString("ko-KR", {
     year: "2-digit",
@@ -131,7 +131,8 @@ const TimerApp = () => {
 
   const recordStartWork = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (!userUid) return alert("로그인부터 먼저 진행해주세요!");
+    if (!userUid)
+      return swal("Warning", "로그인부터 먼저 진행해주세요!", "warning");
     const startWorkTime = serverTimestamp() as Timestamp; // 현재 시간을 출근 시간으로 기록
     const workTimeSubCollectionRef = collection(
       db,
