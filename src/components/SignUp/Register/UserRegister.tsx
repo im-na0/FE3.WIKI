@@ -209,6 +209,7 @@ export default function UserRegister() {
       alert("업로드 실패");
     }
   };
+  // 내 정보 수정시 기존 유저 정보 보이게 하기
   useEffect(() => {
     const userDataStr = localStorage.getItem("userData");
     if (userDataStr) {
@@ -238,7 +239,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="사용하실 이름을 입력해주세요"
               onChange={handleInputChange}
-              value={input.name}
+              value={input.name} // 기존 유저 이름 정보
             />
           </UserNameCategory>
           <UserEmailCategory>
@@ -248,7 +249,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="이메일을 입력해주세요"
               onChange={handleInputChange}
-              value={input.email}
+              value={input.email} // 기존 유저 메일 정보
             />
           </UserEmailCategory>
           <UserPhoneCategory>
@@ -258,7 +259,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="휴대폰 번호를 입력해주세요"
               onChange={handleInputChange}
-              value={input.phone}
+              value={input.phone} // 기존 유저 번호 정보
             />
           </UserPhoneCategory>
           <UserDepartmentCategory>
@@ -279,7 +280,7 @@ export default function UserRegister() {
                   ],
               }))}
               onChange={handleSelectedPart}
-              value={selectedPart}
+              value={selectedPart} // 기존 유저 부서
             />
           </UserDepartmentCategory>
           <UserTeamCategory>
@@ -302,7 +303,7 @@ export default function UserRegister() {
                 label: team.teamName,
               }))}
               onChange={handleSelectedTeam}
-              value={selectedTeam}
+              value={selectedTeam} // 기존 유저 팀 정보
             />
           </UserTeamCategory>
           <UserPositionCategory>
@@ -328,7 +329,7 @@ export default function UserRegister() {
                   ],
               }))}
               onChange={handleSelectedPosition}
-              value={selectedPosition}
+              value={selectedPosition} // 기존 유저 직급 정보
             />
           </UserPositionCategory>
           <UserImageCategory>
