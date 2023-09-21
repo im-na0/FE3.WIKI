@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Button, message } from "antd";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db, auth } from "../../libs/firebase";
+import { db, auth } from "../../../libs/firebase";
 import TeamForm from "./TeamForm";
-import { FormDataType } from "../../type/form";
-import CustomForm from "../common/CustomForm";
+import { FormDataType } from "../../../type/form";
+import CustomForm from "../../common/CustomForm";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
-import { selectedUserIdsState } from "../../store/member";
+import { selectedUserIdsState } from "../../../store/member";
 import TeamMemberSelect from "./TeamMemberSelect";
 
 const COLLECTION_NAME = "Teams";
@@ -18,7 +18,6 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
   const [isEditMode, setIsEditMode] = useState(true);
   const [selectedUserIds, setSelectedUserIds] =
     useRecoilState(selectedUserIdsState);
-  const [teamLeaderId, setTeamLeaderId] = useState<string | null>(null);
 
   const handleAdd = async (data: FormDataType) => {
     const user = auth.currentUser;
@@ -27,13 +26,11 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
       await setDoc(doc(db, COLLECTION_NAME, userUid), {
         ...data,
         userId: selectedUserIds,
-        teamLeaderId: teamLeaderId,
         createdAt: serverTimestamp(),
       });
       onCancel();
       form.resetFields();
       setSelectedUserIds([]);
-      setTeamLeaderId(null);
       message.success("팀이 생성되었습니다!");
 
       setSelectedUserIds([]);
@@ -48,7 +45,7 @@ export default function AddTeamModal({ onCancel }: { onCancel: () => void }) {
       }}
       form={form}
     >
-      <TeamForm isEditMode={isEditMode} setTeamLeaderId={setTeamLeaderId} />
+      <TeamForm isEditMode={isEditMode} />
       <TeamMemberSelect
         onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
       />

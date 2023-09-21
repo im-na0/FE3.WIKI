@@ -1,16 +1,29 @@
+import React, { useState } from "react";
 import { message } from "antd";
-import { FormDataType } from "../../type/form";
+import { FormDataType, TeamType } from "../../type/form";
 import {
   getDownloadURL,
   uploadBytesResumable,
   deleteObject,
   ref,
 } from "firebase/storage";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import { db, storage } from "../../libs/firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { db, storage, auth } from "../../libs/firebase";
 
 interface UseMemberMutationParams {
   COLLECTION_NAME: string;
+}
+
+interface UserData {
+  key: string;
+  title: string;
 }
 
 export function useUploadStorage() {
@@ -46,8 +59,6 @@ export function useDeleteStorage() {
   return { deleteStorage };
 }
 
-import { updateDoc } from "firebase/firestore";
-
 export function useUpdateData({ COLLECTION_NAME }: UseMemberMutationParams) {
   const updateData = async (id: string, data: FormDataType) => {
     try {
@@ -65,3 +76,66 @@ export function useUpdateData({ COLLECTION_NAME }: UseMemberMutationParams) {
 
   return { updateData };
 }
+
+export async function userFetchTeamsData({
+  COLLECTION_NAME,
+}: UseMemberMutationParams) {
+  try {
+    const docRef = collection(db, COLLECTION_NAME);
+    const querySnapshot = await getDocs(docRef);
+    const data: UserData[] = [];
+    querySnapshot.forEach((doc) => {
+      data.push({
+        key: doc.id,
+        title: doc.data().teamName,
+      });
+    });
+    return data;
+  } catch (error) {
+    console.error("Error fetching collections: ", error);
+    message.error("데이터를 불러오는 중 오류가 발생했습니다");
+  }
+}
+
+export const useUploadData = (COLLECTION_NAME: string) => {
+  const [uploading, setUploading] = useState(false);
+  const [downloadURL, setDownloadURL] = useState<string | null>(null);
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const userUid = user.uid;
+  const userDocRef = doc(db, COLLECTION_NAME, userUid);
+
+  const uploadStorage = async (file: File) => {
+    setUploading(true);
+    const name = new Date().getTime() + file.name;
+    const storageRef = ref(storage, `member/${name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on("state_changed", null, null, async () => {
+      const url = await getDownloadURL(storageRef);
+      setDownloadURL(url);
+      setUploading(false);
+    });
+  };
+
+  const uploadStore = async (data: any) => {
+    try {
+      await setDoc(userDocRef, data, { merge: true }); // Using merge: true to update/overwrite
+      message.success("데이터가 업로드되었습니다.");
+    } catch (error) {
+      message.error("데이터 업로드 중 오류가 발생했습니다.");
+      console.error("데이터 업로드 중 오류 발생:", error);
+    }
+  };
+
+  return {
+    uploadStorage,
+    uploadStore,
+    uploading,
+    downloadURL,
+  };
+};

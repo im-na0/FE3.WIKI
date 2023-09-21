@@ -113,10 +113,15 @@ function CustomSelect({
   );
 }
 
+interface UserData {
+  key: string;
+  title: string;
+}
+
 interface CustomSearchSelectProps extends Omit<SelectProps, "options"> {
   loading: boolean;
   error?: string | null;
-  item: FormDataType[];
+  item?: UserData[];
 }
 
 function CustomSearchSelect({
@@ -148,13 +153,9 @@ function CustomSearchSelect({
         }
         value={defaultValue}
       >
-        {item.length > 0 ? (
+        {item && item.length > 0 ? (
           item.map((item) => (
-            <Select.Option
-              key={item.key}
-              value={item.key}
-              disabled={item.key === defaultValue}
-            >
+            <Select.Option key={item.key} value={item.title}>
               {item.title}
             </Select.Option>
           ))

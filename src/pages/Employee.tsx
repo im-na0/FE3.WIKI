@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import MemberList from "../components/Employee/MemberList";
-import TeamList from "../components/Employee/TeamList";
+import TeamList from "../components/Employee/Team/TeamList";
 import { Layout } from "antd";
 import { useLocation } from "react-router-dom";
 import MemberSider from "../components/Employee/MemberSider";

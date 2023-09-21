@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../libs/firebase";
-import { useTeamUserIds } from "../../hooks/Employee/useTeamUserIds";
-import CustomForm from "../common/CustomForm";
+import { db } from "../../../libs/firebase";
+import { useTeamUserIds } from "../../../hooks/Employee/useTeamUserIds";
+import CustomForm from "../../common/CustomForm";
 
 interface UserData {
   key: string;
@@ -10,11 +10,10 @@ interface UserData {
 }
 
 interface TeamLeaderSelectProps {
-  onChange: (selectedUserId: string) => void;
   readOnly: boolean;
 }
 
-function TeamLeaderSelect({ onChange, readOnly }: TeamLeaderSelectProps) {
+function TeamLeaderSelect({ readOnly }: TeamLeaderSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<null | string>(null);
@@ -45,6 +44,8 @@ function TeamLeaderSelect({ onChange, readOnly }: TeamLeaderSelectProps) {
 
     fetchUsers();
   }, [teamUserIds]);
+
+  console.log(users);
 
   const { required } = CustomForm.useValidate();
 

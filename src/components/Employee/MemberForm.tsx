@@ -2,6 +2,7 @@ import React from "react";
 import { Divider } from "antd";
 import CustomForm from "../common/CustomForm";
 import { userInputs, userSelect } from "../../data/formSource";
+import MemberSelectTeam from "./MemberSelectTeam";
 
 function MemberForm({ isEditMode }: { isEditMode: boolean }) {
   return (
@@ -17,6 +18,7 @@ function MemberForm({ isEditMode }: { isEditMode: boolean }) {
         />
       ))}
       <Divider orientation="left">회사 정보</Divider>
+      <MemberSelectTeam readOnly={!isEditMode} />
       {userSelect.map((select) => (
         <CustomForm.Select
           key={select.name}

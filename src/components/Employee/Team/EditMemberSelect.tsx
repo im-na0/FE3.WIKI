@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Transfer, Form, message } from "antd";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../libs/firebase";
+import { db } from "../../../libs/firebase";
 import { Rule } from "antd/lib/form";
-import CustomForm from "../common/CustomForm";
-import { useTeamUserIds } from "../../hooks/Employee/useTeamUserIds";
+import CustomForm from "../../common/CustomForm";
+import { useTeamUserIds } from "../../../hooks/Employee/useTeamUserIds";
 
 interface EditTeamMemberSelectProps {
   isEditMode: boolean;

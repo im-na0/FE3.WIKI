@@ -1,15 +1,18 @@
 import React from "react";
 import { Divider } from "antd";
-import CustomForm from "../common/CustomForm";
+import CustomForm from "../../common/CustomForm";
 import TeamLeaderSelect from "./TeamLeaderSelect";
-import { teamInputs, teamSelect, teamTextAreas } from "../../data/formSource";
+import {
+  teamInputs,
+  teamSelect,
+  teamTextAreas,
+} from "../../../data/formSource";
 
 interface TeamFormProps {
   isEditMode: boolean;
-  setTeamLeaderId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-function TeamForm({ isEditMode, setTeamLeaderId }: TeamFormProps) {
+function TeamForm({ isEditMode }: TeamFormProps) {
   return (
     <>
       <Divider orientation="left">기본 정보</Divider>
@@ -33,10 +36,7 @@ function TeamForm({ isEditMode, setTeamLeaderId }: TeamFormProps) {
           readOnly={!isEditMode}
         />
       ))}
-      <TeamLeaderSelect
-        readOnly={!isEditMode}
-        onChange={(selectedUserId) => setTeamLeaderId(selectedUserId)}
-      />
+      <TeamLeaderSelect readOnly={!isEditMode} />
       {teamTextAreas.map((textArea) => (
         <CustomForm.TextArea
           key={textArea.name}

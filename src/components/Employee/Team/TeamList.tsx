@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Button } from "antd";
 import styled from "styled-components";
-import MemberFilter from "./MemberFilter";
-import MemberSearch from "./MemberSearch";
-import CustomForm from "../common/CustomForm";
+import MemberFilter from "../MemberFilter";
+import MemberSearch from "../MemberSearch";
+import CustomForm from "../../common/CustomForm";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import { useDeleteData } from "../../../hooks/Employee/useDeleteData";
 import AddTeamModal from "./AddTeamModal";
 import TeamCard from "./TeamCard";
 

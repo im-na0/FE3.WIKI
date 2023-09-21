@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Spin, Card, Avatar, Tooltip, Button, message, Popconfirm } from "antd";
-import { FormDataType } from "../../type/form";
-import { useFetchTeamData } from "../../hooks/Employee/useFetchTeamData";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import { FormDataType } from "../../../type/form";
+import { useFetchTeamData } from "../../../hooks/Employee/useFetchTeamData";
+import { useDeleteData } from "../../../hooks/Employee/useDeleteData";
 import { useNavigate } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
 import { styled } from "styled-components";

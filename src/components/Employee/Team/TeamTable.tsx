@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Table, Spin } from "antd";
-import { FormDataType } from "../../type/form";
-import { useFetchTeamData } from "../../hooks/Employee/useFetchTeamData";
-import { columns } from "../../data/teamTableColumns";
+import { FormDataType } from "../../../type/form";
+import { useFetchTeamData } from "../../../hooks/Employee/useFetchTeamData";
+import { columns } from "../../../data/teamTableColumns";
 import { useNavigate } from "react-router-dom";
 
 interface MemberTableProps {
