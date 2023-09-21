@@ -50,6 +50,11 @@ function MemberDetailInfo() {
       const { deleteStorage } = useDeleteStorage();
       const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
       const fieldsValue = form.getFieldsValue();
+      const [teamName, teamId] = fieldsValue.team.split("|");
+      fieldsValue.team = teamName;
+      fieldsValue.teamId = teamId;
+
+      console.log(fieldsValue);
 
       if (file) {
         const downloadURL = await uploadStorage(file);
@@ -87,7 +92,15 @@ function MemberDetailInfo() {
   };
 
   return (
-    <Form form={form}>
+    <Form
+      form={form}
+      onFinish={() => {
+        toggleEditMode();
+        if (isEditMode) {
+          handleUpdate();
+        }
+      }}
+    >
       {loading ? (
         <Overlay>
           <Spin size="large" />
@@ -107,16 +120,7 @@ function MemberDetailInfo() {
           >
             목록
           </Button>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => {
-              toggleEditMode();
-              if (isEditMode) {
-                handleUpdate();
-              }
-            }}
-          >
+          <Button type="primary" icon={<EditOutlined />} htmlType="submit">
             {isEditMode ? "Save" : "Edit"}
           </Button>
         </div>
