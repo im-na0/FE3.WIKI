@@ -59,13 +59,10 @@ export default function TeamCard({
       key: item.id,
     }));
 
-    console.log(dataWithKeys);
-
     setFilteredData(dataWithKeys);
   }, [teamData, filterValue, sortValue, searchText]);
 
   const handleConfirmDelete = (id: string | undefined) => {
-    console.log(id);
     if (id != null) {
       deleteData(id);
       message.info("삭제되었습니다");

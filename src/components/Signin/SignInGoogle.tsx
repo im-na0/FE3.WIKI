@@ -3,7 +3,7 @@ import { GoogleOutlined } from "@ant-design/icons";
 import { auth, db } from "../../libs/firebase";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { getDoc, doc } from "firebase/firestore";
-import { useNavigation } from "../../hooks/SignIn/Navigation";
+import { useNavigation } from "../../hooks/SignIn/useNavigation";
 import { styled } from "styled-components";
 
 const provider = new GoogleAuthProvider();

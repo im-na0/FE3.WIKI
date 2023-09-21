@@ -12,6 +12,7 @@ import {
   useUploadStorage,
   useDeleteStorage,
 } from "../../hooks/Employee/useMemberMutaion";
+import { useUpdateTeamForMember } from "../../hooks/Employee/useUpdateTeamForMember";
 import styled from "styled-components";
 
 function MemberDetailInfo() {
@@ -50,6 +51,9 @@ function MemberDetailInfo() {
       const { deleteStorage } = useDeleteStorage();
       const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
       const fieldsValue = form.getFieldsValue();
+      const [teamName, teamId] = fieldsValue.team.split("|");
+      fieldsValue.team = teamName;
+      fieldsValue.teamId = teamId;
 
       if (file) {
         const downloadURL = await uploadStorage(file);
@@ -58,9 +62,14 @@ function MemberDetailInfo() {
       } else {
         fieldsValue.photo = previewUrl || fieldsValue.photo;
       }
-
+      const currentTeamId = userData.teamId;
       if (memberId) {
         await updateData(memberId, fieldsValue);
+      }
+      const { updateTeamForMember } = useUpdateTeamForMember();
+
+      if (memberId && fieldsValue.teamId && currentTeamId) {
+        await updateTeamForMember(memberId, currentTeamId, fieldsValue.teamId);
       }
 
       handleProfileCard();
@@ -87,7 +96,15 @@ function MemberDetailInfo() {
   };
 
   return (
-    <Form form={form}>
+    <Form
+      form={form}
+      onFinish={() => {
+        toggleEditMode();
+        if (isEditMode) {
+          handleUpdate();
+        }
+      }}
+    >
       {loading ? (
         <Overlay>
           <Spin size="large" />
@@ -107,16 +124,7 @@ function MemberDetailInfo() {
           >
             목록
           </Button>
-          <Button
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => {
-              toggleEditMode();
-              if (isEditMode) {
-                handleUpdate();
-              }
-            }}
-          >
+          <Button type="primary" icon={<EditOutlined />} htmlType="submit">
             {isEditMode ? "Save" : "Edit"}
           </Button>
         </div>

@@ -6,8 +6,13 @@ import { columns } from "../../data/tableColumns";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { useNavigate } from "react-router-dom";
 
+type SelectedRowData = {
+  id: string;
+  teamId?: string;
+};
+
 interface MemberTableProps {
-  setSelectedRowKeys: (keys: string[]) => void;
+  setSelectedRowKeys: (keys: SelectedRowData[]) => void;
   searchText: string;
   filterValue: string;
   sortValue: string;
@@ -26,6 +31,7 @@ export default function MemberTable({
   const data = useFetchData(fetchDataParams);
 
   const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -81,8 +87,12 @@ export default function MemberTable({
               selectedRows: FormDataType[],
             ) => {
               const selectedIds = selectedRows
-                .filter((row) => typeof row.id !== "undefined")
-                .map((row) => row.id) as string[];
+                .filter((row) => row.id)
+                .map((row) => ({
+                  id: row.id!,
+                  teamId: row.teamId,
+                }));
+              console.log(selectedIds);
               setSelectedRowKeys(selectedIds);
             },
           }}

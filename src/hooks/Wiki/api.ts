@@ -13,6 +13,8 @@ import {
 import { NewFile } from "../../components/Wiki/WikiNav";
 import { TeamNewFile } from "../../components/Wiki/WikiTeamNav";
 
+import swal from "sweetalert";
+
 type RefreshFunction = () => void;
 
 // 새로운 전체 폴더 생성
@@ -31,7 +33,7 @@ export const addAllFolder = async (
     );
 
     if (existFolderNames.includes(folderName)) {
-      alert("이미 같은 이름의 폴더가 존재합니다.");
+      swal("Fail", "이미 같은 이름의 폴더가 존재합니다.", "error");
     } else {
       const order = foldersQuerySnapshot.size;
 
@@ -66,7 +68,7 @@ export const addTeamFolder = async (
     );
 
     if (existFolderNames.includes(folderName)) {
-      alert("이미 같은 이름의 폴더가 존재합니다.");
+      swal("Fail", "이미 같은 이름의 폴더가 존재합니다.", "error");
     } else {
       const order = foldersQuerySnapshot.size;
 
@@ -203,7 +205,11 @@ export const deleteFolder = async (
 ) => {
   try {
     if (folderName === "FE3 WIKI 가이드") {
-      alert("현재 폴더는 가이드 폴더이므로 삭제할 수 없습니다.");
+      swal(
+        "Fail",
+        "현재 폴더는 가이드 폴더이므로 삭제할 수 없습니다.",
+        "error",
+      );
     } else {
       const q = query(
         collection(db, "WikiPage"),

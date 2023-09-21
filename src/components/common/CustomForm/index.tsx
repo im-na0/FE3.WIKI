@@ -155,7 +155,7 @@ function CustomSearchSelect({
       >
         {item && item.length > 0 ? (
           item.map((item) => (
-            <Select.Option key={item.key} value={`${item.title}|${item.key}`}>
+            <Select.Option key={item.key} value={item.title}>
               {item.title}
             </Select.Option>
           ))
