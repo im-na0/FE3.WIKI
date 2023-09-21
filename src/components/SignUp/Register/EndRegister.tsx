@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "styled-components";
 import { ActiveDot, Dot, SlideCounter } from "../Pagination";
-import { useNavigation } from "../../../hooks/SignIn/Navigation";
+import { useNavigation } from "../../../hooks/SignIn/useNavigation";
 import { EndSubTitle, EndTitle } from "../Title";
 import { motion } from "framer-motion";
 

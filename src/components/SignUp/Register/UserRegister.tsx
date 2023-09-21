@@ -1,41 +1,30 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
+// firebase
+import { collection, getDocs } from "firebase/firestore";
+import { db, auth, storage } from "../../../libs/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// style
 import { styled } from "styled-components";
 import { Button, Input, Select, Upload } from "antd";
 import { UploadOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import swal from "sweetalert";
-import { MainTitle } from "../Title";
-import { SlideCounter, Dot, ActiveDot } from "../Pagination";
-import { useNavigation } from "../../../hooks/SignIn/Navigation";
 import { motion } from "framer-motion";
-import {
-  collection,
-  getDocs,
-  setDoc,
-  doc,
-  updateDoc,
-  addDoc,
-  query,
-  where,
-} from "firebase/firestore";
-import { db, auth, storage } from "../../../libs/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// state 및 data
 import { useRecoilState } from "recoil";
-import {
-  Team,
-  selectedPartState,
-  selectedPoState,
-  selectedTeamState,
-  teamState,
-  userInfo,
-} from "../../../store/sign";
+import { Team, teamState } from "../../../store/sign";
 import { SELECT_OPTIONS } from "../../../constant/member";
+// custom hooks
+import { userRegister } from "../../../hooks/SignIn/userRegister";
+import { SlideCounter, Dot, ActiveDot } from "../Pagination";
+import { useNavigation } from "../../../hooks/SignIn/useNavigation";
+import { MainTitle } from "../Title";
 
 // 부서 가져오기
 const departmentKey = Object.keys(SELECT_OPTIONS.department);
 const positionKey = Object.keys(SELECT_OPTIONS.position);
 
-// Teams 정보 가져오기
+// Teams 컬렉션에서 팀 가져오기
 async function getTeams() {
   const teamRef = collection(db, "Teams");
   const querySnapshot = await getDocs(teamRef);
@@ -46,35 +35,23 @@ async function getTeams() {
   return teams;
 }
 export default function UserRegister() {
-  // 로그인 유저 정보 가져오기
-  const user = auth.currentUser;
-  const { moveStartRegister, moveEndRegister } = useNavigation();
+  const {
+    selectedPart,
+    setSelectedPart,
+    selectedTeam,
+    setSelectedTeam,
+    selectedPosition,
+    input,
+    setInput,
+    setSelectedPosition,
+    handleInputChange,
+    handleSelectChange,
+    handleUpload,
+  } = userRegister();
+
+  // 선택한 팀 저장할 값
   const [teamOptions, setTeamOptions] = useRecoilState(teamState);
-  const [selectedPart, setSelectedPart] = useRecoilState(selectedPartState);
-  const [selectedTeam, setSelectedTeam] = useRecoilState(selectedTeamState);
-  const [selectedPosition, setSelectedPosition] =
-    useRecoilState(selectedPoState);
-
-  // 기존 부서 저장
-  const prevPartmentRef = useRef<string | undefined>(undefined);
-  const prevTeamRef = useRef<string | undefined>(selectedTeam);
-
-  //  부서 선택하면 선택 부서 저장
-  const handleSelectedPart = (value: string | undefined) => {
-    prevPartmentRef.current = selectedPart;
-    setSelectedPart(value);
-  };
-
-  //  팀 선택하면 선택 팀 저장
-  const handleSelectedTeam = (value: string | undefined) => {
-    prevTeamRef.current = selectedTeam;
-    setSelectedTeam(value);
-  };
-
-  // 직급 선택하면 선택 직급 저장
-  const handleSelectedPosition = (value: string | undefined) => {
-    setSelectedPosition(value);
-  };
+  const { moveStartRegister } = useNavigation();
   useEffect(() => {
     async function fetchTeams() {
       const teams = await getTeams();
@@ -82,55 +59,6 @@ export default function UserRegister() {
     }
     fetchTeams();
   }, []);
-
-  // 유저 정보 input 값 저장
-  const [input, setInput] = useRecoilState(userInfo);
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    switch (name) {
-      case "phone":
-        setInput((prevInput) => {
-          const phone = value
-            .replace(/[^0-9]/g, "")
-            .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
-          return {
-            ...prevInput,
-            phone,
-          };
-        });
-        break;
-      case "department":
-        setSelectedPart(value);
-        break;
-      case "team":
-        setSelectedTeam(value);
-        break;
-      case "position":
-        setSelectedPosition(value);
-        break;
-      default:
-        setInput((prevInput) => ({
-          ...prevInput,
-          [name]: value,
-        }));
-        break;
-    }
-
-    // if (name === "department") {
-    //   setSelectedPart(value);
-    // }
-    // if (name === "team") {
-    //   setSelectedTeam(value);
-    // }
-    // if (name === "position") {
-    //   setSelectedPosition(value);
-    // }
-    // setInput((prevInput) => ({
-    //   ...prevInput,
-    //   [name]: value,
-    // }));
-  };
 
   // upload 컴포넌트 props 값 => 이미지 업로드
   const props: UploadProps = {
@@ -164,80 +92,6 @@ export default function UserRegister() {
     showUploadList: false,
   };
 
-  // firebase에 로그인 uid 이름으로 업로드
-  const handleUpload = async () => {
-    try {
-      if (user) {
-        const userUid = user.uid; // uid 가져오기
-        const userDB = doc(db, "Users", userUid);
-        const newUser = {
-          name: input.name,
-          email: input.email,
-          phone: input.phone,
-          department: selectedPart,
-          team: selectedTeam,
-          position: selectedPosition,
-          photo: input.photo,
-        };
-        const prevTeamName = prevTeamRef.current;
-        console.log(prevTeamName);
-        console.log(selectedTeam);
-        if (prevTeamName !== selectedTeam) {
-          if (prevTeamName) {
-            const prevTeamQuery = query(
-              collection(db, "Teams"),
-              where("teamName", "==", prevTeamName),
-            );
-            const prevTeamQuerySnapshot = await getDocs(prevTeamQuery);
-            if (!prevTeamQuerySnapshot.empty) {
-              const prevTeamDoc = prevTeamQuerySnapshot.docs[0];
-              const prevTeamData = prevTeamDoc.data();
-              const updatedUserId = (prevTeamData.userId || []).filter(
-                (userId: string) => userId !== userUid,
-              );
-              await updateDoc(prevTeamDoc.ref, {
-                userId: updatedUserId,
-              });
-              moveEndRegister();
-            }
-          }
-        }
-        await setDoc(userDB, newUser);
-        const teamDB = collection(db, "Teams");
-        const q = query(teamDB, where("teamName", "==", selectedTeam));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const teamDoc = querySnapshot.docs[0];
-          const teamData = teamDoc.data();
-          const updatedUserId = [...(teamData.userId || []), userUid];
-          await updateDoc(teamDoc.ref, {
-            userId: updatedUserId,
-          });
-        } else {
-          const teamData = {
-            department: selectedPart,
-            teamName: selectedTeam,
-            userId: [userUid],
-          };
-          await addDoc(teamDB, teamData);
-        }
-        // localStorage에 user 정보 올리기
-        const userData = {
-          newUser: newUser,
-          userUid: userUid,
-        };
-        localStorage.setItem("userData", JSON.stringify(userData));
-        swal("Success", "업로드 성공", "success");
-        moveEndRegister();
-      } else {
-        console.error("로그아웃 상태");
-        swal("Warning", "로그아웃 상태입니다!", "warning");
-      }
-    } catch (error) {
-      console.error("Error: ", error);
-      swal("Error", "업로드 실패", "error");
-    }
-  };
   // 내 정보 수정시 기존 유저 정보 보이게 하기
   useEffect(() => {
     const userDataStr = localStorage.getItem("userData");
@@ -268,7 +122,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="사용하실 이름을 입력해주세요"
               onChange={handleInputChange}
-              value={input.name} // 기존 유저 이름 정보
+              value={input.name}
             />
           </UserNameCategory>
           <UserEmailCategory>
@@ -278,7 +132,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="이메일을 입력해주세요"
               onChange={handleInputChange}
-              value={input.email} // 기존 유저 메일 정보
+              value={input.email}
             />
           </UserEmailCategory>
           <UserPhoneCategory>
@@ -288,7 +142,7 @@ export default function UserRegister() {
               style={{ width: "320px" }}
               placeholder="휴대폰 번호를 입력해주세요"
               onChange={handleInputChange}
-              value={input.phone} // 기존 유저 번호 정보
+              value={input.phone}
             />
           </UserPhoneCategory>
           <UserDepartmentCategory>
@@ -308,8 +162,8 @@ export default function UserRegister() {
                     key as keyof typeof SELECT_OPTIONS.department
                   ],
               }))}
-              onChange={handleSelectedPart}
-              value={selectedPart} // 기존 유저 부서
+              onChange={handleSelectChange("part")}
+              value={selectedPart}
             />
           </UserDepartmentCategory>
           <UserTeamCategory>
@@ -331,8 +185,8 @@ export default function UserRegister() {
                 value: team.teamName,
                 label: team.teamName,
               }))}
-              onChange={handleSelectedTeam}
-              value={selectedTeam} // 기존 유저 팀 정보
+              onChange={handleSelectChange("team")}
+              value={selectedTeam}
             />
           </UserTeamCategory>
           <UserPositionCategory>
@@ -357,8 +211,8 @@ export default function UserRegister() {
                     key as keyof typeof SELECT_OPTIONS.position
                   ],
               }))}
-              onChange={handleSelectedPosition}
-              value={selectedPosition} // 기존 유저 직급 정보
+              onChange={handleSelectChange("position")}
+              value={selectedPosition}
             />
           </UserPositionCategory>
           <UserImageCategory>
@@ -394,8 +248,9 @@ const Container = styled.div`
   margin-top: 80px;
 `;
 const UserInfoContainer = styled.div`
-  border: 1px solid black;
-  border-radius: 10px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 3px 4px 16px rgba(0, 0, 0, 0.15);
   margin: 20px auto;
   display: flex;
   flex-direction: column;
@@ -424,7 +279,7 @@ const BtnContainer = styled.div`
   height: 30px;
 `;
 const BackBtn = styled.button`
-  border: 1px solid black;
+  border: none;
   width: 60px;
   background-color: #6c63ff;
   font-size: 16px;
@@ -439,7 +294,7 @@ const BackBtn = styled.button`
   }
 `;
 const SubmitBtn = styled.button`
-  border: 1px solid black;
+  border: none;
   width: 240px;
   font-size: 16px;
   color: #fff;

@@ -57,7 +57,9 @@ const MainHeader = () => {
       setIsSignIn(false);
       localStorage.removeItem("userData");
       auth.signOut();
-      swal("Success", "로그아웃 되었습니다!", "success");
+      swal("Success", "로그아웃 되었습니다!", "success").then(() => {
+        window.location.reload();
+      });
     }
   };
   return (

@@ -1,34 +1,14 @@
-import React, { useState } from "react";
-import { Button, Modal, Checkbox, Form, Input } from "antd";
+import React from "react";
+import { Button, Form, Input } from "antd";
 import { styled } from "styled-components";
-import swal from "sweetalert";
-import { auth } from "../../libs/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useNavigation } from "../../hooks/SignIn/Navigation";
+import { useSign } from "../../hooks/SignIn/useSign";
 
 interface FieldType {
   userEmail?: string;
   password?: string;
   remember?: string;
 }
-const Container = styled.div`
-  margin: 0;
-  padding: 0;
-`;
-const ModalContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border-radius: 20px;
-  text-align: start;
-`;
-const ModalTitle = styled.p`
-  font-size: 20px;
-  margin-top: 50px;
-  margin-bottom: 0;
-  text-align: center;
-`;
+
 const onFinish = (values: any) => {
   console.log("Success: ", values);
 };
@@ -37,33 +17,7 @@ const onFinishFailed = (errorInfo: any) => {
 };
 
 const SignUpEmailModal = () => {
-  const { moveStartRegister } = useNavigation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSignUp = async () => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
-      console.log("회원가입 성공:", user);
-      swal("회원가입 성공", "회원가입 완료되었습니다!", "success");
-      moveStartRegister();
-    } catch (error) {
-      console.error("로그인 실패:", error);
-    }
-  };
+  const { handleEmailChange, handlePasswordChange, handleSignUp } = useSign();
   return (
     <Container>
       <ModalContainer>
@@ -104,14 +58,28 @@ const SignUpEmailModal = () => {
             wrapperCol={{ offset: 8, span: 16 }}
           ></Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit" onClick={handleSignUp}>
-              제출
-            </Button>
-          </Form.Item>
+          <Form.Item wrapperCol={{ offset: 8, span: 16 }}></Form.Item>
         </Form>
       </ModalContainer>
     </Container>
   );
 };
 export default SignUpEmailModal;
+
+const Container = styled.div`
+  margin: 0;
+  padding: 0;
+`;
+const ModalContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 20px;
+  text-align: start;
+`;
+const ModalTitle = styled.p`
+  font-size: 20px;
+  margin-top: 50px;
+  margin-bottom: 0;
+  text-align: center;
+`;

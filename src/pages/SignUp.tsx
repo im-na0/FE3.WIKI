@@ -17,9 +17,11 @@ import {
   Logo,
   LoginBtnContainer,
 } from "./SignIn";
+import { useSign } from "../hooks/SignIn/useSign";
 
 const SignUp = () => {
   const { isEmailModalOpen, showModal, handleCancel, handleOk } = useModal();
+  const { handleSignUp } = useSign();
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -58,7 +60,12 @@ const SignUp = () => {
             </Col>
           </Row>
         </SignInContainer>
-        <Modal open={isEmailModalOpen} onCancel={handleCancel} onOk={handleOk}>
+        <Modal
+          open={isEmailModalOpen}
+          onCancel={handleCancel}
+          onOk={handleSignUp}
+        >
+          {/* <Modal open={isEmailModalOpen}> */}
           <SignUpEmailModal />
         </Modal>
       </Container>
