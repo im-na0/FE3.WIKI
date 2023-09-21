@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 
 import { EllipsisOutlined } from "@ant-design/icons";
+import swal from "sweetalert";
 
 // Recoil
 import { useSetRecoilState } from "recoil";
@@ -74,8 +75,10 @@ const WikiSelect = ({ title }: IProps) => {
             handleItemClick();
             setCurrentFolder(title);
             if (title === "FE3 WIKI 가이드") {
-              alert(
+              swal(
+                "Fail",
                 "현재 폴더는 위키 가이드 폴더이므로 새로운 파일을 생성할 수 없습니다.",
+                "error",
               );
             } else {
               setFolderState((prev) => !prev);
@@ -98,8 +101,10 @@ const WikiSelect = ({ title }: IProps) => {
           onClick={() => {
             handleItemClick();
             if (title === "FE3 WIKI 가이드") {
-              alert(
+              swal(
+                "Fail",
                 "현재 폴더는 위키 가이드 폴더이므로 새로운 파일을 생성할 수 없습니다.",
+                "error",
               );
             } else {
               setFileState((prev) => !prev);
@@ -139,6 +144,9 @@ const CustomSelectMenu = styled.ul`
   padding: 0;
   margin: 0;
   margin-left: 8px;
+  @media (max-width: 768px) {
+    left: -110px;
+  }
 `;
 
 const CustomSelectItem = styled.li`

@@ -2,6 +2,17 @@ import React from "react";
 import { CalendarOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
+const ProjectDate = ({ duration }: { duration?: string[] }) => {
+  return (
+    <ProjectDateInfo>
+      <CalendarOutlined />
+      <span className="text-block date-block">{duration?.join(" ~ ")}</span>
+    </ProjectDateInfo>
+  );
+};
+
+export default ProjectDate;
+
 const ProjectDateInfo = styled.div`
   margin-bottom: 6px;
   .text-block {
@@ -14,14 +25,3 @@ const ProjectDateInfo = styled.div`
     }
   }
 `;
-
-const ProjectDate = ({ duration }: { duration?: string[] }) => {
-  return (
-    <ProjectDateInfo>
-      <CalendarOutlined />
-      <span className="text-block date-block">{duration?.join(" ~ ")}</span>
-    </ProjectDateInfo>
-  );
-};
-
-export default ProjectDate;

@@ -1,22 +1,26 @@
 import React, { useState } from "react";
 import ProjectListItem from "./ProjectListItem";
-import useQueryProjectAllList from "../../hooks/project/useQueryProjectAllList";
 import useQueryParam from "../../hooks/project/useQueryParam";
 import { Button, Dropdown, MenuProps, Skeleton, Space } from "antd";
 import useQueryProjectEdit from "../../hooks/project/useQueryProjectEdit";
 import { DownOutlined, RedoOutlined } from "@ant-design/icons";
+import useQueryProjectList from "../../hooks/project/useQueryProjectList";
 
 const ProjectListSider = () => {
   const [selectedTeam, setSelectedTeam] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const status = useQueryParam().get("status");
   const [teams, users, , isLoaded] = useQueryProjectEdit();
-  const projects = useQueryProjectAllList();
+  const [projects] = useQueryProjectList();
   let projectArr =
     status === null
-      ? [...projects["plus"], ...projects["progress"], ...projects["completed"]]
-      : [...projects[status]];
-  projectArr.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
+      ? projects && [
+          ...projects["plus"],
+          ...projects["progress"],
+          ...projects["completed"],
+        ]
+      : projects && [...projects[status]];
+  projectArr?.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
 
   // 팀명을 드롭다운 아이템 형식으로 변경하기
   const teamItems: MenuProps["items"] = teams?.map((team, index) => {
@@ -48,22 +52,22 @@ const ProjectListSider = () => {
     setSelectedUser("");
     projectArr =
       status === null
-        ? [
+        ? projects && [
             ...projects["plus"],
             ...projects["progress"],
             ...projects["completed"],
           ]
-        : [...projects[status]];
+        : projects && [...projects[status]];
   };
 
   if (selectedTeam !== "") {
-    const selectedProj = projectArr.filter(
+    const selectedProj = projectArr?.filter(
       (proj) => proj.teams.indexOf(selectedTeam) > -1,
     );
     projectArr = selectedProj;
   }
   if (selectedUser !== "") {
-    const selectedProj = projectArr.filter(
+    const selectedProj = projectArr?.filter(
       (proj) => proj.assignees.indexOf(selectedUser) > -1,
     );
     projectArr = selectedProj;

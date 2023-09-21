@@ -8,9 +8,11 @@ import { Link } from "react-router-dom";
 import { MainTitle } from "../components/SignUp/Title";
 import { motion } from "framer-motion";
 import useModal from "../hooks/SignIn/useModal";
+import { useSign } from "../hooks/SignIn/useSign";
 
 const SignIn = () => {
   const { isEmailModalOpen, showModal, handleCancel, handleOk } = useModal();
+  const { handleSignIn } = useSign();
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -49,7 +51,11 @@ const SignIn = () => {
             </Col>
           </Row>
         </SignInContainer>
-        <Modal open={isEmailModalOpen} onCancel={handleCancel} onOk={handleOk}>
+        <Modal
+          open={isEmailModalOpen}
+          onCancel={handleCancel}
+          onOk={handleSignIn}
+        >
           <SignInEmailModal />
         </Modal>
       </Container>

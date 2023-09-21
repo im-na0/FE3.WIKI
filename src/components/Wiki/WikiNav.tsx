@@ -1,4 +1,10 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 
 // Components
 import WikiSelect from "./WikiSelect";
@@ -14,6 +20,7 @@ import {
   TeamOutlined,
   LockOutlined,
   UnlockOutlined,
+  CaretDownOutlined,
 } from "@ant-design/icons";
 import { Input } from "antd";
 
@@ -70,6 +77,9 @@ export interface ITeamProps {
 }
 
 const WikiNav = () => {
+  const navRef = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState<number>();
+
   const [newFolder, setNewFolder] = useState<string>("");
   const [folderName, setFolderName] = useState<string>("");
   const [newFile, setNewFile] = useState<NewFile>({
@@ -94,9 +104,9 @@ const WikiNav = () => {
   const [teamName, setTeamName] = useState<string | null>("");
   const [teamInfo, setTeamInfo] = useState<ITeamProps | null>(null);
   const setUserTeam = useSetRecoilState(userTeamName);
-
   const [userUid, setUserUid] = useState<string | null>(null);
   const [authState, setAuthState] = useState<boolean>(false);
+  const [hideFolder, setHideFolder] = useState<boolean>(false);
 
   const refreshFolders = async () => {
     const q = query(
@@ -254,6 +264,19 @@ const WikiNav = () => {
   };
 
   useEffect(() => {
+    setNavHeight(navRef.current?.offsetHeight);
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setHideFolder(true);
+      } else {
+        setHideFolder(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     validTeamUser();
     refreshFolders();
   }, [userUid, authState]);
@@ -267,12 +290,25 @@ const WikiNav = () => {
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="folders">
         {(provided) => (
-          <Container>
+          <Container ref={navRef} $navHeight={navHeight ?? 530}>
             <StyledContainer>
-              <FolderWrapper>
-                <TeamOutlined />
-                <StyledFolderTitle>전체</StyledFolderTitle>
-              </FolderWrapper>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <FolderWrapper>
+                  <TeamOutlined />
+                  <StyledFolderTitle>전체</StyledFolderTitle>
+                </FolderWrapper>
+                <CaretDownOutlined
+                  style={{
+                    fontSize: "9px",
+                    marginRight: "10px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setHideFolder((prev) => !prev);
+                  }}
+                />
+              </div>
+
               <StyledDiv>
                 <StyledForm
                   onClick={() => {
@@ -303,83 +339,86 @@ const WikiNav = () => {
                   </NewFolderContainer>
                 )}
               </StyledDiv>
-              <StyledUl {...provided.droppableProps} ref={provided.innerRef}>
-                {items.map((item, index: number) => (
-                  <Draggable
-                    key={item.title}
-                    draggableId={item.title + index}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div key={item.title + index}>
-                        <li
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          onClick={() => handleLiClick(item.title)}
-                        >
-                          <StyledTitle>
-                            <div>
-                              {(folderState && currentFolder) === item.title ? (
-                                <form onSubmit={onSubmitFolderName}>
-                                  <Input
-                                    defaultValue={item.title}
-                                    onChange={onChangeFolderName}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                </form>
-                              ) : (
-                                <>
-                                  <FolderOutlined />
-                                  <StyledSpan>{item.title}</StyledSpan>
-                                </>
-                              )}
-                            </div>
-                            <div
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleWikiSelectToggle(e);
-                              }}
-                            >
-                              <WikiSelect title={item.title} />
-                            </div>
-                          </StyledTitle>
-                          <StyledFile
-                            className={
-                              item.title === currentFolder ? "open" : "closed"
-                            }
+              <HideDiv $hideFolder={hideFolder}>
+                <StyledUl {...provided.droppableProps} ref={provided.innerRef}>
+                  {items.map((item, index: number) => (
+                    <Draggable
+                      key={item.title}
+                      draggableId={item.title + index}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div key={item.title + index}>
+                          <li
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            onClick={() => handleLiClick(item.title)}
                           >
-                            {fileState && (
-                              <FormContainer>
-                                <FileOutlined style={{ fontSize: "14px" }} />
-                                <FileForm onSubmit={onSubmitFile}>
-                                  <Input
-                                    placeholder="새로운 파일"
-                                    onChange={onChangeFile}
-                                  />
-                                </FileForm>
-                              </FormContainer>
-                            )}
-                            {item.items &&
-                              item.items.map((v, fileIndex: number) => (
-                                <StyledItem
-                                  key={v.fileName + fileIndex}
-                                  onClick={() => handleFileClick(v.fileName)}
-                                >
-                                  <div>
-                                    <FileOutlined />
-                                    <StyledSpan>{v.fileName}</StyledSpan>
-                                  </div>
-                                </StyledItem>
-                              ))}
-                          </StyledFile>
-                        </li>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </StyledUl>
+                            <StyledTitle>
+                              <div>
+                                {(folderState && currentFolder) ===
+                                item.title ? (
+                                  <form onSubmit={onSubmitFolderName}>
+                                    <Input
+                                      defaultValue={item.title}
+                                      onChange={onChangeFolderName}
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                  </form>
+                                ) : (
+                                  <>
+                                    <FolderOutlined />
+                                    <StyledSpan>{item.title}</StyledSpan>
+                                  </>
+                                )}
+                              </div>
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleWikiSelectToggle(e);
+                                }}
+                              >
+                                <WikiSelect title={item.title} />
+                              </div>
+                            </StyledTitle>
+                            <StyledFile
+                              className={
+                                item.title === currentFolder ? "open" : "closed"
+                              }
+                            >
+                              {fileState && (
+                                <FormContainer>
+                                  <FileOutlined style={{ fontSize: "14px" }} />
+                                  <FileForm onSubmit={onSubmitFile}>
+                                    <Input
+                                      placeholder="새로운 파일"
+                                      onChange={onChangeFile}
+                                    />
+                                  </FileForm>
+                                </FormContainer>
+                              )}
+                              {item.items &&
+                                item.items.map((v, fileIndex: number) => (
+                                  <StyledItem
+                                    key={v.fileName + fileIndex}
+                                    onClick={() => handleFileClick(v.fileName)}
+                                  >
+                                    <div>
+                                      <FileOutlined />
+                                      <StyledSpan>{v.fileName}</StyledSpan>
+                                    </div>
+                                  </StyledItem>
+                                ))}
+                            </StyledFile>
+                          </li>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </StyledUl>
+              </HideDiv>
             </StyledContainer>
             <StyledTeamContainer>
               <FolderWrapper>
@@ -406,7 +445,17 @@ const WikiNav = () => {
 
 export default WikiNav;
 
-const Container = styled.div`
+const HideDiv = styled.div<{ $hideFolder: boolean }>`
+  opacity: ${(props) => (props.$hideFolder ? "0" : "1")};
+  max-height: ${(props) => (props.$hideFolder ? "0" : "auto")};
+  visibility: ${(props) => (props.$hideFolder ? "hidden" : "visible")};
+  transition:
+    max-height 0.3s,
+    opacity 0.3s;
+    visibility 0.3s;
+`;
+
+const Container = styled.div<{ $navHeight: number }>`
   display: flex;
   flex-direction: column;
 `;
@@ -419,6 +468,9 @@ const StyledContainer = styled.div`
   width: 280px;
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const FolderWrapper = styled.div`
@@ -478,6 +530,7 @@ const StyledTitle = styled.div`
       background-color: rgba(0, 0, 0, 0.03);
       transition: background-color 0.3s;
     }
+  }
 `;
 
 const StyledForm = styled.div`
@@ -507,18 +560,21 @@ const StyledFile = styled.ul`
     max-height: 500px;
     div {
       opacity: 1;
+      visibility: visible;
     }
   }
   &.closed {
     max-height: 0;
     opacity: 0;
+    visibility: hidden;
   }
   overflow: hidden;
   transition:
     max-height 0.3s,
     opacity 0.3s;
+    visibility 0.3s;
   div {
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, visibility 0.3s;
   }
 `;
 
@@ -557,4 +613,7 @@ const StyledTeamContainer = styled.div`
   background-color: rgba(0, 0, 0, 0.01);
   border-right: 0.1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 15px;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;

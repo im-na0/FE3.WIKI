@@ -2,19 +2,6 @@ import React from "react";
 import { UserOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
-const ProjectAssigneeInfo = styled.div`
-  margin-bottom: 6px;
-  .text-block {
-    display: inline-block;
-    font-size: 12px;
-    padding: 3px 5px;
-    margin-left: 6px;
-    &.user-block {
-      background-color: lightgrey;
-    }
-  }
-`;
-
 const ProjectAssignee = ({ assignees }: { assignees?: string[] }) => {
   return (
     <ProjectAssigneeInfo>
@@ -29,3 +16,16 @@ const ProjectAssignee = ({ assignees }: { assignees?: string[] }) => {
 };
 
 export default ProjectAssignee;
+
+const ProjectAssigneeInfo = styled.div`
+  margin-bottom: 6px;
+  .text-block {
+    display: inline-block;
+    font-size: 12px;
+    padding: 3px 5px;
+    margin-left: 6px;
+    &.user-block {
+      background-color: lightgrey;
+    }
+  }
+`;

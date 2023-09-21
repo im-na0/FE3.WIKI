@@ -8,6 +8,11 @@ export const authState = atom<boolean>({
   default: false,
   effects_UNSTABLE: [persistAtom],
 });
+// Modal창 상태 전역 관리
+export const modalState = atom<boolean>({
+  key: "modalstate",
+  default: false,
+});
 // 이메일 비밀번호 상태 전역 관리
 export const emailState = atom<string>({
   key: "emailState",

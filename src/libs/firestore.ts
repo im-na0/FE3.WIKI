@@ -221,3 +221,26 @@ export const workTimeConverter: FirestoreDataConverter<WorkTimeInfo> = {
     return new WorkTimeInfo(data.starttime, data.finishtime);
   },
 };
+
+// 휴가 일자 컨버터를 위한 타입 정의
+export class LeaveDateInfo {
+  constructor(
+    public leavedate: Timestamp,
+    public leavenote?: string,
+  ) {}
+}
+
+export const leaveDateConverter: FirestoreDataConverter<LeaveDateInfo> = {
+  toFirestore: (docData: LeaveDateInfo): DocumentData => {
+    return {
+      leavedate: docData.leavedate,
+    };
+  },
+  fromFirestore: (
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions,
+  ) => {
+    const data = snapshot.data(options);
+    return new LeaveDateInfo(data.leavedate);
+  },
+};

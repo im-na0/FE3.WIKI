@@ -46,18 +46,6 @@ const items: MenuItem[] = [
 
 const { Sider } = Layout;
 
-const NewProjectBtn = styled.div<{ $primary: string }>`
-  background: ${(props) => props.$primary};
-  a {
-    display: block;
-    padding: 12px 10px 12px 24px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: bold;
-    margin-left: 4px;
-  }
-`;
-
 const ProjectSider = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -107,3 +95,15 @@ const ProjectSider = () => {
 };
 
 export default ProjectSider;
+
+const NewProjectBtn = styled.div<{ $primary: string }>`
+  background: ${(props) => props.$primary};
+  a {
+    display: block;
+    padding: 12px 10px 12px 24px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 4px;
+  }
+`;

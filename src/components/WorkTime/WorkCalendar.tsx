@@ -6,19 +6,24 @@ import type { BadgeProps, CalendarProps } from "antd";
 import { Badge, Calendar } from "antd";
 import locale from "antd/es/calendar/locale/ko_KR";
 import useQueryWorkTime from "../../hooks/Timer/useQueryWorkTime";
+import useQueryLeave from "../../hooks/WorkTime/useQueryLeave";
 
 const WorkCalendar = () => {
   const [isLoaded, worktime] = useQueryWorkTime();
+  const [isLeaveLoaded, userName, leaveData, leaveNote] = useQueryLeave();
 
   const getListData = (value: Dayjs) => {
+    const date = `${value.month() + 1}-${value.date()}`;
+    // isLeaveLoaded 코드에서도 사용하기 위해, 임의로 초기값을 지정해줌.
+    const startTime = "";
+    const finishTime = "";
+
     if (isLoaded) {
-      const date = `${value.month() + 1}-${value.date()}`;
       const start = worktime?.find((time) => {
         const startDate = time?.starttime?.toDate();
         const dateStr = startDate
           ? `${startDate.getMonth() + 1}-${startDate.getDate()}`
           : "";
-        console.log(dateStr, date);
         return dateStr === date;
       });
       const startTime = start?.starttime?.toDate().toTimeString().split(" ")[0];
@@ -34,25 +39,57 @@ const WorkCalendar = () => {
         .toTimeString()
         .split(" ")[0];
 
-      return start !== undefined
-        ? [
-            { type: "success", content: startTime ? "출근: " + startTime : "" },
-            {
-              type: "error",
-              content: finishTime ? "퇴근: " + finishTime : "",
-            },
-          ]
-        : [];
+      const contentArray = [];
+
+      if (start !== undefined) {
+        contentArray.push({
+          type: "success",
+          content: startTime ? "출근: " + startTime : "",
+        });
+      }
+      if (finishTime) {
+        contentArray.push({ type: "error", content: "퇴근: " + finishTime });
+      }
+      return contentArray.length > 0 ? contentArray : null; // 출력할 내용이 없을 시 null 값을 반환
+    }
+
+    if (isLeaveLoaded) {
+      const leaveInfo = (leaveData ?? []).find((leave) => {
+        const leaveDate = leave.leavedate?.toDate();
+        const dateStr = leaveDate
+          ? `${leaveDate.getMonth() + 1}-${leaveDate.getDate()}`
+          : "";
+        console.log(dateStr, date);
+        alert(`leavenote: ${leave.leavenote}`);
+
+        return dateStr === date;
+      });
+
+      const leaveType = leaveInfo ? "error" : "warning";
+      const leaveContent = leaveInfo ? leaveInfo.leavenote : "";
+
+      if (leaveInfo) {
+        return [
+          {
+            type: leaveType as BadgeProps["status"],
+            content: leaveContent,
+          },
+        ];
+      } else {
+        return null; // 출력할 내용이 없을 시 null 값을 반환
+      }
     } else {
-      return [
-        { type: "success", content: "" },
-        { type: "warning", content: "" },
-      ];
+      return null; // 출력할 내용이 없을 시 null 값을 반환
     }
   };
 
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value);
+
+    if (listData === null) {
+      return null; // 출력할 내용이 없을 시 null 값을 반환
+    }
+
     return (
       <ul className="worktime">
         {listData.map((item) => (
