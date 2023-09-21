@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, getDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  getDoc,
+  doc,
+  query,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "../../libs/firebase";
 import { FormDataType } from "../../type/form";
 import { message } from "antd";
@@ -10,7 +17,9 @@ export function useFetchTeamData() {
 
   useEffect(() => {
     const teamCollectionRef = collection(db, "Teams");
-    const unsubscribe = onSnapshot(teamCollectionRef, (querySnapshot) => {
+    const sortedQuery = query(teamCollectionRef, orderBy("createdAt")); // "createdAt" 필드를 기준으로 정렬
+
+    const unsubscribe = onSnapshot(sortedQuery, (querySnapshot) => {
       const teamArray: any[] = [];
 
       querySnapshot.forEach((doc) => {

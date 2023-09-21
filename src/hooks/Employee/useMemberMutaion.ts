@@ -102,33 +102,40 @@ export const useUploadData = (COLLECTION_NAME: string) => {
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
   const user = auth.currentUser;
 
-  if (!user) {
-    throw new Error("로그인이 필요합니다.");
-  }
+  const userUid = user?.uid;
+  const userDocRef = userUid ? doc(db, COLLECTION_NAME, userUid) : null;
 
-  const userUid = user.uid;
-  const userDocRef = doc(db, COLLECTION_NAME, userUid);
-
-  const uploadStorage = async (file: File) => {
+  const uploadStorage = async (file: File): Promise<string> => {
     setUploading(true);
-    const name = new Date().getTime() + file.name;
-    const storageRef = ref(storage, `member/${name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    return new Promise((resolve, reject) => {
+      const name = new Date().getTime() + file.name;
+      const storageRef = ref(storage, `member/${name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-    uploadTask.on("state_changed", null, null, async () => {
-      const url = await getDownloadURL(storageRef);
-      setDownloadURL(url);
-      setUploading(false);
+      uploadTask.on("state_changed", null, null, async () => {
+        try {
+          const url = await getDownloadURL(storageRef);
+          setDownloadURL(url);
+          setUploading(false);
+          resolve(url);
+        } catch (uploadError) {
+          reject(uploadError);
+        }
+      });
     });
   };
 
-  const uploadStore = async (data: any) => {
+  const uploadStore = async (data: any, mergeOption = true) => {
+    if (!userDocRef) {
+      message.error("로그인이 필요합니다.");
+      return;
+    }
+
     try {
-      await setDoc(userDocRef, data, { merge: true }); // Using merge: true to update/overwrite
+      await setDoc(userDocRef, data, { merge: mergeOption });
       message.success("데이터가 업로드되었습니다.");
-    } catch (error) {
+    } catch (storeError) {
       message.error("데이터 업로드 중 오류가 발생했습니다.");
-      console.error("데이터 업로드 중 오류 발생:", error);
     }
   };
 

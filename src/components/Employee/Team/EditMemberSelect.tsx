@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Transfer, Form, message } from "antd";
+import { Transfer, Form, message, Avatar, Tooltip } from "antd";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../libs/firebase";
 import { Rule } from "antd/lib/form";
@@ -16,6 +16,7 @@ interface EditTeamMemberSelectProps {
 interface UserData {
   key: string;
   title: string;
+  photo?: string;
 }
 
 function EditTeamMemberSelect({
@@ -25,6 +26,7 @@ function EditTeamMemberSelect({
 }: EditTeamMemberSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [selectedUserKeys, setSelectedUserKeys] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<UserData[]>([]);
 
   const teamUserIds = useTeamUserIds();
 
@@ -36,7 +38,11 @@ function EditTeamMemberSelect({
         const userArray: UserData[] = [];
 
         userSnapshot.forEach((doc) => {
-          const userData = { key: doc.id, title: doc.data().name || "" };
+          const userData = {
+            key: doc.id,
+            title: doc.data().name,
+            photo: doc.data().photo || "",
+          };
           userArray.push(userData);
         });
 
@@ -45,12 +51,20 @@ function EditTeamMemberSelect({
         );
 
         if (prevUserIds && prevUserIds.length > 0) {
+          const selectedUserData: UserData[] = [];
+
           prevUserIds.forEach((userId) => {
             const userToAdd = userArray.find((user) => user.key === userId);
             if (userToAdd) {
               filteredUserArray.push(userToAdd);
+              selectedUserData.push(userToAdd);
             }
           });
+
+          setSelectedUsers(selectedUserData);
+
+          const selectedKeys = selectedUserData.map((user) => user.key);
+          setSelectedUserKeys(selectedKeys);
         }
 
         setUsers(filteredUserArray);
@@ -73,9 +87,14 @@ function EditTeamMemberSelect({
 
   const handleUserChange = (nextSelectedKeys: string[]) => {
     setSelectedUserKeys(nextSelectedKeys);
+
+    const nextSelectedUsers = users.filter((user) =>
+      nextSelectedKeys.includes(user.key),
+    );
+    setSelectedUsers(nextSelectedUsers);
+
     onChange(nextSelectedKeys);
   };
-
   const { required } = CustomForm.useValidate();
 
   return (
@@ -91,6 +110,25 @@ function EditTeamMemberSelect({
           disabled={!isEditMode}
         />
       </Form.Item>
+      <div style={{ marginLeft: "38px", marginBottom: "16px" }}>
+        <Avatar.Group
+          maxStyle={{
+            color: "#f56a00",
+            backgroundColor: "#fde3cf",
+            cursor: "pointer",
+          }}
+          maxPopoverTrigger="click"
+          size="large"
+        >
+          {selectedUsers.map((user) => (
+            <Tooltip key={user.key} title={user.title} placement="top">
+              <Avatar key={user.key} src={user.photo}>
+                {user.title}
+              </Avatar>
+            </Tooltip>
+          ))}
+        </Avatar.Group>
+      </div>
     </>
   );
 }

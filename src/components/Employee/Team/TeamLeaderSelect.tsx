@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../libs/firebase";
 import { useTeamUserIds } from "../../../hooks/Employee/useTeamUserIds";
 import CustomForm from "../../common/CustomForm";
+import { message } from "antd";
 
 interface UserData {
   key: string;
@@ -16,7 +17,7 @@ interface TeamLeaderSelectProps {
 function TeamLeaderSelect({ readOnly }: TeamLeaderSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<null | string>(null);
+  const [value, setValue] = useState<string[]>([]);
   const teamUserIds = useTeamUserIds();
 
   useEffect(() => {
@@ -36,7 +37,7 @@ function TeamLeaderSelect({ readOnly }: TeamLeaderSelectProps) {
         setUsers(filteredUserArray);
       } catch (error) {
         console.error("Error fetching users:", error);
-        setError("유저 데이터를 불러오는데 문제가 발생했습니다.");
+        message.error("멤버를 불러오는데 실패했습니다.");
       } finally {
         setLoading(false);
       }
@@ -44,8 +45,6 @@ function TeamLeaderSelect({ readOnly }: TeamLeaderSelectProps) {
 
     fetchUsers();
   }, [teamUserIds]);
-
-  console.log(users);
 
   const { required } = CustomForm.useValidate();
 
@@ -55,7 +54,7 @@ function TeamLeaderSelect({ readOnly }: TeamLeaderSelectProps) {
       rules={[required()]}
       item={users}
       label="팀 리더"
-      name="teamLeader"
+      name="leader"
       readOnly={readOnly}
     />
   );

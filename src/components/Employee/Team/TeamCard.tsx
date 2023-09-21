@@ -14,10 +14,6 @@ interface MemberTableProps {
   sortValue: string;
 }
 
-const DeleteDataParams = {
-  COLLECTION_NAME: "Teams",
-};
-
 export default function TeamCard({
   setSelectedRowKeys,
   searchText,
@@ -26,18 +22,16 @@ export default function TeamCard({
 }: MemberTableProps) {
   const { loading, teamData } = useFetchTeamData();
   const navigate = useNavigate();
-  const { deleteData } = useDeleteData(DeleteDataParams);
+  const { deleteData } = useDeleteData({ COLLECTION_NAME: "Teams" });
 
   const [filteredData, setFilteredData] = useState<FormDataType[]>(teamData);
 
   useEffect(() => {
-    const filteredByAccess = filterValue
-      ? teamData.filter((item: FormDataType) => item.access === filterValue)
-      : teamData;
-
-    const searchedData = filteredByAccess.filter((item: FormDataType) => {
+    const searchedData = teamData.filter((item: FormDataType) => {
       if (!searchText) return true;
-      const nameIncludes = item.name ? item.name.includes(searchText) : false;
+      const nameIncludes = item.teamName
+        ? item.teamName.includes(searchText)
+        : false;
       const departmentIncludes = item.department
         ? item.department.includes(searchText)
         : false;
@@ -46,14 +40,14 @@ export default function TeamCard({
 
     const sortedDataSource = [...searchedData];
     switch (sortValue) {
-      case "sortName":
+      case "sortTeamName":
         sortedDataSource.sort((a, b) =>
-          (a.name ?? "").localeCompare(b.name ?? ""),
+          (a.teamName ?? "").localeCompare(b.teamName ?? ""),
         );
         break;
-      case "sortTeam":
+      case "sortDepartment":
         sortedDataSource.sort((a, b) =>
-          (a.team ?? "").localeCompare(b.team ?? ""),
+          (a.department ?? "").localeCompare(b.department ?? ""),
         );
         break;
       default:
@@ -64,6 +58,8 @@ export default function TeamCard({
       ...item,
       key: item.id,
     }));
+
+    console.log(dataWithKeys);
 
     setFilteredData(dataWithKeys);
   }, [teamData, filterValue, sortValue, searchText]);

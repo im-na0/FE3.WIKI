@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button, Form } from "antd";
 import { UserAddOutlined } from "@ant-design/icons";
-import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 import MemberForm from "./MemberForm";
 import MemberProfile from "./MemberProfile";

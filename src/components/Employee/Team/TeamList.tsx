@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { Button } from "antd";
 import styled from "styled-components";
 import MemberFilter from "../MemberFilter";
-import MemberSearch from "../MemberSearch";
+import TeamSearch from "./TeamSearch";
 import CustomForm from "../../common/CustomForm";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDeleteData } from "../../../hooks/Employee/useDeleteData";
 import AddTeamModal from "./AddTeamModal";
 import TeamCard from "./TeamCard";
+import TeamFilter from "./TeamFilter";
 
 export default function TeamList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,11 +46,11 @@ export default function TeamList() {
       <List>
         <CardHeader className="card-header">
           <ToggleWrap>
-            <MemberFilter
+            <TeamFilter
               setFilterValue={setFilterValue}
               setSortValue={setSortValue}
             />
-            <MemberSearch onSearch={setSearchText} />
+            <TeamSearch onSearch={setSearchText} />
           </ToggleWrap>
           <ToggleWrap>
             <Button
