@@ -31,6 +31,7 @@ function MemberDetailInfo() {
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [teamId, setTeamId] = useState<string | undefined>("");
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
@@ -38,6 +39,7 @@ function MemberDetailInfo() {
         if (fieldName === "photo") {
           setPreviewUrl(userData[fieldName as string]);
         }
+        setTeamId(userData.teamId);
         setCardDepartment(userData.department);
         setCardName(userData.name);
       });
@@ -53,13 +55,18 @@ function MemberDetailInfo() {
 
       if (file) {
         const downloadURL = await uploadStorage(file);
-        fieldsValue.photo = downloadURL || fieldsValue.photo!;
+        fieldsValue.photo = downloadURL;
+
         if (userData && userData.photo) {
           await deleteStorage(userData.photo);
         }
       } else {
-        fieldsValue.photo = previewUrl || fieldsValue.photo;
+        fieldsValue.photo = previewUrl || "";
       }
+      if (typeof fieldsValue.photo === "undefined" || !fieldsValue.photo) {
+        fieldsValue.photo = "";
+      }
+
       const currentTeamId = userData.teamId;
       if (memberId) {
         await updateData(memberId, fieldsValue);
