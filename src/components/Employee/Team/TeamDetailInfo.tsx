@@ -13,7 +13,7 @@ import {
 } from "../../../hooks/Employee/useMemberMutaion";
 import TeamForm from "./TeamForm";
 import { useRecoilState } from "recoil";
-import { selectedUserIdsState, userIdsState } from "../../../store/member";
+import { selectedUserIdsState } from "../../../store/member";
 import EditMemberSelect from "./EditMemberSelect";
 import styled from "styled-components";
 

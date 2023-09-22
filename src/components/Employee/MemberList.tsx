@@ -1,27 +1,22 @@
 import React, { useState } from "react";
 import { Button } from "antd";
-import styled from "styled-components";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import useUserAccess from "../../hooks/Employee/useUserAccess";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import MemberFilter from "./MemberFilter";
 import MemberSearch from "./MemberSearch";
 import MemberTable from "./MemberTable";
-import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import CustomForm from "../common/CustomForm";
+import styled from "styled-components";
 
 export default function MemberList() {
+  const { userAccess, checkAdminPermission } = useUserAccess();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [sortValue, setSortValue] = useState("");
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
 
   type selectedRowKeys = {
     id: string;
@@ -32,9 +27,8 @@ export default function MemberList() {
     COLLECTION_NAME: "Users",
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
-
   const handleDelete = async () => {
+    if (!checkAdminPermission()) return;
     try {
       for (const data of selectedRowKeys) {
         await deleteData(data.id, data.teamId);
@@ -43,6 +37,14 @@ export default function MemberList() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -66,6 +68,7 @@ export default function MemberList() {
             >
               Add
             </Button>
+
             <CustomForm.Modal
               title="멤버 등록"
               width={700}

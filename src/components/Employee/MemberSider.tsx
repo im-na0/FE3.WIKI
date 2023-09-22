@@ -1,8 +1,7 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UserOutlined, TeamOutlined } from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Layout, Menu, theme } from "antd";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Layout, Menu, MenuProps, theme } from "antd";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -31,9 +30,11 @@ const { Sider } = Layout;
 
 const MemberSider = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // 현재 경로를 얻습니다.
   const {
     token: { colorBgContainer, colorPrimary },
   } = theme.useToken();
+
   const onClick: MenuProps["onClick"] = (e) => {
     switch (e.key) {
       case "member":
@@ -45,12 +46,19 @@ const MemberSider = () => {
     }
   };
 
+  let selectedKey: string;
+  if (location.pathname.startsWith("/employee/team")) {
+    selectedKey = "team";
+  } else {
+    selectedKey = "member";
+  }
+
   return (
     <Sider style={{ background: colorBgContainer }} width={200}>
       <Menu
         onClick={onClick}
         style={{ width: 200 }}
-        defaultSelectedKeys={["member"]}
+        selectedKeys={[selectedKey]}
         mode="inline"
         items={items}
       />

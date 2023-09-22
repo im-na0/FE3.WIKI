@@ -70,12 +70,6 @@ export default function TeamList() {
             >
               <AddTeamModal onCancel={closeModal} />
             </CustomForm.Modal>
-            <Button
-              danger={true}
-              icon={<DeleteOutlined />}
-              size="large"
-              onClick={handleDelete}
-            ></Button>
           </ToggleWrap>
         </CardHeader>
         <ListTable>

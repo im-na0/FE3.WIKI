@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, FormInstance, Select, Spin } from "antd";
+import { Form, FormInstance, Select, Spin, Input } from "antd";
 import CustomForm from "../common/CustomForm";
 import { userFetchTeamsData } from "../../hooks/Employee/useMemberMutaion";
 
@@ -34,16 +34,19 @@ function MemberSelectTeam({ readOnly, form }: MemberSelectTeamProps) {
   const { required } = CustomForm.useValidate();
   return (
     <Spin spinning={loading}>
-      <Form.Item label="팀" name="team" rules={[required()]}>
+      <Form.Item label="팀" name="team" rules={[required]}>
         <Select
           loading={loading}
+          className={readOnly ? "readOnly" : undefined}
           showSearch
           placeholder="Select"
-          onChange={(combinedValue) => {
-            if (combinedValue) {
-              const [title, key] = combinedValue.split("|");
-              form.setFieldsValue({ team: combinedValue });
-            }
+          onChange={(selectedValue) => {
+            const parsedValue = JSON.parse(selectedValue);
+            const { title, key } = parsedValue;
+            form.setFieldsValue({
+              team: title,
+              teamId: key,
+            });
           }}
           optionFilterProp="children"
           filterOption={(input, option: any) =>
@@ -55,7 +58,10 @@ function MemberSelectTeam({ readOnly, form }: MemberSelectTeamProps) {
             data
               .filter((data) => data.key && data.title)
               .map((data) => (
-                <Option key={data.key} value={`${data.title}|${data.key}`}>
+                <Option
+                  key={data.key}
+                  value={JSON.stringify({ title: data.title, key: data.key })}
+                >
                   {data.title}
                 </Option>
               ))
@@ -65,6 +71,9 @@ function MemberSelectTeam({ readOnly, form }: MemberSelectTeamProps) {
             </Option>
           )}
         </Select>
+      </Form.Item>
+      <Form.Item name="teamId" style={{ display: "none" }}>
+        <Input />
       </Form.Item>
     </Spin>
   );

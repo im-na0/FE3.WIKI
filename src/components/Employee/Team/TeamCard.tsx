@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Spin, Card, Avatar, Tooltip, Button, message, Popconfirm } from "antd";
+import {
+  Spin,
+  Card,
+  Avatar,
+  Tooltip,
+  Button,
+  message,
+  Popconfirm,
+  Skeleton,
+} from "antd";
+import { CalendarOutlined, EyeOutlined } from "@ant-design/icons";
 import { FormDataType } from "../../../type/form";
 import { useFetchTeamData } from "../../../hooks/Employee/useFetchTeamData";
 import { useDeleteData } from "../../../hooks/Employee/useDeleteData";
+import { formatDate } from "../../../utils/formatDate";
 import { useNavigate } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
-import { styled } from "styled-components";
+import styled, { css } from "styled-components";
 
 interface MemberTableProps {
   setSelectedRowKeys: (keys: string[]) => void;
@@ -78,17 +89,11 @@ export default function TeamCard({
           {filteredData.map((item) => (
             <StyledCard
               key={item.id}
-              cover={
-                // 팀 대표이미지 등록
-                item.photo ? <img src={item.photo} alt="Cover Image" /> : null
-              }
-              title={item.teamName}
-              extra={
-                <Button onClick={() => navigate(`/employee/team/${item.id}`)}>
-                  View
-                </Button>
-              }
               actions={[
+                <EyeOutlined
+                  key={item.id}
+                  onClick={() => navigate(`/employee/team/${item.id}`)}
+                />,
                 <Popconfirm
                   key={item.id}
                   title="정말로 삭제하시겠습니까?"
@@ -100,24 +105,46 @@ export default function TeamCard({
                 </Popconfirm>,
               ]}
             >
-              <UserList>
-                <Avatar.Group
-                  maxCount={3}
-                  maxStyle={{ color: "#f56a00", backgroundColor: "#fde3cf" }}
+              <Skeleton loading={loading} avatar active>
+                <CardTag
+                  department={item.department ? String(item.department) : ""}
                 >
-                  {item.teamUsers.map((user: FormDataType, index: number) => (
-                    <span key={`${user.id}-${index}`}>
-                      <Tooltip title={user.name} placement="top">
-                        <Avatar key={`${user.id}-${index}`} src={user.photo}>
-                          {user.name}
-                        </Avatar>
-                      </Tooltip>
-                    </span>
-                  ))}
-                </Avatar.Group>
-              </UserList>
-              <p>Department: {item.department}</p>
-              <p>CreatedAt: {item.createdAt?.toDate().toLocaleDateString()}</p>
+                  {item.department}
+                </CardTag>
+                <CardMeta>
+                  <div className="teamName">{item.teamName}</div>
+                  <div className="teamDescription">{item.teamDescription}</div>
+                </CardMeta>
+                <CardContent>
+                  <UserList>
+                    <Avatar.Group
+                      maxCount={3}
+                      maxStyle={{
+                        backgroundColor: "#fde3cf",
+                        color: "#f56a00",
+                      }}
+                    >
+                      {item.teamUsers.map(
+                        (user: FormDataType, index: number) => (
+                          <span key={`${user.id}-${index}`}>
+                            <Tooltip title={user.name} placement="top">
+                              <Avatar
+                                key={`${user.id}-${index}`}
+                                src={user.photo}
+                              >
+                                {user.name}
+                              </Avatar>
+                            </Tooltip>
+                          </span>
+                        ),
+                      )}
+                    </Avatar.Group>
+                  </UserList>
+                  <CardDate className="card-date">
+                    <CalendarOutlined /> {formatDate(item.createdAt?.toDate())}
+                  </CardDate>
+                </CardContent>
+              </Skeleton>
             </StyledCard>
           ))}
         </CardContainer>
@@ -129,15 +156,67 @@ const CardContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+  padding: 1.5rem;
+`;
+
+const CardContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const CardTag = styled.span<{ department: string }>`
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #df8bf0;
+  padding: 3px 13px;
+  background: #fbebff;
+  border-radius: 1rem;
+
+  ${(props) =>
+    props.department === "PM" &&
+    css`
+      background: #fbebde;
+      color: #ef9989;
+    `}
+
+  ${(props) =>
+    props.department === "BE" &&
+    css`
+      background: #d8f2f1;
+      color: #2ac4db;
+    `}
+
+  ${(props) =>
+    props.department === "UI/UX" &&
+    css`
+      background: #e4f8da;
+      color: #88c851;
+    `}
+`;
+
+const CardMeta = styled.div`
+  .teamName {
+    font-weight: 700;
+    font-size: 1.4rem;
+    padding: 0.5rem 0;
+    margin-bottom: 0.3rem;
+  }
+  .teamDescription {
+    font-size: 0.8rem;
+    color: #afafaf;
+    padding: 0.3rem 0;
+  }
 `;
 
 const UserList = styled.ul`
   display: flex;
+  padding: 0;
+  margin: 0;
 `;
 
 const StyledCard = styled(Card)`
-  width: 300px;
-  margin: 16px;
+  width: 340px;
   border-radius: 10px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
 
@@ -150,4 +229,9 @@ const StyledCard = styled(Card)`
       object-fit: cover;
     }
   }
+`;
+
+const CardDate = styled.span`
+  font-weight: 600;
+  color: #444a4d;
 `;

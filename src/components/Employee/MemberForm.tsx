@@ -31,7 +31,7 @@ function MemberForm({
           key={select.name}
           label={select.label}
           name={select.name}
-          defaultValue={select.defaultValue}
+          placeholder={select.placeholder}
           options={select.options}
           rules={select.rules}
           readOnly={!isEditMode}

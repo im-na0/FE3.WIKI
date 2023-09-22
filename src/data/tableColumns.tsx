@@ -1,20 +1,20 @@
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Col, Dropdown, message, Row } from "antd";
+import { Col, Dropdown, message, Row, Avatar } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { FormDataType } from "../type/form";
-import { useDeleteData } from "../hooks/Employee/useDeleteData";
 import { NavigateFunction } from "react-router-dom";
 
-const DeleteDataParams = {
-  COLLECTION_NAME: "Users",
-};
-
-export const columns = (navigate: NavigateFunction) => {
-  const { deleteData } = useDeleteData(DeleteDataParams);
-
+export const columns = (
+  navigate: NavigateFunction,
+  deleteData: (arg1: string, arg2: string) => void,
+  userAccess: string | null,
+  checkAdminPermission: () => boolean,
+) => {
   const handleDelete = async (id: string, teamId: string) => {
+    if (!checkAdminPermission()) return;
     deleteData(id, teamId);
+    message.info("삭제되었습니다");
   };
 
   const handleMenuClick = (record: FormDataType, key: string) => {
@@ -24,9 +24,9 @@ export const columns = (navigate: NavigateFunction) => {
       }
     }
     if (key === "delete") {
-      message.info("삭제되었습니다");
-      if (record.id && record.teamId) {
-        handleDelete(record.id, record.teamId);
+      console.log(record);
+      if (record.id) {
+        handleDelete(record.id, record.teamId!);
       }
     }
   };
@@ -37,9 +37,13 @@ export const columns = (navigate: NavigateFunction) => {
       render: (record: FormDataType) => (
         <Row gutter={16}>
           <Col flex="0 1">
-            <Image className="profile">
-              <img src={record.photo} alt={record.name} />
-            </Image>{" "}
+            <Avatar
+              src={record.photo}
+              alt={record.name}
+              size={{ xs: 32, xxl: 43 }}
+            >
+              {record.name?.charAt(0)}
+            </Avatar>
           </Col>
           <Col flex="auto">
             <div className="name">{record.name}</div>

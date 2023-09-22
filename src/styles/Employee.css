@@ -23,7 +23,16 @@
     gap: 1rem
 }
 
-.memer-profile-area {
+/* form */
+.ant-skeleton.ant-skeleton-element {
+    text-align: center;
+    display: flex;
+}
+.member-form-profile .ant-skeleton.ant-skeleton-element .ant-skeleton-image{
+    width: 130px;
+    height: 100%;
+}
+.member-profile-area {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,7 +49,8 @@
     margin-top: 1.5rem;
 }
 .member-form-profile {
-    display: block;
+    display: flex;
+    justify-content: center;
     width: 130px;
     height: 130px;
     border-radius: 50%;
@@ -114,3 +124,20 @@
 .ant-select.readOnly > .ant-select-arrow {
     display: none;
 }
+
+
+/* Card List*/
+.ant-card .ant-card-body {
+padding: 2rem 2rem 1.2rem;
+
+}
+
+.ant-card .ant-card-actions {
+
+}
+
+.ant-card .ant-card-actions>li {
+    margin: 0;
+    padding: 0.4rem;
+}
+

@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { Spin, Table } from "antd";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import React, { useState, useEffect, useMemo } from "react";
+import { Table } from "antd";
 import { FormDataType } from "../../type/form";
 import { columns } from "../../data/tableColumns";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { useNavigate } from "react-router-dom";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
+import useUserAccess from "../../hooks/Employee/useUserAccess";
 
 type SelectedRowData = {
   id: string;
   teamId?: string;
 };
-
 interface MemberTableProps {
   setSelectedRowKeys: (keys: SelectedRowData[]) => void;
   searchText: string;
   filterValue: string;
   sortValue: string;
 }
-
 export default function MemberTable({
   setSelectedRowKeys,
   searchText,
@@ -29,10 +28,14 @@ export default function MemberTable({
     ORDER: "name",
   };
   const data = useFetchData(fetchDataParams);
-
   const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
-
   const navigate = useNavigate();
+  const { deleteData } = useDeleteData({ COLLECTION_NAME: "Users" });
+  const { userAccess, checkAdminPermission } = useUserAccess();
+  const memoizedColumns = useMemo(
+    () => columns(navigate, deleteData, userAccess, checkAdminPermission),
+    [navigate, deleteData, userAccess, checkAdminPermission],
+  );
 
   useEffect(() => {
     const filteredByAccess = filterValue
@@ -76,7 +79,7 @@ export default function MemberTable({
       {filteredData && (
         <Table
           dataSource={filteredData}
-          columns={columns(navigate)}
+          columns={memoizedColumns}
           pagination={{
             defaultPageSize: 8,
             showSizeChanger: true,
@@ -92,7 +95,6 @@ export default function MemberTable({
                   id: row.id!,
                   teamId: row.teamId,
                 }));
-              console.log(selectedIds);
               setSelectedRowKeys(selectedIds);
             },
           }}

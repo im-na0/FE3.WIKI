@@ -13,7 +13,6 @@ import {
   getDocs,
   runTransaction,
   serverTimestamp,
-  setDoc,
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
@@ -50,6 +49,7 @@ export function useUploadStorage() {
 
 export function useDeleteStorage() {
   const deleteStorage = async (src: string) => {
+    if (!src) return;
     try {
       await deleteObject(ref(storage, src));
     } catch (error) {
@@ -57,7 +57,6 @@ export function useDeleteStorage() {
       message.error("파일 삭제 중 오류가 발생했습니다 ");
     }
   };
-
   return { deleteStorage };
 }
 
@@ -134,7 +133,6 @@ export const useUploadData = (COLLECTION_NAME: string) => {
     }
 
     try {
-      console.log("uploadStore 시작");
       await runTransaction(db, async (transaction) => {
         // 먼저 읽기 작업을 수행
         let teamDocRef;
@@ -154,7 +152,6 @@ export const useUploadData = (COLLECTION_NAME: string) => {
           userId: arrayUnion(userUid),
         });
       });
-      console.log("uploadStore 종료");
       message.success("데이터가 업로드되었습니다.");
     } catch (error) {
       console.error(error);
