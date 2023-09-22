@@ -53,7 +53,7 @@ function MemberProfile({
             src={previewUrl}
           />
         ) : (
-          <Skeleton.Image style={{ width: "100%", height: "100%" }} />
+          <Skeleton.Image />
         )}
         {isEditMode && (
           <Button

@@ -132,7 +132,7 @@ function MemberDetailInfo() {
         </div>
       </div>
       <div className="member-container">
-        <div className="memer-profile-area">
+        <div className="member-profile-area">
           <MemberProfile
             isEditMode={isEditMode}
             previewUrl={previewUrl}

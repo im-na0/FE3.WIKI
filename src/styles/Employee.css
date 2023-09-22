@@ -28,8 +28,9 @@
     text-align: center;
     display: flex;
 }
-.ant-skeleton.ant-skeleton-element > .ant-skeleton-image{
-   width: 130px;
+.member-form-profile .ant-skeleton.ant-skeleton-element .ant-skeleton-image{
+    width: 130px;
+    height: 100%;
 }
 .member-profile-area {
     display: flex;
