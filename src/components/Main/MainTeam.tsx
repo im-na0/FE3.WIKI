@@ -65,7 +65,7 @@ const MainTeam = () => {
 export default MainTeam;
 
 export const MainSect = styled.section`
-  padding: 60px 0;
+  padding: 60px 0 0 0;
   position: relative;
 `;
 

@@ -5,6 +5,7 @@ export interface slideInfos {
   description: string;
   background: string;
   bgColor: string;
+  paddingRight: string;
 }
 
 export interface teamInfos {
@@ -27,6 +28,7 @@ export const MAIN_SLIDES: slideInfos[] = [
     background:
       "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg01.jpg?alt=media&token=1248f549-8f0f-4710-b3d5-ef0b648a9394",
     bgColor: "#FB783B",
+    paddingRight: "10px",
   },
   {
     key: "2",
@@ -37,6 +39,7 @@ export const MAIN_SLIDES: slideInfos[] = [
     background:
       "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg02.jpg?alt=media&token=cefb50fc-fb97-4017-96ea-bd06ea7571f0",
     bgColor: "#00b96b",
+    paddingRight: "10px",
   },
   {
     key: "3",
@@ -47,6 +50,7 @@ export const MAIN_SLIDES: slideInfos[] = [
     background:
       "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg03.jpg?alt=media&token=bfa144f8-5126-4461-853c-3797580c063b",
     bgColor: "#6B62FF",
+    paddingRight: "10px",
   },
 ];
 
