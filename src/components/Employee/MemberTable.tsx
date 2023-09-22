@@ -74,8 +74,6 @@ export default function MemberTable({
     setFilteredData(dataWithKeys);
   }, [data, filterValue, sortValue, searchText]);
 
-  // const memoizedColumns = useMemo(() => columns(navigate), [navigate]);
-
   return (
     <>
       {filteredData && (

@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Col, Dropdown, message, Row } from "antd";
+import { Col, Dropdown, message, Row, Avatar } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { FormDataType } from "../type/form";
@@ -37,9 +37,13 @@ export const columns = (
       render: (record: FormDataType) => (
         <Row gutter={16}>
           <Col flex="0 1">
-            <Image className="profile">
-              <img src={record.photo} alt={record.name} />
-            </Image>{" "}
+            <Avatar
+              src={record.photo}
+              alt={record.name}
+              size={{ xs: 24, xl: 32, xxl: 43 }}
+            >
+              {record.name?.charAt(0)}
+            </Avatar>
           </Col>
           <Col flex="auto">
             <div className="name">{record.name}</div>

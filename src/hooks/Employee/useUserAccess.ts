@@ -7,7 +7,7 @@ import { userAccessState } from "../../store/member";
 
 export default function useUserAccess() {
   const [userAccess, setUserAccess] = useRecoilState(userAccessState);
-  const [notified, setNotified] = useState(false); // 상태 변수 추가
+  const [notified, setNotified] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -24,11 +24,9 @@ export default function useUserAccess() {
           const access = userData?.access || null;
           setUserAccess(access);
 
-          // 관리자 권한을 감지하면 알림을 보여줍니다.
           if (access === "admin" && !notified) {
-            // 여기서 확인
             showAdminLoginNotification();
-            setNotified(true); // 알림이 표시되면 상태를 true로 설정
+            setNotified(true);
           }
         } else {
           setUserAccess(null);
