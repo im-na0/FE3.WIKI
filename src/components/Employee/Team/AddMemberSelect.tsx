@@ -10,7 +10,6 @@ interface AddTeamMemberSelectProps {
   onChange: (selectedUserIds: string[]) => void;
   rules?: Rule[];
 }
-
 interface UserData {
   key: string;
   title: string;

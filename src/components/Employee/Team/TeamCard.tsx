@@ -4,7 +4,6 @@ import {
   Card,
   Avatar,
   Tooltip,
-  Button,
   message,
   Popconfirm,
   Skeleton,
@@ -26,7 +25,6 @@ interface MemberTableProps {
 }
 
 export default function TeamCard({
-  setSelectedRowKeys,
   searchText,
   filterValue,
   sortValue,

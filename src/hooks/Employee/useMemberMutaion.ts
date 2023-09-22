@@ -134,7 +134,6 @@ export const useUploadData = (COLLECTION_NAME: string) => {
 
     try {
       await runTransaction(db, async (transaction) => {
-        // 먼저 읽기 작업을 수행
         let teamDocRef;
         if (teamId) {
           teamDocRef = doc(db, "Teams", teamId);
@@ -146,7 +145,6 @@ export const useUploadData = (COLLECTION_NAME: string) => {
           teamDocRef = doc(db, "Teams", userUid!);
         }
 
-        // 읽기 작업이 완료된 후 쓰기 작업을 수행
         transaction.set(userDocRef, data);
         transaction.update(teamDocRef, {
           userId: arrayUnion(userUid),

@@ -50,7 +50,6 @@ export default function MemberTable({
         : false;
       return nameIncludes || departmentIncludes;
     });
-
     const sortedDataSource = [...searchedData];
     switch (sortValue) {
       case "sortName":
@@ -66,7 +65,6 @@ export default function MemberTable({
       default:
         break;
     }
-
     const dataWithKeys = sortedDataSource.map((item) => ({
       ...item,
       key: item.id,

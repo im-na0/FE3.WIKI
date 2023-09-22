@@ -1,9 +1,9 @@
 import { EllipsisOutlined } from "@ant-design/icons";
 import { Col, Dropdown, message, Row, Avatar } from "antd";
 import React from "react";
-import styled from "styled-components";
 import { FormDataType } from "../type/form";
 import { NavigateFunction } from "react-router-dom";
+import styled, { css } from "styled-components";
 
 export const columns = (
   navigate: NavigateFunction,
@@ -46,7 +46,7 @@ export const columns = (
             </Avatar>
           </Col>
           <Col flex="auto">
-            <div className="name">{record.name}</div>
+            <NameStyle className="name">{record.name}</NameStyle>
             <div className="email">{record.email}</div>
           </Col>
         </Row>
@@ -71,7 +71,11 @@ export const columns = (
     },
     {
       title: "Access",
-      render: (record: FormDataType) => <div>{record.access}</div>,
+      render: (record: FormDataType) => (
+        <AccessStyle access={record.access ? String(record.access) : ""}>
+          {record.access}
+        </AccessStyle>
+      ),
     },
     {
       title: <EllipsisOutlined />,
@@ -119,4 +123,25 @@ const Image = styled.span`
 const Btn = styled.a`
   display: block;
   padding: 0.3rem;
+`;
+
+const NameStyle = styled.span`
+  font-size: 0.9rem;
+`;
+
+const AccessStyle = styled.span<{ access: string }>`
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #a67aff;
+  padding: 3px 13px;
+  background: #f4eeff;
+  border-radius: 1rem;
+  letter-spacing: -0.5px;
+
+  ${(props) =>
+    props.access === "admin" &&
+    css`
+      background: #e4f8da;
+      color: #88c851;
+    `}
 `;
