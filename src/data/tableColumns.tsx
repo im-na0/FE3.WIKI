@@ -14,6 +14,7 @@ export const columns = (navigate: NavigateFunction) => {
   const { deleteData } = useDeleteData(DeleteDataParams);
 
   const handleDelete = async (id: string, teamId: string) => {
+    console.log(id);
     deleteData(id, teamId);
   };
 
@@ -24,9 +25,10 @@ export const columns = (navigate: NavigateFunction) => {
       }
     }
     if (key === "delete") {
-      message.info("삭제되었습니다");
-      if (record.id && record.teamId) {
-        handleDelete(record.id, record.teamId);
+      console.log(record);
+      if (record.id) {
+        handleDelete(record.id, record.teamId!);
+        message.info("삭제되었습니다");
       }
     }
   };

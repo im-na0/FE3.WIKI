@@ -25,11 +25,12 @@ export default function MemberList() {
   const [filterValue, setFilterValue] = useState("");
   const [sortValue, setSortValue] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
-
   const userAccessLoadable = useRecoilValueLoadable(fetchUserAccess);
+
   useEffect(() => {
     if (userAccessLoadable.state === "hasValue") {
-      setUserAccess(userAccessLoadable.contents);
+      console.log(userAccessLoadable.contents);
+      setUserAccess(userAccessLoadable.contents as string | null);
     }
   }, [userAccessLoadable.state, setUserAccess, userAccessLoadable.contents]);
 

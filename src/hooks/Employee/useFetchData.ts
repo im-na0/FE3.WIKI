@@ -22,11 +22,10 @@ export function useFetchData({
   COLLECTION_NAME,
   ORDER,
   DOCUMENT_ID,
-}: FetchDataParams): { data: FormDataType[]; loading: boolean } {
+}: FetchDataParams): FormDataType[] {
   const [data, setData] = useState<FormDataType[]>([]);
-  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    setLoading(true);
     // doc 단위
     if (DOCUMENT_ID) {
       const docRef = doc(db, COLLECTION_NAME, DOCUMENT_ID);
@@ -36,7 +35,6 @@ export function useFetchData({
           if (snapshot.exists()) {
             const docData = snapshot.data();
             setData(docData as FormDataType[]);
-            setLoading(false);
           } else {
             message.error("문서를 찾을 수 없습니다!");
           }
@@ -78,7 +76,6 @@ export function useFetchData({
           });
 
           setData(orderedData);
-          setLoading(false);
         },
         (error) => {
           console.error("Error fetching data:", error);
@@ -91,5 +88,5 @@ export function useFetchData({
     }
   }, [COLLECTION_NAME, ORDER, DOCUMENT_ID]);
 
-  return { data, loading };
+  return data;
 }
