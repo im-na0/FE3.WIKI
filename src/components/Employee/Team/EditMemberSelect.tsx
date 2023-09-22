@@ -12,13 +12,11 @@ interface EditTeamMemberSelectProps {
   rules?: Rule[];
   prevUserIds?: string[];
 }
-
 interface UserData {
   key: string;
   title: string;
   photo?: string;
 }
-
 function EditTeamMemberSelect({
   isEditMode,
   prevUserIds,
@@ -81,18 +79,15 @@ function EditTeamMemberSelect({
         message.error("데이터를 불러올 수 없습니다!");
       }
     };
-
     fetchUsers();
   }, [prevUserIds, teamUserIds]);
 
   const handleUserChange = (nextSelectedKeys: string[]) => {
     setSelectedUserKeys(nextSelectedKeys);
-
     const nextSelectedUsers = users.filter((user) =>
       nextSelectedKeys.includes(user.key),
     );
     setSelectedUsers(nextSelectedUsers);
-
     onChange(nextSelectedKeys);
   };
   const { required } = CustomForm.useValidate();

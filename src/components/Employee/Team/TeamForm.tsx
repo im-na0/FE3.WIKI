@@ -11,7 +11,6 @@ import {
 interface TeamFormProps {
   isEditMode: boolean;
 }
-
 function TeamForm({ isEditMode }: TeamFormProps) {
   return (
     <>

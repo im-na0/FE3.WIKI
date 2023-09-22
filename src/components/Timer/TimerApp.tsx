@@ -97,7 +97,9 @@ const TimerApp = () => {
   const [clickedStartBtnText, setClickedStartBtnText] = useState<string>(""); // 출근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
   const [clickedFinishBtnText, setClickedFinishBtnText] = useState<string>(""); // 퇴근 버튼이 클릭됐을 때 해당 시각을 버튼에 표시
   const [workTimeDocId, setWorkTimeDocId] = useState<string | null>(""); // starttime 기록시 자동으로 생성된 문서 ID 저장
-  const [passedTime, setPassedTime] = useState<number | null>(0); // 출근 버튼을 클릭한 순간부터 퇴근 버튼을 클릭할 때까지의 타이머 역할
+  const [passedTime, setPassedTime] = useState<number | null>(
+    Number(localStorage.getItem("passedTime")) || 0,
+  ); // 출근 버튼을 클릭한 순간부터 퇴근 버튼을 클릭할 때까지의 타이머 역할
   const [timeDiff, setTimeDiff] = useState<number | null>(0); // 출근 시간과 퇴근 시간을 대조하여 총 근무 시간을 계산 (Timestamp 형태가 숫자로 변환되어 있음)
 
   function setCookie(name: string, value: string, days: number) {
@@ -169,6 +171,7 @@ const TimerApp = () => {
     if (startWorkBtnClicked && !finishWorkBtnClicked) {
       interval = setInterval(() => {
         setPassedTime((prevPassedTime) => (prevPassedTime ?? 0) + 1);
+        localStorage.setItem("passedTime", String(passedTime));
       }, 1000);
     }
 
@@ -178,6 +181,12 @@ const TimerApp = () => {
       }
     };
   }, [startWorkBtnClicked, finishWorkBtnClicked]);
+
+  useEffect(() => {
+    if (finishWorkBtnClicked) {
+      localStorage.removeItem("passedTime");
+    }
+  }, [finishWorkBtnClicked]);
 
   const formatTotalWorkTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -222,9 +231,12 @@ const TimerApp = () => {
     // 현재 시간을 퇴근 시간으로 기록
 
     if (!startWorkBtnClicked) {
-      return alert("출근한 상태일 때만 퇴근 기록이 가능합니다!");
+      return swal(
+        "Warning",
+        "출근한 상태일 때만 퇴근 기록이 가능합니다!",
+        "warning",
+      );
     }
-    console.log(workTimeDocId);
     if (workTimeDocId) {
       const finishWorkTime = serverTimestamp();
 

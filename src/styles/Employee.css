@@ -129,11 +129,7 @@
 /* Card List*/
 .ant-card .ant-card-body {
 padding: 2rem 2rem 1.2rem;
-
-}
-
-.ant-card .ant-card-actions {
-
+    border-radius: 5px;
 }
 
 .ant-card .ant-card-actions>li {
@@ -141,3 +137,7 @@ padding: 2rem 2rem 1.2rem;
     padding: 0.4rem;
 }
 
+/* Table */
+.ant-table-wrapper .ant-table-selection-col {
+    margin-left: 5px;
+}

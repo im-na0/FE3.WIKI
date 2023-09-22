@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Button } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, notification } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import useUserAccess from "../../hooks/Employee/useUserAccess";
+import useFetchUserAccess from "../../hooks/Employee/useFetchUserAccess";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import MemberFilter from "./MemberFilter";
 import MemberSearch from "./MemberSearch";
@@ -11,7 +11,7 @@ import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 
 export default function MemberList() {
-  const { userAccess, checkAdminPermission } = useUserAccess();
+  const { userAccess, checkAdminPermission, notified } = useFetchUserAccess();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
@@ -28,7 +28,14 @@ export default function MemberList() {
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
   const handleDelete = async () => {
-    if (!checkAdminPermission()) return;
+    if (!checkAdminPermission()) {
+      notification.warning({
+        message: "경고",
+        description: "admin 권한만 수정 할 수 있습니다!",
+        duration: 3,
+      });
+      return;
+    }
     try {
       for (const data of selectedRowKeys) {
         await deleteData(data.id, data.teamId);
@@ -47,9 +54,21 @@ export default function MemberList() {
     setIsModalOpen(false);
   };
 
+  useEffect(() => {
+    if (userAccess === "admin") {
+      notification.success({
+        message: "환영합니다!",
+        description: "관리자 권한으로 접속하셨습니다.",
+        duration: 3,
+      });
+    }
+  }, [notified]);
+
   return (
     <>
-      <h2>Employee</h2>
+      <Header>
+        <h2>Employee</h2>
+      </Header>
       <List>
         <CardHeader className="card-header">
           <ToggleWrap>
@@ -99,10 +118,14 @@ export default function MemberList() {
   );
 }
 
+const Header = styled.div`
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #f0f0f0;
+`;
+
 const List = styled.div`
-  background-color: #fff;
   border-radius: 8px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
   word-wrap: break-word;
 `;
 

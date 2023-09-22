@@ -5,7 +5,6 @@ import {
   arrayRemove,
   arrayUnion,
 } from "firebase/firestore";
-import { message } from "antd";
 
 export const useUpdateTeamForMember = () => {
   const updateTeamForMember = async (
@@ -15,14 +14,17 @@ export const useUpdateTeamForMember = () => {
   ) => {
     await runTransaction(db, async (transaction) => {
       const memberRef = doc(db, "Users", memberId);
-      const memberDoc = await transaction.get(memberRef);
+
       if (!currentTeamId) {
         throw new Error("The member doesn't belong to any team.");
       }
+
       try {
         await transaction.update(memberRef, { teamId: newTeamId });
+
         const oldTeamRef = doc(db, "Teams", currentTeamId);
         await transaction.update(oldTeamRef, { userId: arrayRemove(memberId) });
+
         const newTeamRef = doc(db, "Teams", newTeamId);
         await transaction.update(newTeamRef, { userId: arrayUnion(memberId) });
       } catch (error) {

@@ -6,17 +6,12 @@ import type { BadgeProps, CalendarProps } from "antd";
 import { Badge, Calendar } from "antd";
 import locale from "antd/es/calendar/locale/ko_KR";
 import useQueryWorkTime from "../../hooks/Timer/useQueryWorkTime";
-import useQueryLeave from "../../hooks/WorkTime/useQueryLeave";
 
 const WorkCalendar = () => {
   const [isLoaded, worktime] = useQueryWorkTime();
-  const [isLeaveLoaded, userName, leaveData, leaveNote] = useQueryLeave();
 
   const getListData = (value: Dayjs) => {
     const date = `${value.month() + 1}-${value.date()}`;
-    // isLeaveLoaded 코드에서도 사용하기 위해, 임의로 초기값을 지정해줌.
-    const startTime = "";
-    const finishTime = "";
 
     if (isLoaded) {
       const start = worktime?.find((time) => {
@@ -52,42 +47,13 @@ const WorkCalendar = () => {
       }
       return contentArray.length > 0 ? contentArray : null; // 출력할 내용이 없을 시 null 값을 반환
     }
-
-    if (isLeaveLoaded) {
-      const leaveInfo = (leaveData ?? []).find((leave) => {
-        const leaveDate = leave.leavedate?.toDate();
-        const dateStr = leaveDate
-          ? `${leaveDate.getMonth() + 1}-${leaveDate.getDate()}`
-          : "";
-        console.log(dateStr, date);
-        alert(`leavenote: ${leave.leavenote}`);
-
-        return dateStr === date;
-      });
-
-      const leaveType = leaveInfo ? "error" : "warning";
-      const leaveContent = leaveInfo ? leaveInfo.leavenote : "";
-
-      if (leaveInfo) {
-        return [
-          {
-            type: leaveType as BadgeProps["status"],
-            content: leaveContent,
-          },
-        ];
-      } else {
-        return null; // 출력할 내용이 없을 시 null 값을 반환
-      }
-    } else {
-      return null; // 출력할 내용이 없을 시 null 값을 반환
-    }
   };
 
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value);
 
-    if (listData === null) {
-      return null; // 출력할 내용이 없을 시 null 값을 반환
+    if (listData === null || listData === undefined) {
+      return null;
     }
 
     return (

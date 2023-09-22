@@ -25,7 +25,12 @@ const MainSwiper = () => {
           <SwiperSlide key={slide.key}>
             <MainSwiperItem $slide={slide}>
               <div className="slide-wrap">
-                <div className="slide-desc">
+                <div
+                  className="slide-desc"
+                  style={{
+                    paddingRight: "50px",
+                  }}
+                >
                   <h3 className="text-block">{slide.subText}</h3>
                   <h2>{slide.title}</h2>
                   <p>{slide.description}</p>

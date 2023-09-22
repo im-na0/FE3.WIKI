@@ -1,9 +1,9 @@
 export const SELECT_OPTIONS = {
   department: {
-    FE: "Front-end Developer",
-    BE: "Back-end Developer",
+    "Front-end Developer": "Front-end Developer",
+    "Back-end Developer": "Back-end Developer",
     "UI/UX": "UI/UX",
-    PM: "Product Manager",
+    "Product Manager": "Product Manager",
   },
   position: {
     Junior: "Junior",

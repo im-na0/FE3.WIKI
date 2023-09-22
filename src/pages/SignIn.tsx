@@ -35,14 +35,15 @@ const SignIn = () => {
                     <br />
                     시작하시기 전에 로그인을 해주세요!
                   </MainTitle>
-                  <SignInGoogle />
+                  <SignInEmailModal />
                   <Divider plain>OR</Divider>
-                  <EmailLogin onClick={showModal}>
+                  <SignInGoogle />
+                  {/* <EmailLogin onClick={showModal}>
                     <IconContainer>
                       <MailOutlined />
                     </IconContainer>
                     <span>직접 이메일 입력</span>
-                  </EmailLogin>
+                  </EmailLogin> */}
                 </LoginBtnContainer>
                 <MoveSingUp to="/signup">
                   <span>아직 계정이 없으신가요?</span> 회원가입하기
@@ -104,6 +105,7 @@ export const LoginBtnContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
 `;
 export const GoogleLogin = styled.button`
   border: none;
