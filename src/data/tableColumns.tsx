@@ -40,7 +40,7 @@ export const columns = (
             <Avatar
               src={record.photo}
               alt={record.name}
-              size={{ xs: 24, xl: 32, xxl: 43 }}
+              size={{ xs: 32, xxl: 43 }}
             >
               {record.name?.charAt(0)}
             </Avatar>
