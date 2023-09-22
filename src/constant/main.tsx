@@ -20,32 +20,33 @@ export interface teamInfos {
 export const MAIN_SLIDES: slideInfos[] = [
   {
     key: "1",
-    subText: "작은 텍스트1",
-    title: "제목1 입니다!",
+    subText: "첫번째 소식",
+    title: "추석(秋夕): 가을 달빛이 가장 좋은 밤",
     description:
-      "별에도 많은 위에 아이들의 어머니, 하나의 별을 나는 오면 버리었습니다.",
+      "추석을 글자대로 풀이하면, '가을 달빛이 유난히 밝아 보기 좋은 날'이라는 뜻이라고 합니다. 사랑하는 가족들과 함께 밤 하늘에 가득 찬 보름달처럼 풍요로운 연휴 보내세요.",
     background:
-      "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg01.jpg?alt=media&token=ae5158fd-83b5-407b-b818-8378e9b8561e",
-    bgColor: "#6C63FF",
+      "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg01.jpg?alt=media&token=1248f549-8f0f-4710-b3d5-ef0b648a9394",
+    bgColor: "#FB783B",
   },
   {
     key: "2",
-    subText: "작은 텍스트2",
-    title: "제목2 입니다!",
-    description: "가난한 우는 가슴속에 새겨지는 까닭이요, 비둘기,",
+    subText: "두번째 소식",
+    title: "새로워진 우리의 공간, 위키",
+    description:
+      "지난 2주간 FE팀에서 진행한 '우리 임직원들을 위한 위키 앱 개발프로젝트'가 무사히 끝났습니다. 더욱 새롭고 다채로워진 우리의 위키를 만나보세요!",
     background:
-      "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg02.jpg?alt=media&token=764dc294-b608-4f94-a1a5-241bdb5524ca",
+      "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg02.jpg?alt=media&token=cefb50fc-fb97-4017-96ea-bd06ea7571f0",
     bgColor: "#00b96b",
   },
   {
     key: "3",
-    subText: "작은 텍스트3",
-    title: "제목3 입니다!",
+    subText: "세번째 소식",
+    title: "이 달의 우수 개발팀, FE3 이정도면껌이조",
     description:
-      "무덤 릴케 했던 있습니다. 이제 슬퍼하는 속의 시와 된 이름자 이름을 까닭입니다.",
+      "이번 달에 진행된 우수 개발팀 투표에서, FE 3팀인 '이정도면껌이조'팀이 선정되었습니다! 모두 기쁜 마음으로 축하해주시고, 어제보다 오늘 더 성장해나가는 우리가 됩시다.",
     background:
       "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2Fslide-bg03.jpg?alt=media&token=bfa144f8-5126-4461-853c-3797580c063b",
-    bgColor: "#0E21A0",
+    bgColor: "#6B62FF",
   },
 ];
 
