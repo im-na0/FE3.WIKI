@@ -17,7 +17,6 @@ export default function useUserAccess() {
       const userId = firebaseUser.uid;
       const db = getFirestore();
       const userRef = doc(db, "Users", userId);
-
       const unsubscribe = onSnapshot(userRef, (docSnap) => {
         if (docSnap.exists()) {
           const userData = docSnap.data();
@@ -26,7 +25,6 @@ export default function useUserAccess() {
 
           if (access === "admin" && !notified) {
             showAdminLoginNotification();
-            setNotified(true);
           }
         } else {
           setUserAccess(null);
@@ -38,7 +36,7 @@ export default function useUserAccess() {
         unsubscribe();
       };
     }
-  }, [setUserAccess, setNotified]);
+  }, []);
 
   const showAdminLoginNotification = () => {
     notification.success({

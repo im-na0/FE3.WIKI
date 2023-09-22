@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { Button } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, notification } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import useUserAccess from "../../hooks/Employee/useUserAccess";
+import useFetchUserAccess from "../../hooks/Employee/useFetchUserAccess";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import MemberFilter from "./MemberFilter";
 import MemberSearch from "./MemberSearch";
@@ -11,7 +11,7 @@ import CustomForm from "../common/CustomForm";
 import styled from "styled-components";
 
 export default function MemberList() {
-  const { userAccess, checkAdminPermission } = useUserAccess();
+  const { userAccess, checkAdminPermission, notified } = useFetchUserAccess();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
@@ -28,7 +28,14 @@ export default function MemberList() {
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
   const handleDelete = async () => {
-    if (!checkAdminPermission()) return;
+    if (!checkAdminPermission()) {
+      notification.warning({
+        message: "경고",
+        description: "admin 권한만 수정 할 수 있습니다!",
+        duration: 3,
+      });
+      return;
+    }
     try {
       for (const data of selectedRowKeys) {
         await deleteData(data.id, data.teamId);
@@ -46,6 +53,16 @@ export default function MemberList() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    if (userAccess === "admin") {
+      notification.success({
+        message: "환영합니다!",
+        description: "관리자 권한으로 접속하셨습니다.",
+        duration: 3,
+      });
+    }
+  }, [notified]);
 
   return (
     <>
