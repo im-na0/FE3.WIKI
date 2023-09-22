@@ -14,7 +14,6 @@ export const useUpdateTeamForMember = () => {
     newTeamId: string,
   ) => {
     await runTransaction(db, async (transaction) => {
-      // 멤버의 현재 팀 가져오기
       const memberRef = doc(db, "Users", memberId);
       const memberDoc = await transaction.get(memberRef);
       if (!currentTeamId) {
