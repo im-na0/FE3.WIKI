@@ -19,11 +19,11 @@ import {
 // api
 import { deleteFolder } from "../../hooks/Wiki/api";
 
-interface IProps {
+interface ISelect {
   title: string;
 }
 
-const WikiSelect = ({ title }: IProps) => {
+const WikiSelect = ({ title }: ISelect) => {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const setFileState = useSetRecoilState(newFileState);
   const setFolderState = useSetRecoilState(editFolderState);
@@ -58,10 +58,6 @@ const WikiSelect = ({ title }: IProps) => {
       document.removeEventListener("click", handleOutsideClick);
     };
   }, [isMenuVisible]);
-
-  useEffect(() => {
-    console.log("Initialize");
-  }, [deleteFolderState]);
 
   return (
     <Container>
