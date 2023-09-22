@@ -43,6 +43,7 @@ export interface User {
   department: string;
   team: string;
   position: string;
+  access: string;
   photo: string;
 }
 
@@ -84,6 +85,7 @@ export const userInfo = atom<User>({
     department: "",
     team: "",
     position: "",
+    access: "",
     photo: "",
   },
 });
