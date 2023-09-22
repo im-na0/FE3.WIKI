@@ -21,7 +21,6 @@ const SignInEmailModal = () => {
   return (
     <Container>
       <ModalContainer>
-        {/* <ModalTitle>Wiki에서 사용하고 있는 이메일을 적어주세요!</ModalTitle> */}
         <Form
           name="basic"
           labelCol={{ span: 8 }}
@@ -60,27 +59,6 @@ const SignInEmailModal = () => {
           >
             제출
           </Button>
-          {/* <Button
-            type="primary"
-            htmlType="submit"
-            onClick={handleSignIn}
-            style={{ width: 330, height: 40 }}
-          >
-            제출
-          </Button> */}
-          {/* <Form.Item
-            wrapperCol={{ offset: 8, span: 16 }}
-            style={{ margin: "auto" }}
-          >
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={handleSignIn}
-              style={{ width: 320 }}
-            >
-              제출
-            </Button>
-          </Form.Item> */}
         </Form>
       </ModalContainer>
     </Container>
@@ -98,10 +76,4 @@ const ModalContainer = styled.div`
   justify-content: center;
   border-radius: 20px;
   text-align: start;
-`;
-const ModalTitle = styled.p`
-  font-size: 20px;
-  /* margin-top: 50px; */
-  margin-bottom: 0;
-  text-align: center;
 `;
