@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 // firebase
 import { collection, getDocs } from "firebase/firestore";
 import { db, auth, storage } from "../../../libs/firebase";
@@ -19,6 +20,7 @@ import { userRegister } from "../../../hooks/SignIn/userRegister";
 import { SlideCounter, Dot, ActiveDot } from "../Pagination";
 import { useNavigation } from "../../../hooks/SignIn/useNavigation";
 import { MainTitle } from "../Title";
+import { Logo } from "./StartRegister";
 
 // 부서 가져오기
 const departmentKey = Object.keys(SELECT_OPTIONS.department);
@@ -112,6 +114,9 @@ export default function UserRegister() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      <Link to="/">
+        <Logo src="/fe3-wiki-logo.png"></Logo>
+      </Link>
       <Container>
         <MainTitle>회원님의 정보를 입력해주세요!</MainTitle>
         <UserInfoContainer>
