@@ -4,6 +4,7 @@ import { ActiveDot, Dot, SlideCounter } from "../Pagination";
 import { useNavigation } from "../../../hooks/SignIn/useNavigation";
 import { StartSubTitle, StartTitle } from "../Title";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function StartRegister() {
   const { moveUserRegister } = useNavigation();
@@ -14,8 +15,10 @@ export default function StartRegister() {
       transition={{ duration: 0.5 }}
     >
       <Container>
+        <Link to="/">
+          <Logo src="/fe3-wiki-logo.png"></Logo>
+        </Link>
         <StartContainer>
-          <StartTitle>Wiki에 오신 것을 환영합니다!</StartTitle>
           <StartSubTitle>아래 버튼을 통해 정보를 입력해주세요!</StartSubTitle>
           <StartBtn onClick={moveUserRegister}>시작하기</StartBtn>
         </StartContainer>
@@ -28,7 +31,12 @@ export default function StartRegister() {
     </motion.div>
   );
 }
-
+export const Logo = styled.img`
+  position: absolute;
+  width: 120px;
+  top: 40px;
+  left: 40px;
+`;
 const Container = styled.div`
   margin: 0;
   padding: 0;
