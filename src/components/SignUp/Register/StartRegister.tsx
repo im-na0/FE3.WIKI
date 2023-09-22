@@ -19,6 +19,7 @@ export default function StartRegister() {
           <Logo src="/fe3-wiki-logo.png"></Logo>
         </Link>
         <StartContainer>
+          <StartTitle>Wiki에 오신 것을 환영합니다!</StartTitle>
           <StartSubTitle>아래 버튼을 통해 정보를 입력해주세요!</StartSubTitle>
           <StartBtn onClick={moveUserRegister}>시작하기</StartBtn>
         </StartContainer>
