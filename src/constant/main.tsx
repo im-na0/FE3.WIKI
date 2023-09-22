@@ -84,10 +84,10 @@ export const TEAM3: teamInfos[] = [
     id: "4",
     name: "노욱진",
     profile:
-      "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2F%EB%85%B8%EC%9A%B1%EC%A7%84.jpeg?alt=media&token=4c9e3629-0116-4121-92ea-b41aaf1e16f8",
+      "https://firebasestorage.googleapis.com/v0/b/fe3-wiki.appspot.com/o/main%2F%E1%84%82%E1%85%A9%E1%84%8B%E1%85%AE%E1%86%A8%E1%84%8C%E1%85%B5%E1%86%AB.jpg?alt=media&token=f01bbe93-0263-457a-aeac-b3d657a5bfa4",
     part: "위키 페이지 담당",
     mbti: "ISFJ",
-    desc: "열심히 해보겠습니다~!",
+    desc: "열심히 해보겠습니다!",
     isLeader: false,
   },
   {
