@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFetchData } from "../../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../../type/form";
-import { Button, message, Spin } from "antd";
+import { Button, message, Skeleton, Spin } from "antd";
 import CustomForm from "../../common/CustomForm";
 import { EditOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import MemberProfile from "../MemberProfile";
@@ -30,14 +30,16 @@ function TeamDetailInfo() {
     COLLECTION_NAME: "Teams",
     DOCUMENT_ID: teamId,
   };
-  const userData: FormDataType | null = useFetchData(fetchDataParams);
+  const { data: userData, loading } = useFetchData(fetchDataParams) as {
+    data: FormDataType;
+    loading: boolean;
+  };
   const [cardName, setCardName] = useState(userData.name || userData.teamName);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedUserIds, setSelectedUserIds] =
     useRecoilState(selectedUserIdsState);
   const [prevUserIds, setPrevUserIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (userData) {
@@ -55,8 +57,6 @@ function TeamDetailInfo() {
 
   const handleUpdate = async () => {
     try {
-      setLoading(true);
-
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
       const { updateData } = useUpdateData({ COLLECTION_NAME: "Teams" });
@@ -78,8 +78,6 @@ function TeamDetailInfo() {
     } catch (error) {
       console.error("Error updating member:", error);
       message.error("데이터 업데이트 중 오류가 발생했습니다");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -132,14 +130,18 @@ function TeamDetailInfo() {
         </div>
       </div>
       <div className="member-container">
-        <div className="memer-profile-area">
-          <MemberProfile
-            isEditMode={isEditMode}
-            previewUrl={previewUrl}
-            setPreviewUrl={setPreviewUrl}
-            file={file}
-            setFile={setFile}
-          />
+        <div className="member-profile-area">
+          {loading ? (
+            <Skeleton.Avatar size="large" shape="circle" active />
+          ) : (
+            <MemberProfile
+              isEditMode={isEditMode}
+              previewUrl={previewUrl}
+              setPreviewUrl={setPreviewUrl}
+              file={file}
+              setFile={setFile}
+            />
+          )}
           <div className="member-profile-info">
             <div className="title-text">{cardName}</div>
             <div className="desc-text">{cardDepartment}</div>
@@ -147,12 +149,18 @@ function TeamDetailInfo() {
         </div>
         <div className="member-info-area">
           <div className="member-info-wrap">
-            <TeamForm isEditMode={isEditMode} />
-            <EditMemberSelect
-              isEditMode={isEditMode}
-              onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
-              prevUserIds={prevUserIds}
-            />
+            {loading ? (
+              <Skeleton active />
+            ) : (
+              <>
+                <TeamForm isEditMode={isEditMode} />
+                <EditMemberSelect
+                  isEditMode={isEditMode}
+                  onChange={(userIds: string[]) => setSelectedUserIds(userIds)}
+                  prevUserIds={prevUserIds}
+                />{" "}
+              </>
+            )}
           </div>
         </div>
       </div>

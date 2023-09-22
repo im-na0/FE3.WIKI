@@ -1,5 +1,5 @@
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Col, Dropdown, message, Row, Avatar } from "antd";
+import { Col, Dropdown, message, Row, Avatar, Tag } from "antd";
 import React from "react";
 import { FormDataType } from "../type/form";
 import { NavigateFunction } from "react-router-dom";
@@ -8,7 +8,7 @@ import styled, { css } from "styled-components";
 export const columns = (
   navigate: NavigateFunction,
   deleteData: (arg1: string, arg2: string) => void,
-  userAccess: string | null,
+  userAccess: string | undefined,
   checkAdminPermission: () => boolean,
 ) => {
   const handleDelete = async (id: string, teamId: string) => {
@@ -46,8 +46,10 @@ export const columns = (
             </Avatar>
           </Col>
           <Col flex="auto">
-            <NameStyle className="name">{record.name}</NameStyle>
-            <div className="email">{record.email}</div>
+            <NameField>
+              <div className="name">{record.name}</div>
+              <div className="email">{record.email}</div>
+            </NameField>
           </Col>
         </Row>
       ),
@@ -55,26 +57,28 @@ export const columns = (
     {
       title: "Department",
       render: (record: FormDataType) => (
-        <div>
+        <DepartmentField>
           <div className="name">{record.department}</div>
-          <div className="address">{record.position}</div>
-        </div>
+          <PositionTag position={record.position} bordered={false}>
+            {record.position}
+          </PositionTag>
+        </DepartmentField>
       ),
     },
     {
       title: "Team",
-      dataIndex: "team",
+      render: (record: FormDataType) => <TeamField>{record.team}</TeamField>,
     },
     {
       title: "Phone",
-      dataIndex: "phone",
+      render: (record: FormDataType) => <PhoneField>{record.phone}</PhoneField>,
     },
     {
       title: "Access",
       render: (record: FormDataType) => (
-        <AccessStyle access={record.access ? String(record.access) : ""}>
+        <AccessField access={record.access ? String(record.access) : ""}>
           {record.access}
-        </AccessStyle>
+        </AccessField>
       ),
     },
     {
@@ -109,28 +113,37 @@ export const columns = (
   ];
 };
 
-const Image = styled.span`
-  display: block;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  overflow: hidden;
-  & > img {
-    width: 100%;
-  }
-`;
-
 const Btn = styled.a`
   display: block;
   padding: 0.3rem;
 `;
-
-const NameStyle = styled.span`
-  font-size: 0.9rem;
+const SharedFontStyle = css`
+  font-size: 0.85rem;
 `;
 
-const AccessStyle = styled.span<{ access: string }>`
-  font-size: 0.8rem;
+const NameField = styled.span`
+  font-size: 0.9rem;
+  font-weight: 500;
+  & > .email {
+    ${SharedFontStyle};
+    font-weight: 400;
+    color: #817e81;
+  }
+`;
+
+const DepartmentField = styled.span`
+  ${SharedFontStyle};
+`;
+
+const TeamField = styled.span`
+  ${SharedFontStyle};
+`;
+
+const PhoneField = styled.span`
+  ${SharedFontStyle};
+`;
+const AccessField = styled.span<{ access: string }>`
+  ${SharedFontStyle};
   font-weight: 500;
   color: #a67aff;
   padding: 3px 13px;
@@ -144,4 +157,24 @@ const AccessStyle = styled.span<{ access: string }>`
       background: #e4f8da;
       color: #88c851;
     `}
+`;
+
+const PositionTag = styled(Tag)<{ position: string | undefined }>`
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  ${(props) =>
+    props.position
+      ? css`
+          color: ${props.position === "Manager"
+            ? "#531dab"
+            : props.position === "Senior"
+            ? "#d4380d"
+            : props.position === "Junior"
+            ? "#7cb305"
+            : "#333"};
+        `
+      : `
+          background: #333;
+        `};
 `;

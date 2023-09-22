@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { FormDataType } from "../../type/form";
-import { Button, message, Spin } from "antd";
+import { Button, message, Spin, Skeleton } from "antd";
 import CustomForm from "../common/CustomForm";
 import { EditOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import MemberForm from "./MemberForm";
@@ -26,11 +26,15 @@ function MemberDetailInfo() {
     COLLECTION_NAME: "Users",
     DOCUMENT_ID: memberId,
   };
-  const userData: FormDataType | null = useFetchData(fetchDataParams);
+  const { data: userData, loading } = useFetchData(fetchDataParams) as {
+    data: FormDataType;
+    loading: boolean;
+  };
+
   const [cardName, setCardName] = useState(userData.name);
   const [cardDepartment, setCardDepartment] = useState(userData.photo);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [teamId, setTeamId] = useState<string | undefined>("");
   useEffect(() => {
     if (userData) {
       Object.keys(userData).forEach((fieldName) => {
@@ -38,6 +42,7 @@ function MemberDetailInfo() {
         if (fieldName === "photo") {
           setPreviewUrl(userData[fieldName as string]);
         }
+        setTeamId(userData.teamId);
         setCardDepartment(userData.department);
         setCardName(userData.name);
       });
@@ -46,20 +51,24 @@ function MemberDetailInfo() {
 
   const handleUpdate = async (fieldsValue: FormDataType) => {
     try {
-      setLoading(true);
       const { uploadStorage } = useUploadStorage();
       const { deleteStorage } = useDeleteStorage();
       const { updateData } = useUpdateData({ COLLECTION_NAME: "Users" });
 
       if (file) {
         const downloadURL = await uploadStorage(file);
-        fieldsValue.photo = downloadURL || fieldsValue.photo!;
+        fieldsValue.photo = downloadURL;
+
         if (userData && userData.photo) {
           await deleteStorage(userData.photo);
         }
       } else {
-        fieldsValue.photo = previewUrl || fieldsValue.photo;
+        fieldsValue.photo = previewUrl || "";
       }
+      if (typeof fieldsValue.photo === "undefined" || !fieldsValue.photo) {
+        fieldsValue.photo = "";
+      }
+
       const currentTeamId = userData.teamId;
       if (memberId) {
         await updateData(memberId, fieldsValue);
@@ -75,8 +84,6 @@ function MemberDetailInfo() {
     } catch (error) {
       console.error("Error updating member:", error);
       message.error("데이터 업데이트 중 오류가 발생했습니다");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -89,7 +96,6 @@ function MemberDetailInfo() {
     setCardDepartment(fieldsValue.department);
   };
   const toggleEditMode = () => {
-    console.log("호출");
     setIsEditMode((prevIsEditMode) => {
       return !prevIsEditMode;
     });
@@ -105,7 +111,13 @@ function MemberDetailInfo() {
       <div className="member-header">
         <div className="member-title">
           <h3>직원 정보</h3>
-          <span className="member-desc">{userData?.name} 님의 프로필</span>
+          <span className="member-desc">
+            {userData?.name ? (
+              `${userData.name} 님의 프로필`
+            ) : (
+              <Skeleton.Input style={{ width: "200px" }} active />
+            )}
+          </span>
         </div>
         <div className="member-btn-area">
           <Button
@@ -133,22 +145,36 @@ function MemberDetailInfo() {
       </div>
       <div className="member-container">
         <div className="member-profile-area">
-          <MemberProfile
-            isEditMode={isEditMode}
-            previewUrl={previewUrl}
-            setPreviewUrl={setPreviewUrl}
-            file={file}
-            setFile={setFile}
-          />
+          {loading ? (
+            <Skeleton.Avatar size="large" shape="circle" active />
+          ) : (
+            <MemberProfile
+              isEditMode={isEditMode}
+              previewUrl={previewUrl}
+              setPreviewUrl={setPreviewUrl}
+              file={file}
+              setFile={setFile}
+            />
+          )}
           <div className="member-profile-info">
-            <div className="title-text">{cardName}</div>
-            <div className="desc-text">{cardDepartment}</div>
+            <div className="title-text">
+              {cardName || <Skeleton.Input style={{ width: "150px" }} active />}
+            </div>
+            <div className="desc-text">
+              {cardDepartment || (
+                <Skeleton.Input style={{ width: "100px" }} active />
+              )}
+            </div>
           </div>
         </div>
         <div className="member-info-area">
-          <div className="member-info-wrap">
-            <MemberForm isEditMode={isEditMode} form={form} />
-          </div>
+          {loading ? (
+            <Skeleton active />
+          ) : (
+            <div className="member-info-wrap">
+              <MemberForm isEditMode={isEditMode} form={form} />
+            </div>
+          )}
         </div>
       </div>
     </Form>

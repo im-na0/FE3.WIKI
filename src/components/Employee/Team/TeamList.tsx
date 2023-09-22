@@ -29,17 +29,6 @@ export default function TeamList() {
   const { deleteData } = useDeleteData(DeleteDataParams);
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const handleDelete = async () => {
-    try {
-      for (const id of selectedRowKeys) {
-        await deleteData(id);
-      }
-      setSelectedRowKeys([]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <>
       <h2>Teams</h2>
@@ -88,7 +77,6 @@ export default function TeamList() {
 const List = styled.div`
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
   word-wrap: break-word;
 `;
 

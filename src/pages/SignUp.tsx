@@ -44,14 +44,14 @@ const SignUp = () => {
                     <br />
                     시작하시기 전에 회원가입을 해주세요!
                   </MainTitle>
-                  <SignInGoogle />
-                  <Divider plain>OR</Divider>
                   <EmailLogin onClick={showModal}>
                     <IconContainer>
                       <MailOutlined />
                     </IconContainer>
                     <span>직접 이메일 입력</span>
                   </EmailLogin>
+                  <Divider plain>OR</Divider>
+                  <SignInGoogle />
                 </LoginBtnContainer>
                 <MoveSingIn to="/signin">
                   <span>이미 계정이 있으신가요?</span> 로그인하기

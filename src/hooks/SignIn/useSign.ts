@@ -72,6 +72,7 @@ export const useSign = () => {
       });
     } catch (error) {
       console.error("로그인 실패:", error);
+      swal("Fail", "이미 사용중인 계정입니다!", "error");
     }
   };
   return {

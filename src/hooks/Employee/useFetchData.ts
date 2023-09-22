@@ -18,14 +18,21 @@ interface FetchDataParams {
   DOCUMENT_ID?: string;
 }
 
+interface FetchDataResult {
+  data: FormDataType[];
+  loading: boolean;
+}
+
 export function useFetchData({
   COLLECTION_NAME,
   ORDER,
   DOCUMENT_ID,
-}: FetchDataParams): FormDataType[] {
+}: FetchDataParams): FetchDataResult {
   const [data, setData] = useState<FormDataType[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    setLoading(true);
     // doc 단위
     if (DOCUMENT_ID) {
       const docRef = doc(db, COLLECTION_NAME, DOCUMENT_ID);
@@ -35,8 +42,10 @@ export function useFetchData({
           if (snapshot.exists()) {
             const docData = snapshot.data();
             setData(docData as FormDataType[]);
+            setLoading(false);
           } else {
             message.error("문서를 찾을 수 없습니다!");
+            setLoading(false);
           }
         },
         (error) => {
@@ -48,7 +57,7 @@ export function useFetchData({
         },
       );
     } else {
-      // collection 단위 FIXME: 테이블만 가능
+      // collection 단위
       let q = query(collection(db, COLLECTION_NAME));
       if (ORDER) {
         q = query(q, orderBy(ORDER));
@@ -76,10 +85,12 @@ export function useFetchData({
           });
 
           setData(orderedData);
+          setLoading(false);
         },
         (error) => {
           console.error("Error fetching data:", error);
           message.error("데이터를 불러올 수 없습니다!");
+          setLoading(false);
           return () => {
             unsubscribe();
           };
@@ -88,5 +99,5 @@ export function useFetchData({
     }
   }, [COLLECTION_NAME, ORDER, DOCUMENT_ID]);
 
-  return data;
+  return { data, loading };
 }

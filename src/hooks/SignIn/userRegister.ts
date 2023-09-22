@@ -49,6 +49,13 @@ export const userRegister = () => {
         break;
       case "position":
         setSelectedPosition(value);
+        {
+          const access = value === "Manager" ? "admin" : "member";
+          setInput((prevInput) => ({
+            ...prevInput,
+            access: access,
+          }));
+        }
         break;
       default:
         break;
@@ -100,6 +107,7 @@ export const userRegister = () => {
           department: selectedPart,
           team: selectedTeam,
           position: selectedPosition,
+          access: input.access,
           photo: input.photo,
         };
         // 기존 업로드 된 유저 정보 삭제
@@ -122,7 +130,7 @@ export const userRegister = () => {
               await updateDoc(prevTeamDoc.ref, {
                 userId: updatedUserId,
               });
-              moveEndRegister();
+              // moveEndRegister();
             }
           }
         }

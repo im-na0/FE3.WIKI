@@ -1,22 +1,25 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Table } from "antd";
+import { Table, Skeleton, Spin } from "antd";
+
 import { FormDataType } from "../../type/form";
 import { columns } from "../../data/tableColumns";
 import { useFetchData } from "../../hooks/Employee/useFetchData";
 import { useNavigate } from "react-router-dom";
 import { useDeleteData } from "../../hooks/Employee/useDeleteData";
-import useUserAccess from "../../hooks/Employee/useUserAccess";
+import useFetchUserAccess from "../../hooks/Employee/useFetchUserAccess";
 
 type SelectedRowData = {
   id: string;
   teamId?: string;
 };
+
 interface MemberTableProps {
   setSelectedRowKeys: (keys: SelectedRowData[]) => void;
   searchText: string;
   filterValue: string;
   sortValue: string;
 }
+
 export default function MemberTable({
   setSelectedRowKeys,
   searchText,
@@ -27,77 +30,78 @@ export default function MemberTable({
     COLLECTION_NAME: "Users",
     ORDER: "name",
   };
-  const data = useFetchData(fetchDataParams);
+
+  const { data, loading } = useFetchData(fetchDataParams);
   const [filteredData, setFilteredData] = useState<FormDataType[]>(data);
+
   const navigate = useNavigate();
   const { deleteData } = useDeleteData({ COLLECTION_NAME: "Users" });
-  const { userAccess, checkAdminPermission } = useUserAccess();
+  const { userAccess, checkAdminPermission } = useFetchUserAccess();
+
   const memoizedColumns = useMemo(
     () => columns(navigate, deleteData, userAccess, checkAdminPermission),
     [navigate, deleteData, userAccess, checkAdminPermission],
   );
 
   useEffect(() => {
-    const filteredByAccess = filterValue
-      ? data.filter((item: FormDataType) => item.access === filterValue)
-      : data;
+    let processedData = data;
 
-    const searchedData = filteredByAccess.filter((item: FormDataType) => {
-      if (!searchText) return true;
-      const nameIncludes = item.name ? item.name.includes(searchText) : false;
-      const departmentIncludes = item.department
-        ? item.department.includes(searchText)
-        : false;
-      return nameIncludes || departmentIncludes;
-    });
-    const sortedDataSource = [...searchedData];
-    switch (sortValue) {
-      case "sortName":
-        sortedDataSource.sort((a, b) =>
-          (a.name ?? "").localeCompare(b.name ?? ""),
-        );
-        break;
-      case "sortTeam":
-        sortedDataSource.sort((a, b) =>
-          (a.team ?? "").localeCompare(b.team ?? ""),
-        );
-        break;
-      default:
-        break;
+    if (filterValue) {
+      processedData = data.filter((item) => item.access === filterValue);
     }
-    const dataWithKeys = sortedDataSource.map((item) => ({
-      ...item,
-      key: item.id,
-    }));
-    setFilteredData(dataWithKeys);
+
+    if (searchText) {
+      processedData = processedData.filter(
+        (item) =>
+          item.name?.includes(searchText) ||
+          item.department?.includes(searchText),
+      );
+    }
+
+    if (sortValue === "sortName") {
+      processedData.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+    } else if (sortValue === "sortTeam") {
+      processedData.sort((a, b) => (a.team ?? "").localeCompare(b.team ?? ""));
+    }
+
+    setFilteredData(processedData.map((item) => ({ ...item, key: item.id })));
   }, [data, filterValue, sortValue, searchText]);
 
-  return (
-    <>
-      {filteredData && (
+  if (loading) {
+    return (
+      <Spin size="large">
         <Table
-          dataSource={filteredData}
-          columns={memoizedColumns}
-          pagination={{
-            defaultPageSize: 8,
-            showSizeChanger: true,
-          }}
-          rowSelection={{
-            onChange: (
-              selectedKeys: React.Key[],
-              selectedRows: FormDataType[],
-            ) => {
-              const selectedIds = selectedRows
-                .filter((row) => row.id)
-                .map((row) => ({
-                  id: row.id!,
-                  teamId: row.teamId,
-                }));
-              setSelectedRowKeys(selectedIds);
-            },
-          }}
+          dataSource={Array(8)
+            .fill({})
+            .map((_, idx) => ({ key: idx }))}
+          columns={memoizedColumns.map((column) => ({
+            ...column,
+            render: () => (
+              <Skeleton.Input style={{ width: "100%" }} active size="small" />
+            ),
+          }))}
+          pagination={false}
         />
-      )}
-    </>
+      </Spin>
+    );
+  }
+
+  return (
+    <Table
+      dataSource={filteredData}
+      columns={memoizedColumns}
+      pagination={{
+        defaultPageSize: 8,
+        showSizeChanger: true,
+      }}
+      rowSelection={{
+        onChange: (selectedKeys, selectedRows) => {
+          const selectedIds = selectedRows
+            .filter((row) => row.id)
+            .map((row) => ({ id: row.id!, teamId: row.teamId }));
+          setSelectedRowKeys(selectedIds);
+        },
+      }}
+    />
   );
 }
