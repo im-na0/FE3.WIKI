@@ -17,7 +17,6 @@ interface TeamLeaderSelectProps {
 function TeamLeaderSelect({ readOnly }: TeamLeaderSelectProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState<string[]>([]);
   const teamUserIds = useTeamUserIds();
 
   useEffect(() => {

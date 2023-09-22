@@ -4,7 +4,6 @@ import {
   Card,
   Avatar,
   Tooltip,
-  Button,
   message,
   Popconfirm,
   Skeleton,
@@ -14,6 +13,7 @@ import { FormDataType } from "../../../type/form";
 import { useFetchTeamData } from "../../../hooks/Employee/useFetchTeamData";
 import { useDeleteData } from "../../../hooks/Employee/useDeleteData";
 import { formatDate } from "../../../utils/formatDate";
+import { formatDepartment } from "../../../utils/formatDepartment";
 import { useNavigate } from "react-router-dom";
 import { DeleteOutlined } from "@ant-design/icons";
 import styled, { css } from "styled-components";
@@ -26,7 +26,6 @@ interface MemberTableProps {
 }
 
 export default function TeamCard({
-  setSelectedRowKeys,
   searchText,
   filterValue,
   sortValue,
@@ -89,6 +88,7 @@ export default function TeamCard({
           {filteredData.map((item) => (
             <StyledCard
               key={item.id}
+              department={item.department}
               actions={[
                 <EyeOutlined
                   key={item.id}
@@ -109,7 +109,7 @@ export default function TeamCard({
                 <CardTag
                   department={item.department ? String(item.department) : ""}
                 >
-                  {item.department}
+                  {formatDepartment(item.department)}
                 </CardTag>
                 <CardMeta>
                   <div className="teamName">{item.teamName}</div>
@@ -126,7 +126,7 @@ export default function TeamCard({
                     >
                       {item.teamUsers.map(
                         (user: FormDataType, index: number) => (
-                          <span key={`${user.id}-${index}`}>
+                          <AvatarItem key={`${user.id}-${index}`}>
                             <Tooltip title={user.name} placement="top">
                               <Avatar
                                 key={`${user.id}-${index}`}
@@ -135,7 +135,7 @@ export default function TeamCard({
                                 {user.name}
                               </Avatar>
                             </Tooltip>
-                          </span>
+                          </AvatarItem>
                         ),
                       )}
                     </Avatar.Group>
@@ -204,7 +204,7 @@ const CardMeta = styled.div`
   }
   .teamDescription {
     font-size: 0.8rem;
-    color: #afafaf;
+    color: #505050;
     padding: 0.3rem 0;
   }
 `;
@@ -215,10 +215,36 @@ const UserList = styled.ul`
   margin: 0;
 `;
 
-const StyledCard = styled(Card)`
+const getCardBackground = (department: string) => {
+  switch (department) {
+    case "PM":
+      return `
+        background-color: #FBAB7E;
+        background-image: linear-gradient(62deg, #FBAB7E 0%, #F7CE68 100%);
+      `;
+    case "BE":
+      return `
+      background-color: #8BC6EC;
+      background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+      `;
+    case "UI/UX":
+      return `
+      background-color: #85FFBD;
+      background-image: linear-gradient(45deg, #85FFBD 0%, #FFFB7D 100%);
+`;
+    default:
+      return `
+      background-color: #FAACA8;
+      background-image: linear-gradient(19deg, #FAACA8 0%, #DDD6F3 100%);
+      `;
+  }
+};
+
+const StyledCard = styled(Card)<{ department?: string }>`
   width: 340px;
   border-radius: 10px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  background: ${(props) => getCardBackground(props.department ?? "")};
 
   .ant-card-cover {
     max-height: 160px;
@@ -230,8 +256,16 @@ const StyledCard = styled(Card)`
     }
   }
 `;
-
 const CardDate = styled.span`
   font-weight: 600;
-  color: #444a4d;
+  color: #434343;
+`;
+
+const AvatarItem = styled.span`
+  display: inline-block;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1) translateY(-5px);
+  }
 `;

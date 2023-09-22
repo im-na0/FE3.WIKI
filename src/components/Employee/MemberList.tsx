@@ -66,7 +66,9 @@ export default function MemberList() {
 
   return (
     <>
-      <h2>Employee</h2>
+      <Header>
+        <h2>Employee</h2>
+      </Header>
       <List>
         <CardHeader className="card-header">
           <ToggleWrap>
@@ -116,10 +118,14 @@ export default function MemberList() {
   );
 }
 
+const Header = styled.div`
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #f0f0f0;
+`;
+
 const List = styled.div`
-  background-color: #fff;
   border-radius: 8px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0 0 5px 0;
   word-wrap: break-word;
 `;
 

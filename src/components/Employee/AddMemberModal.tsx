@@ -7,17 +7,16 @@ import MemberProfile from "./MemberProfile";
 import { useUploadData } from "../../hooks/Employee/useMemberMutaion";
 import { FormDataType } from "../../type/form";
 
+const COLLECTION_NAME = "Users";
+
 export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   const [form] = Form.useForm();
-  const [isEditMode, setIsEditMode] = useState(true);
+  const [isEditMode] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const COLLECTION_NAME = "Users";
-  const { uploadStorage, uploadStore, uploading, downloadURL } =
-    useUploadData(COLLECTION_NAME);
+  const { uploadStorage, uploadStore } = useUploadData(COLLECTION_NAME);
 
   const handleAdd = async (data: FormDataType, teamId: string) => {
     setIsLoading(true);
@@ -25,13 +24,11 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
       if (file) {
         setLoadingMessage("이미지 업로드 중...");
         const uploadedURL = await uploadStorage(file);
-
         setLoadingMessage("데이터 저장 중...");
         await uploadStore({ ...data, photo: uploadedURL }, teamId);
       }
-      setIsLoading(false);
       form.resetFields();
-      setPreviewUrl("");
+      setPreviewUrl(null);
     } catch (error) {
       console.error("handleAdd 오류:", error);
     } finally {
@@ -43,54 +40,44 @@ export default function AddMemberModal({ onCancel }: { onCancel: () => void }) {
   return (
     <>
       <FullScreenSpin message={loadingMessage} />
-      <Form
-        form={form}
-        onFinish={(data) => {
-          handleAdd(data, data.teamId);
-        }}
-      >
+      <Form form={form} onFinish={(data) => handleAdd(data, data.teamId)}>
         <MemberProfile
-          isEditMode={isEditMode}
-          previewUrl={previewUrl}
-          setPreviewUrl={setPreviewUrl}
-          file={file}
-          setFile={setFile}
+          {...{ isEditMode, previewUrl, setPreviewUrl, file, setFile }}
         />
-        <MemberForm isEditMode={isEditMode} form={form} />
-        <SumbitBtn>
-          <Button
-            icon={<UserAddOutlined />}
-            htmlType="submit"
-            type="primary"
-            disabled={isLoading}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-          >
-            Add
-          </Button>
-        </SumbitBtn>
+        <MemberForm {...{ isEditMode, form }} />
+        <SubmitButton isLoading={isLoading} />
       </Form>
     </>
   );
 }
 
-const FullScreenSpin = ({ message }: { message: string | null }) => {
-  return (
-    <Spin
-      style={{
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        zIndex: 9999,
-      }}
-      spinning={!!message}
+const FullScreenSpin = ({ message }: { message: string | null }) => (
+  <Spin
+    style={{
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      zIndex: 9999,
+    }}
+    spinning={!!message}
+  >
+    {message && <div>{message}</div>}
+  </Spin>
+);
+
+const SubmitButton = ({ isLoading }: { isLoading: boolean }) => (
+  <SumbitBtn>
+    <Button
+      icon={<UserAddOutlined />}
+      htmlType="submit"
+      type="primary"
+      disabled={isLoading}
     >
-      {message && <div>{message}</div>}
-    </Spin>
-  );
-};
+      Add
+    </Button>
+  </SumbitBtn>
+);
 
 const SumbitBtn = styled.div`
   display: flex;
