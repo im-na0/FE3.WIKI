@@ -49,6 +49,7 @@ export function useUploadStorage() {
 
 export function useDeleteStorage() {
   const deleteStorage = async (src: string) => {
+    if (!src) return;
     try {
       await deleteObject(ref(storage, src));
     } catch (error) {
@@ -56,7 +57,6 @@ export function useDeleteStorage() {
       message.error("파일 삭제 중 오류가 발생했습니다 ");
     }
   };
-
   return { deleteStorage };
 }
 

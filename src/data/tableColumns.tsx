@@ -3,19 +3,18 @@ import { Col, Dropdown, message, Row } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { FormDataType } from "../type/form";
-import { useDeleteData } from "../hooks/Employee/useDeleteData";
 import { NavigateFunction } from "react-router-dom";
 
-const DeleteDataParams = {
-  COLLECTION_NAME: "Users",
-};
-
-export const columns = (navigate: NavigateFunction) => {
-  const { deleteData } = useDeleteData(DeleteDataParams);
-
+export const columns = (
+  navigate: NavigateFunction,
+  deleteData: (arg1: string, arg2: string) => void,
+  userAccess: string | null,
+  checkAdminPermission: () => boolean,
+) => {
   const handleDelete = async (id: string, teamId: string) => {
-    console.log(id);
+    if (!checkAdminPermission()) return;
     deleteData(id, teamId);
+    message.info("삭제되었습니다");
   };
 
   const handleMenuClick = (record: FormDataType, key: string) => {
@@ -28,7 +27,6 @@ export const columns = (navigate: NavigateFunction) => {
       console.log(record);
       if (record.id) {
         handleDelete(record.id, record.teamId!);
-        message.info("삭제되었습니다");
       }
     }
   };

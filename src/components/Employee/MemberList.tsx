@@ -1,56 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "antd";
-import styled from "styled-components";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useRecoilState, useRecoilValueLoadable } from "recoil";
-import {
-  userState,
-  userAccessState,
-  fetchUserAccess,
-} from "../../store/member";
+import useUserAccess from "../../hooks/Employee/useUserAccess";
+import { useDeleteData } from "../../hooks/Employee/useDeleteData";
 import MemberFilter from "./MemberFilter";
 import MemberSearch from "./MemberSearch";
 import MemberTable from "./MemberTable";
-import CustomForm from "../common/CustomForm";
 import AddMemberModal from "./AddMemberModal";
-import { useDeleteData } from "../../hooks/Employee/useDeleteData";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import CustomForm from "../common/CustomForm";
+import styled from "styled-components";
 
 export default function MemberList() {
-  const [user, setUser] = useRecoilState(userState);
-  const [userAccess, setUserAccess] = useRecoilState(userAccessState);
+  const { userAccess, checkAdminPermission } = useUserAccess();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [sortValue, setSortValue] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState<selectedRowKeys[]>([]);
-  const userAccessLoadable = useRecoilValueLoadable(fetchUserAccess);
-
-  useEffect(() => {
-    if (userAccessLoadable.state === "hasValue") {
-      console.log(userAccessLoadable.contents);
-      setUserAccess(userAccessLoadable.contents as string | null);
-    }
-  }, [userAccessLoadable.state, setUserAccess, userAccessLoadable.contents]);
-
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userId = firebaseUser.uid;
-        const db = getFirestore();
-        const userRef = doc(db, "Users", userId);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          setUser(docSnap.data());
-        }
-      } else {
-        setUser(null);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
   type selectedRowKeys = {
     id: string;
@@ -62,6 +28,7 @@ export default function MemberList() {
   };
   const { deleteData } = useDeleteData(DeleteDataParams);
   const handleDelete = async () => {
+    if (!checkAdminPermission()) return;
     try {
       for (const data of selectedRowKeys) {
         await deleteData(data.id, data.teamId);
@@ -93,16 +60,15 @@ export default function MemberList() {
             <MemberSearch onSearch={setSearchText} />
           </ToggleWrap>
           <ToggleWrap>
-            {userAccess === "admin" && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={openModal}
-                size="large"
-              >
-                Add
-              </Button>
-            )}
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={openModal}
+              size="large"
+            >
+              Add
+            </Button>
+
             <CustomForm.Modal
               title="멤버 등록"
               width={700}

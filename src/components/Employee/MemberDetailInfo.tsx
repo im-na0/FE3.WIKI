@@ -54,7 +54,9 @@ function MemberDetailInfo() {
       if (file) {
         const downloadURL = await uploadStorage(file);
         fieldsValue.photo = downloadURL || fieldsValue.photo!;
-        await deleteStorage(userData.photo!);
+        if (userData && userData.photo) {
+          await deleteStorage(userData.photo);
+        }
       } else {
         fieldsValue.photo = previewUrl || fieldsValue.photo;
       }
@@ -69,6 +71,7 @@ function MemberDetailInfo() {
       }
 
       handleProfileCard();
+      navigate(-1);
     } catch (error) {
       console.error("Error updating member:", error);
       message.error("데이터 업데이트 중 오류가 발생했습니다");
@@ -86,22 +89,14 @@ function MemberDetailInfo() {
     setCardDepartment(fieldsValue.department);
   };
   const toggleEditMode = () => {
+    console.log("호출");
     setIsEditMode((prevIsEditMode) => {
       return !prevIsEditMode;
     });
   };
 
   return (
-    <Form
-      form={form}
-      onFinish={() => {
-        toggleEditMode();
-        if (isEditMode) {
-          const fieldsValue = form.getFieldsValue();
-          handleUpdate(fieldsValue);
-        }
-      }}
-    >
+    <Form form={form}>
       {loading ? (
         <Overlay>
           <Spin size="large" />
@@ -121,7 +116,17 @@ function MemberDetailInfo() {
           >
             목록
           </Button>
-          <Button type="primary" icon={<EditOutlined />} htmlType="submit">
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              toggleEditMode();
+              if (isEditMode) {
+                const fieldsValue = form.getFieldsValue();
+                handleUpdate(fieldsValue);
+              }
+            }}
+          >
             {isEditMode ? "Save" : "Edit"}
           </Button>
         </div>
