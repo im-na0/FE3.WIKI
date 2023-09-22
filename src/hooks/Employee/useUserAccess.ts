@@ -34,9 +34,8 @@ export default function useUserAccess() {
       });
 
       // Clean up
-      return () => {
-        unsubscribe();
-      };
+
+      unsubscribe();
     }
   }, [setUserAccess, setNotified]);
 
