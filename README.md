@@ -145,7 +145,7 @@ Array.prototype.filter 메서드를 사용하여
 
 ## ➡️ 유저 흐름(flow) 이미지
 
-![전체 유저 플로우]()
+![전체 유저 플로우](public/images/user-flow.png)
 
 ## Git 브랜치 전략
 
